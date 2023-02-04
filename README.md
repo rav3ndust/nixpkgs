@@ -19,6 +19,8 @@
 
 _This is [rav3ndust's](https://github.com/rav3ndust) fork of Nixpkgs for **Nightshade**._
 
+_It is kept in sync with upstream Nixpgks._
+
 # Manuals
 
 * [NixOS Manual](https://nixos.org/nixos/manual) - how to install, configure, and maintain a purely-functional Linux distribution
