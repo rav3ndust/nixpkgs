@@ -16,7 +16,8 @@
 80,000 software packages that can be installed with the
 [Nix](https://nixos.org/nix/) package manager. It also implements
 [NixOS](https://nixos.org/nixos/), a purely-functional Linux distribution.
-This is [rav3ndust's](https://github.com/rav3ndust) fork of Nixpkgs for **Nightshade**.
+
+_This is [rav3ndust's](https://github.com/rav3ndust) fork of Nixpkgs for **Nightshade**._
 
 # Manuals
 
