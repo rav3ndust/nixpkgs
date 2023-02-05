@@ -31243,7 +31243,7 @@ with pkgs;
 
   xmrig-mo = callPackage ../applications/misc/xmrig/moneroocean.nix { };
 
-  xmrig-proxy = callPackage ../applications/misc/xmrig/proxy.nix { };
+  xmrig-proxy = darwin.apple_sdk_11_0.callPackage ../applications/misc/xmrig/proxy.nix { };
 
   molot-lite = callPackage ../applications/audio/molot-lite { };
 
@@ -31783,7 +31783,9 @@ with pkgs;
 
   netcoredbg = callPackage ../development/tools/misc/netcoredbg { };
 
-  ncdu = callPackage ../tools/misc/ncdu { };
+  ncdu = callPackage ../tools/misc/ncdu {
+    zig = zig_0_10;
+  };
 
   ncdu_1 = callPackage ../tools/misc/ncdu/1.nix { };
 
