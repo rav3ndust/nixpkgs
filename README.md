@@ -17,9 +17,9 @@
 [Nix](https://nixos.org/nix/) package manager. It also implements
 [NixOS](https://nixos.org/nixos/), a purely-functional Linux distribution.
 
-_This is [rav3ndust's](https://github.com/rav3ndust) fork of Nixpkgs for **Nightshade**._
-
-_It is kept in sync with upstream Nixpgks._
+> _This is [rav3ndust's](https://github.com/rav3ndust) fork of Nixpkgs for **Nightshade**._
+> 
+> _It is kept in sync with upstream Nixpgks._
 
 # Manuals
 
