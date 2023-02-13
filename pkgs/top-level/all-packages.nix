@@ -7732,6 +7732,8 @@ with pkgs;
 
   gnucap = callPackage ../applications/science/electronics/gnucap { };
 
+  gnu-cim = callPackage ../development/compilers/gnu-cim { };
+
   gnu-cobol = callPackage ../development/compilers/gnu-cobol { };
 
   gnuclad = callPackage ../applications/graphics/gnuclad { };
@@ -7939,6 +7941,8 @@ with pkgs;
   groonga = callPackage ../servers/search/groonga { };
 
   grpcurl = callPackage ../tools/networking/grpcurl { };
+
+  grpc_cli = callPackage ../tools/networking/grpc_cli { };
 
   grpc-gateway = callPackage ../development/tools/grpc-gateway { };
 
