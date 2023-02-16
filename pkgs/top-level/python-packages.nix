@@ -3297,6 +3297,8 @@ self: super: with self; {
 
   fasttext = callPackage ../development/python-modules/fasttext { };
 
+  fasttext-predict = callPackage ../development/python-modules/fasttext-predict { };
+
   favicon = callPackage ../development/python-modules/favicon { };
 
   fb-re2 = callPackage ../development/python-modules/fb-re2 { };
@@ -4064,6 +4066,8 @@ self: super: with self; {
   gpyopt = callPackage ../development/python-modules/gpyopt { };
 
   gql = callPackage ../development/python-modules/gql { };
+
+  grad-cam = callPackage ../development/python-modules/grad-cam { };
 
   gradient = callPackage ../development/python-modules/gradient { };
 
@@ -8316,8 +8320,6 @@ self: super: with self; {
   pyls-flake8 = callPackage ../development/python-modules/pyls-flake8 { };
 
   pyls-isort = callPackage ../development/python-modules/pyls-isort { };
-
-  pyls-mypy = callPackage ../development/python-modules/pyls-mypy { };
 
   pyls-spyder = callPackage ../development/python-modules/pyls-spyder { };
 
