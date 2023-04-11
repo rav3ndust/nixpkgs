@@ -19,7 +19,7 @@
 
 > _This is [rav3ndust's](https://github.com/rav3ndust) fork of Nixpkgs for **Nightshade**._
 > 
-> _It is kept in sync with upstream Nixpgks._
+> _It is kept in sync with upstream Nixpkgs._
 
 # Manuals
 
