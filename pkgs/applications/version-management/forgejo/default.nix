@@ -39,17 +39,17 @@ let
 in
 buildGoModule rec {
   pname = "forgejo";
-  version = "1.19.1-0";
+  version = "1.19.3-0";
 
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "forgejo";
     repo = "forgejo";
     rev = "v${version}";
-    hash = "sha256-0FmqLxQvr3bbgdzKFeAhRMvJp/xdRPW40WLH6eKNY9s=";
+    hash = "sha256-0T26EsU5lJ+Rxy/jSDn8nTk5IdHO8oK3LvN7tPArPgs=";
   };
 
-  vendorHash = "sha256-g8QJSewQFfyE/34A2JxrVnwk5vmiIRSbwrVE9LqYJrM=";
+  vendorHash = "sha256-bnLcHmwOh/fw6ecgsndX2BmVf11hJWllE+f2J8YSzec=";
 
   subPackages = [ "." ];
 
@@ -116,7 +116,7 @@ buildGoModule rec {
     homepage = "https://forgejo.org";
     changelog = "https://codeberg.org/forgejo/forgejo/releases/tag/v${version}";
     license = licenses.mit;
-    maintainers = with maintainers; [ indeednotjames urandom ];
+    maintainers = with maintainers; [ emilylange urandom ];
     broken = stdenv.isDarwin;
     mainProgram = "gitea";
   };

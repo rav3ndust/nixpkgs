@@ -2,6 +2,7 @@
 { lib
 , lua
 , wrapLua
+, luarocks
 
 # Whether the derivation provides a lua module or not.
 , luarocksCheckHook
@@ -83,14 +84,13 @@ let
   __structuredAttrs = true;
   env = {
     LUAROCKS_CONFIG="$PWD/${luarocks_config}";
-  };
+  } // attrs.env or {};
 
   generatedRockspecFilename = "${rockspecDir}/${pname}-${rockspecVersion}.rockspec";
 
-
   nativeBuildInputs = [
     wrapLua
-    lua.pkgs.luarocks
+    luarocks
   ];
 
   inherit doCheck extraVariables rockspecFilename knownRockspec externalDeps nativeCheckInputs;
@@ -99,6 +99,7 @@ let
     # example externalDeps': [ { name = "CRYPTO"; dep = pkgs.openssl; } ]
     externalDeps' = lib.filter (dep: !lib.isDerivation dep) self.externalDeps;
     in [ lua.pkgs.luarocks ]
+      ++ buildInputs
       ++ lib.optionals self.doCheck ([ luarocksCheckHook ] ++ self.nativeCheckInputs)
       ++ (map (d: d.dep) externalDeps')
     ;
@@ -200,15 +201,15 @@ let
   '';
 
   passthru = {
-    inherit lua; # The lua interpreter
-  };
+    inherit lua;
+  } // attrs.passthru or { };
 
   meta = {
     platforms = lua.meta.platforms;
     # add extra maintainer(s) to every package
     maintainers = (attrs.meta.maintainers or []) ++ [ ];
     broken = disabled;
-  } // attrs.meta;
+  } // attrs.meta or {};
 }));
 in
   luarocksDrv

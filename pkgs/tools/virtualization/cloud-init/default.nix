@@ -16,17 +16,23 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "cloud-init";
-  version = "23.1.1";
+  version = "23.1.2";
   namePrefix = "";
 
   src = fetchFromGitHub {
     owner = "canonical";
     repo = "cloud-init";
     rev = "refs/tags/${version}";
-    hash = "sha256-w1UP7JIt/+6UlASB8kv2Lil+1sMTDIrADoYOT/WtaeE=";
+    hash = "sha256-tn4flcrf04hVWhqkmK4qDenXcnV93pP+C+8J63b6FXQ=";
   };
 
-  patches = [ ./0001-add-nixos-support.patch ./0002-Add-Udhcpc-support.patch ];
+  patches = [
+    ./0001-add-nixos-support.patch
+    # upstream: https://github.com/canonical/cloud-init/pull/2125
+    ./0002-Add-Udhcpc-support.patch
+    # upstream: https://github.com/canonical/cloud-init/pull/2151
+    ./0003-vultr-remove-check_route-check.patch
+  ];
 
   prePatch = ''
     substituteInPlace setup.py \

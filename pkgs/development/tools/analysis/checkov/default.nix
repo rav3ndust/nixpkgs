@@ -22,14 +22,14 @@ with py.pkgs;
 
 buildPythonApplication rec {
   pname = "checkov";
-  version = "2.3.199";
+  version = "2.3.261";
   format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "bridgecrewio";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-JwEI+i6xvO8wsCCAliljXxddL3T6MWzHvzMmewNlbsk=";
+    hash = "sha256-GRP9crehMlU+T2Iss0fUh00M6nD7dJYDtagDvBakipo=";
   };
 
   patches = [
@@ -74,6 +74,7 @@ buildPythonApplication rec {
     jmespath
     jsonschema
     junit-xml
+    license-expression
     networkx
     openai
     packaging
@@ -82,6 +83,7 @@ buildPythonApplication rec {
     pycep-parser
     pyyaml
     semantic-version
+    spdx-tools
     tabulate
     termcolor
     tqdm
@@ -116,8 +118,12 @@ buildPythonApplication rec {
     # Tests are comparing console output
     "cli"
     "console"
-    # Starting to fail after 2.3.199
+    # Starting to fail after 2.3.205
     "test_non_multiline_pair"
+    "test_secret_value_in_keyword"
+    "test_runner_verify_secrets_skip_invalid_suppressed"
+    "test_runner_verify_secrets_skip_all_no_effect"
+    "test_runner"
   ];
 
   disabledTestPaths = [

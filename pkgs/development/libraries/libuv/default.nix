@@ -1,4 +1,27 @@
-{ stdenv, lib, fetchFromGitHub, fetchpatch, autoconf, automake, libtool, pkg-config, ApplicationServices, CoreServices, pkgsStatic }:
+{ stdenv
+, lib
+, fetchFromGitHub
+, fetchpatch
+, autoconf
+, automake
+, libtool
+, pkg-config
+, ApplicationServices
+, CoreServices
+, pkgsStatic
+
+# for passthru.tests
+, bind
+, cmake
+, knot-resolver
+, lispPackages
+, luajitPackages
+, mosquitto
+, neovim
+, nodejs
+, ocamlPackages
+, python3
+}:
 
 stdenv.mkDerivation rec {
   version = "1.44.2";
@@ -10,6 +33,8 @@ stdenv.mkDerivation rec {
     rev = "v${version}";
     sha256 = "sha256-K6v+00basjI32ON27ZjC5spQi/zWCcslDwQwyosq2iY=";
   };
+
+  outputs = [ "out" "dev" ];
 
   patches = [
     # Fix tests for statically linked variant upstream PR is
@@ -74,12 +99,25 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  # separateDebugInfo breaks static build
+  # https://github.com/NixOS/nixpkgs/issues/219466
+  separateDebugInfo = !stdenv.hostPlatform.isStatic;
+
   doCheck = true;
 
   # Some of the tests use localhost networking.
   __darwinAllowLocalNetworking = true;
 
-  passthru.tests.static = pkgsStatic.libuv;
+  passthru.tests = {
+    inherit bind cmake knot-resolver mosquitto neovim nodejs;
+    inherit (lispPackages) cl-libuv;
+    luajit-libluv = luajitPackages.libluv;
+    luajit-luv = luajitPackages.luv;
+    ocaml-luv = ocamlPackages.luv;
+    python-pyuv = python3.pkgs.pyuv;
+    python-uvloop = python3.pkgs.uvloop;
+    static = pkgsStatic.libuv;
+  };
 
   meta = with lib; {
     description = "A multi-platform support library with a focus on asynchronous I/O";
