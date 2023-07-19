@@ -18,13 +18,13 @@
 
 stdenv.mkDerivation rec {
   pname = "nixd";
-  version = "1.1.0";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "nix-community";
     repo = "nixd";
     rev = version;
-    hash = "sha256-zeBVh9gPMR+1ETx0ujl+TUSoeHHR4fkQfxyOpCDKP9M=";
+    hash = "sha256-3PI/Bzs5WPIKevbRPz6TQ5yo7QpY4HeALrqbUY/zUgY=";
   };
 
   mesonBuildType = "release";
@@ -83,6 +83,5 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl3Plus;
     maintainers = with lib.maintainers; [ inclyc Ruixi-rebirth ];
     platforms = lib.platforms.unix;
-    broken = stdenv.isDarwin;
   };
 }

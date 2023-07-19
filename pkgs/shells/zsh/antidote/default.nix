@@ -1,14 +1,14 @@
 { lib, stdenv, fetchFromGitHub }:
 
 stdenv.mkDerivation (finalAttrs: {
-  version = "1.8.7";
+  version = "1.9.0";
   pname = "antidote";
 
   src = fetchFromGitHub {
     owner = "mattmc3";
     repo = "antidote";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-5ccGoxmaHV7w4w7qc61gjI12OppU1FjDUeYh8ELljWQ=";
+    hash = "sha256-YKFG66Kjw/S0YkvPlJK3HC9v00SHEW1Wng6+xcy41Hg=";
   };
 
   dontPatch = true;

@@ -7,8 +7,8 @@
 , profiledCompiler ? false
 , langJit ? false
 , staticCompiler ? false
-, enableShared ? !stdenv.targetPlatform.isStatic
-, enableLTO ? !stdenv.hostPlatform.isStatic
+, enableShared ? stdenv.targetPlatform.hasSharedLibraries
+, enableLTO ? stdenv.hostPlatform.hasSharedLibraries
 , texinfo ? null
 , perl ? null # optional, for texi2pod (then pod2man)
 , gmp, mpfr, libmpc, gettext, which, patchelf, binutils
@@ -19,10 +19,11 @@
 , name ? "gcc"
 , libcCross ? null
 , threadsCross ? null # for MinGW
-, crossStageStatic ? false
+, withoutTargetLibc ? false
 , gnused ? null
 , cloog ? null # unused; just for compat with gcc4, as we override the parameter on some places
 , buildPackages
+, callPackage
 }:
 
 # Make sure we get GNU sed.
@@ -50,7 +51,6 @@ let majorVersion = "8";
       # Fix https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80431
       ../fix-bug-80431.patch
       ../9/fix-struct-redefinition-on-glibc-2.36.patch
-      ../install-info-files-serially.patch
     ] ++ optional (targetPlatform != hostPlatform) ../libstdc++-target.patch
       ++ optional targetPlatform.isNetBSD ../libstdc++-netbsd-ctypes.patch
       ++ optional noSysDirs ../no-sys-dirs.patch
@@ -63,12 +63,12 @@ let majorVersion = "8";
       ++ optional (targetPlatform.libc == "musl") ../libgomp-dont-force-initial-exec.patch
 
       # Obtain latest patch with ../update-mcfgthread-patches.sh
-      ++ optional (!crossStageStatic && targetPlatform.isMinGW && threadsCross.model == "mcf") ./Added-mcf-thread-model-support-from-mcfgthread.patch
+      ++ optional (!withoutTargetLibc && targetPlatform.isMinGW && threadsCross.model == "mcf") ./Added-mcf-thread-model-support-from-mcfgthread.patch
       ++ [ ../libsanitizer-no-cyclades-9.patch ];
 
     /* Cross-gcc settings (build == host != target) */
     crossMingw = targetPlatform != hostPlatform && targetPlatform.libc == "msvcrt";
-    stageNameAddon = if crossStageStatic then "stage-static" else "stage-final";
+    stageNameAddon = if withoutTargetLibc then "stage-static" else "stage-final";
     crossNameAddon = optionalString (targetPlatform != hostPlatform) "${targetPlatform.config}-${stageNameAddon}-";
 
     callFile = lib.callPackageWith {
@@ -89,7 +89,7 @@ let majorVersion = "8";
         binutils
         buildPackages
         cloog
-        crossStageStatic
+        withoutTargetLibc
         enableLTO
         enableMultilib
         enablePlugin
@@ -130,7 +130,7 @@ let majorVersion = "8";
 
 in
 
-stdenv.mkDerivation ({
+lib.pipe (stdenv.mkDerivation ({
   pname = "${crossNameAddon}${name}";
   inherit version;
 
@@ -199,7 +199,10 @@ stdenv.mkDerivation ({
             )
           '';
 
-  inherit noSysDirs staticCompiler crossStageStatic
+  # kludge to prevent a mass-rebuild; will be removed in a PR sent to staging
+  crossStageStatic = withoutTargetLibc;
+
+  inherit noSysDirs staticCompiler
     libcCross crossMingw;
 
   inherit (callFile ../common/dependencies.nix { })
@@ -220,6 +223,9 @@ stdenv.mkDerivation ({
   buildFlags = optional
     (targetPlatform == hostPlatform && hostPlatform == buildPlatform)
     (if profiledCompiler then "profiledbootstrap" else "bootstrap");
+
+  # https://gcc.gnu.org/PR109898
+  enableParallelInstalling = false;
 
   inherit (callFile ../common/strip-attributes.nix { })
     stripDebugList
@@ -271,10 +277,8 @@ stdenv.mkDerivation ({
   };
 }
 
-// optionalAttrs (targetPlatform != hostPlatform && targetPlatform.libc == "msvcrt" && crossStageStatic) {
-  makeFlags = [ "all-gcc" "all-target-libgcc" ];
-  installTargets = "install-gcc install-target-libgcc";
-}
-
 // optionalAttrs (enableMultilib) { dontMoveLib64 = true; }
-)
+))
+[
+  (callPackage ../common/libgcc.nix   { inherit version langC langCC langJit targetPlatform hostPlatform withoutTargetLibc enableShared; })
+]
