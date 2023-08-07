@@ -161,6 +161,9 @@ self: super:
     + lib.optionalString stdenv.hostPlatform.isStatic ''
       export NIX_CFLAGS_LINK="$NIX_CFLAGS_LINK -lXau -lXdmcp"
     '';
+    meta = attrs.meta // {
+      mainProgram = "xdpyinfo";
+    };
   });
 
   xdm = super.xdm.overrideAttrs (attrs: {
@@ -579,28 +582,6 @@ self: super:
         ${optionalString (symbolsFile  != null) "cp '${symbolsFile}'  'symbols/${name}'"}
         ${optionalString (typesFile    != null) "cp '${typesFile}'    'types/${name}'"}
 
-        # patch makefiles
-        for type in compat geometry keycodes symbols types; do
-          if ! test -f "$type/${name}"; then
-            continue
-          fi
-          test "$type" = geometry && type_name=geom || type_name=$type
-          ${ed}/bin/ed -v $type/Makefile.am <<EOF
-        /''${type_name}_DATA =
-        a
-        ${name} \\
-        .
-        w
-        EOF
-          ${ed}/bin/ed -v $type/Makefile.in <<EOF
-        /''${type_name}_DATA =
-        a
-        ${name} \\
-        .
-        w
-        EOF
-        done
-
         # add model description
         ${ed}/bin/ed -v rules/base.xml <<EOF
         /<\/modelList>
@@ -836,6 +817,7 @@ self: super:
         --replace '_X_NORETURN' '__attribute__((noreturn))' \
         --replace 'n_dirs--;' ""
     '';
+    meta.mainProgram = "lndir";
   });
 
   twm = super.twm.overrideAttrs (attrs: {
@@ -960,6 +942,12 @@ self: super:
     postInstall = ''
       rm $out/bin/xkeystone
     '';
+  });
+
+  xset = super.xset.overrideAttrs (attrs: {
+    meta = attrs.meta // {
+      mainProgram = "xset";
+    };
   });
 
   # convert Type1 vector fonts to OpenType fonts
