@@ -47,11 +47,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "go";
-  version = "1.19.12";
+  version = "1.19.13";
 
   src = fetchurl {
     url = "https://go.dev/dl/go${version}.src.tar.gz";
-    hash = "sha256-7l1Q4Kf9dLobE3y4eWCaqu+YgL9ytdF0IQDjiucrtVc=";
+    hash = "sha256-zPNrU/sAJKAXNTw92yLB8AvHqAc8aqx5BC2iTuNENNM=";
   };
 
   strictDeps = true;
@@ -166,7 +166,8 @@ stdenv.mkDerivation rec {
     runHook preInstall
     mkdir -p $GOROOT_FINAL
     cp -a bin pkg src lib misc api doc $GOROOT_FINAL
-    ln -s $GOROOT_FINAL/bin $out/bin
+    mkdir -p $out/bin
+    ln -s $GOROOT_FINAL/bin/* $out/bin
     runHook postInstall
   '';
 
