@@ -10,13 +10,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "cargo-shuttle";
-  version = "0.26.0";
+  version = "0.28.0";
 
   src = fetchFromGitHub {
     owner = "shuttle-hq";
     repo = "shuttle";
     rev = "v${version}";
-    hash = "sha256-O6erIv+6DbxioB4F1Mfaj51zSswQErcUuFdA+A7DQRA=";
+    hash = "sha256-iBUd42MEfDFMhHXBrgrJaihUeYTRpVt4jFQaKCKhNlc=";
   };
 
   cargoLock = {

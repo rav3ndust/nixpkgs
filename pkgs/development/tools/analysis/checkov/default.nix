@@ -22,14 +22,14 @@ with py.pkgs;
 
 buildPythonApplication rec {
   pname = "checkov";
-  version = "2.4.42";
+  version = "2.5.4";
   format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "bridgecrewio";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-5G7ErzWxyQ17rn5k+3BpLhrGmU6YSBZ6BEK9y0cpki4=";
+    hash = "sha256-Rp1Q486vbgZmWcxQNy1esRYl0HRWQonicNP0bYdqPtc=";
   };
 
   patches = [
@@ -83,6 +83,7 @@ buildPythonApplication rec {
     prettytable
     pycep-parser
     pyyaml
+    rustworkx
     semantic-version
     spdx-tools
     tabulate
