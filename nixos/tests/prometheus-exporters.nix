@@ -416,8 +416,8 @@ let
     };
 
     kea = let
-      controlSocketPathV4 = "/run/kea/dhcp4.sock";
-      controlSocketPathV6 = "/run/kea/dhcp6.sock";
+      controlSocketPathV4 = "/run/kea-dhcp4/dhcp4.sock";
+      controlSocketPathV6 = "/run/kea-dhcp6/dhcp6.sock";
     in
     {
       exporterConfig = {
@@ -471,7 +471,7 @@ let
         services.knot = {
           enable = true;
           extraArgs = [ "-v" ];
-          extraConfig = ''
+          settingsFile = pkgs.writeText "knot.conf" ''
             server:
               listen: 127.0.0.1@53
 
@@ -969,7 +969,7 @@ let
     pgbouncer = {
       exporterConfig = {
         enable = true;
-        connectionString = "postgres://admin:@localhost:6432/pgbouncer?sslmode=disable";
+        connectionStringFile = pkgs.writeText "connection.conf" "postgres://admin:@localhost:6432/pgbouncer?sslmode=disable";
       };
 
       metricProvider = {
