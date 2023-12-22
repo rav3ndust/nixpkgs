@@ -41,9 +41,15 @@ in
       '';
     };
 
-    enable = mkEnableOption (mdDoc ''
-      the {command}`sudo` command, which allows non-root users to execute commands as root.
-    '');
+    enable = mkOption {
+      type = types.bool;
+      default = true;
+      description =
+        lib.mdDoc ''
+          Whether to enable the {command}`sudo` command, which
+          allows non-root users to execute commands as root.
+        '';
+    };
 
     package = mkPackageOption pkgs "sudo" { };
 
@@ -186,10 +192,12 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
-    assertions = [
-      { assertion = cfg.package.pname != "sudo-rs";
-        message = "The NixOS `sudo` module does not work with `sudo-rs` yet."; }
-    ];
+    assertions = [ {
+      assertion = cfg.package.pname != "sudo-rs";
+      message = ''
+        NixOS' `sudo` module does not support `sudo-rs`; see `security.sudo-rs` instead.
+      '';
+    } ];
 
     security.sudo.extraRules =
       let

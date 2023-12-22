@@ -1,18 +1,19 @@
-{ stdenv, lib, buildGoModule, fetchFromGitHub, installShellFiles, testers, k9s }:
+{ stdenv, lib, buildGoModule, fetchFromGitHub, installShellFiles, testers, nix-update-script, k9s }:
 
 buildGoModule rec {
   pname = "k9s";
-  version = "0.28.0";
+  version = "0.29.1";
 
   src = fetchFromGitHub {
-    owner  = "derailed";
-    repo   = "k9s";
-    rev    = "v${version}";
-    sha256 = "sha256-qFZLl37Y9g9LMRnWacwz46cgjVreLg2WyWZrSj3T4ok=";
+    owner = "derailed";
+    repo = "k9s";
+    rev = "v${version}";
+    sha256 = "sha256-agGayZ20RMAcGOx+owwDbUUDsjF3FZajhwDZ5wtE93k=";
   };
 
   ldflags = [
-    "-s" "-w"
+    "-s"
+    "-w"
     "-X github.com/derailed/k9s/cmd.version=${version}"
     "-X github.com/derailed/k9s/cmd.commit=${src.rev}"
     "-X github.com/derailed/k9s/cmd.date=1970-01-01T00:00:00Z"
@@ -20,7 +21,9 @@ buildGoModule rec {
 
   tags = [ "netgo" ];
 
-  vendorHash = "sha256-TfU1IzTdrWQpK/YjQQImRGeo7byaXUI182xSed+21PU=";
+  proxyVendor = true;
+
+  vendorHash = "sha256-9w44gpaB2C/F7hTImjdeabWVgTU5AA/7OSJmAqayrzU=";
 
   # TODO investigate why some config tests are failing
   doCheck = !(stdenv.isDarwin && stdenv.isAarch64);
@@ -28,10 +31,13 @@ buildGoModule rec {
   preCheck = "export HOME=$(mktemp -d)";
   # For arch != x86
   # {"level":"fatal","error":"could not create any of the following paths: /homeless-shelter/.config, /etc/xdg","time":"2022-06-28T15:52:36Z","message":"Unable to create configuration directory for k9s"}
-  passthru.tests.version = testers.testVersion {
-    package = k9s;
-    command = "HOME=$(mktemp -d) k9s version -s";
-    inherit version;
+  passthru = {
+    tests.version = testers.testVersion {
+      package = k9s;
+      command = "HOME=$(mktemp -d) k9s version -s";
+      inherit version;
+    };
+    updateScript = nix-update-script { };
   };
 
   nativeBuildInputs = [ installShellFiles ];

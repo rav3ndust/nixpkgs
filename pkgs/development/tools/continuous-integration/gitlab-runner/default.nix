@@ -1,7 +1,7 @@
 { lib, buildGoModule, fetchFromGitLab, fetchurl, bash }:
 
 let
-  version = "16.5.0";
+  version = "16.6.1";
 in
 buildGoModule rec {
   inherit version;
@@ -17,13 +17,13 @@ buildGoModule rec {
   # For patchShebangs
   buildInputs = [ bash ];
 
-  vendorHash = "sha256-C37ijxvyY9PG/Qn29Fmk0pxK+hq45kHIBveBltfIfTo=";
+  vendorHash = "sha256-m0+iAJITX0JfBd5ZboqlcG6eNbPJ35gHa4LV21jX5d8=";
 
   src = fetchFromGitLab {
     owner = "gitlab-org";
     repo = "gitlab-runner";
     rev = "v${version}";
-    sha256 = "sha256-NLidtwn1zT7BxzMEF5K41fwbZaICA/KuAr8MIjpJD+A=";
+    sha256 = "sha256-z/W4mqC6524ocBR0c2UpMrlo5njXoewgBOulPoe2UBY=";
   };
 
   patches = [

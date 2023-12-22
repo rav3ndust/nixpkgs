@@ -1,17 +1,17 @@
-{ lib, buildNpmPackage, fetchFromGitHub, mystmd, testers }:
+{ lib, buildNpmPackage, fetchFromGitHub, mystmd, testers, nix-update-script }:
 
 buildNpmPackage rec {
   pname = "mystmd";
-  version = "1.1.26";
+  version = "1.1.36";
 
   src = fetchFromGitHub {
     owner = "executablebooks";
     repo = "mystmd";
     rev = "mystmd@${version}";
-    hash = "sha256-hDXqUjJXQqEpaGCdfxGuAnUraB5/RjZB4MmomAG4aPM=";
+    hash = "sha256-mmrNfE8d5yhWU7KsSBKuRpP59Ba6Q6pdkCN2AE+PEJE=";
   };
 
-  npmDepsHash = "sha256-uq3HbmkeJl3A46/rfm29v+oXFnZOwp2SFArm6Wtv+wo=";
+  npmDepsHash = "sha256-5ns2mVD8YJvVMpMq9VeelAoGU0b9SLNIOdRAHXpnCDM=";
 
   dontNpmInstall = true;
 
@@ -23,9 +23,12 @@ buildNpmPackage rec {
     runHook postInstall
   '';
 
-  passthru.tests.version = testers.testVersion {
-    package = mystmd;
-    version = "v${version}";
+  passthru = {
+    tests.version = testers.testVersion {
+      package = mystmd;
+      version = "v${version}";
+    };
+    updateScript = nix-update-script { };
   };
 
   meta = with lib; {

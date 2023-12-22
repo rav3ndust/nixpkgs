@@ -593,6 +593,7 @@ let
     github-unix = callPackage ../development/ocaml-modules/github/unix.nix {  };
 
     gluten = callPackage ../development/ocaml-modules/gluten { };
+    gluten-eio = callPackage ../development/ocaml-modules/gluten/eio.nix { };
     gluten-lwt = callPackage ../development/ocaml-modules/gluten/lwt.nix { };
     gluten-lwt-unix = callPackage ../development/ocaml-modules/gluten/lwt-unix.nix { };
 
@@ -806,7 +807,7 @@ let
         lwt_ppx = self.lwt_ppx.override { inherit ppxlib; };
         sedlex = self.sedlex.override { inherit ppxlib ppx_expect; };
         in callPackage ../development/ocaml-modules/bap {
-          inherit (pkgs.llvmPackages) llvm;
+          inherit (pkgs.llvmPackages_14) llvm;
           ezjsonm = self.ezjsonm.override { inherit sexplib0; };
           ppx_bitstring = self.ppx_bitstring.override { inherit ppxlib; };
           ocurl = self.ocurl.override { inherit lwt_ppx; };
@@ -1046,6 +1047,8 @@ let
 
     merlin-lib = callPackage ../development/tools/ocaml/merlin/lib.nix { };
 
+    metadata = callPackage ../development/ocaml-modules/metadata { };
+
     metrics = callPackage ../development/ocaml-modules/metrics { };
 
     metrics-influx = callPackage ../development/ocaml-modules/metrics/influx.nix { };
@@ -1070,6 +1073,8 @@ let
     mimic-happy-eyeballs = callPackage ../development/ocaml-modules/mimic/happy-eyeballs.nix { };
 
     minisat = callPackage ../development/ocaml-modules/minisat { };
+
+    minttea = callPackage ../development/ocaml-modules/minttea { };
 
     mirage = callPackage ../development/ocaml-modules/mirage { };
 
@@ -1295,8 +1300,6 @@ let
     ocamlnet = callPackage ../development/ocaml-modules/ocamlnet { };
 
     ocamlscript = callPackage ../development/tools/ocaml/ocamlscript { };
-
-    ocamlsdl = callPackage ../development/ocaml-modules/ocamlsdl { };
 
     ocb-stubblr = callPackage ../development/ocaml-modules/ocb-stubblr { };
 
@@ -1579,6 +1582,10 @@ let
 
     reactivedata = callPackage ../development/ocaml-modules/reactivedata {};
 
+    readline = callPackage ../development/ocaml-modules/readline {
+      readline = pkgs.readline;
+    };
+
     reason = callPackage ../development/compilers/reason { };
 
     reason-native = lib.recurseIntoAttrs (callPackage ../development/ocaml-modules/reason-native { });
@@ -1605,6 +1612,8 @@ let
     rfc7748 = callPackage ../development/ocaml-modules/rfc7748 { };
 
     ringo = callPackage ../development/ocaml-modules/ringo { };
+
+    riot = callPackage ../development/ocaml-modules/riot { };
 
     rock = callPackage ../development/ocaml-modules/rock { };
 
@@ -1726,6 +1735,8 @@ let
 
     telegraml = callPackage ../development/ocaml-modules/telegraml { };
 
+    telemetry = callPackage ../development/ocaml-modules/telemetry { };
+
     terminal = callPackage ../development/ocaml-modules/terminal { };
 
     terminal_size = callPackage ../development/ocaml-modules/terminal_size { };
@@ -1773,6 +1784,8 @@ let
     tsdl-ttf = callPackage ../development/ocaml-modules/tsdl-ttf { };
 
     tsort = callPackage ../development/ocaml-modules/tsort { };
+
+    tty = callPackage ../development/ocaml-modules/tty { };
 
     tuntap = callPackage ../development/ocaml-modules/tuntap { };
 
@@ -1893,6 +1906,8 @@ let
     zelus = callPackage ../development/ocaml-modules/zelus { };
 
     zelus-gtk = callPackage ../development/ocaml-modules/zelus-gtk { };
+
+    zipc = callPackage ../development/ocaml-modules/zipc { };
 
     zmq = callPackage ../development/ocaml-modules/zmq { };
 

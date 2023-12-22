@@ -19,7 +19,6 @@
 , gobject-introspection
 , python3
 , pam
-, accountsservice
 , cairo
 , xapp
 , xdotool
@@ -29,13 +28,13 @@
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-screensaver";
-  version = "5.8.1";
+  version = "6.0.1";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-d7h9OJ39HVQNCHNr13M1ybDFoU3Xnd1PEczGLHZU/lU=";
+    hash = "sha256-jWUPn5+ynuLdb2GaqKph1M62Ky00sRP/vUXedEvBT7A=";
   };
 
   nativeBuildInputs = [
@@ -70,7 +69,6 @@ stdenv.mkDerivation rec {
     xapp
     xdotool
     pam
-    accountsservice
     cairo
     cinnamon-desktop
     cinnamon-common

@@ -275,6 +275,12 @@ let
       INFINIBAND = module;
       INFINIBAND_IPOIB = module;
       INFINIBAND_IPOIB_CM = yes;
+    } // optionalAttrs (stdenv.hostPlatform.system == "aarch64-linux") {
+      # Not enabled by default, hides modules behind it
+      NET_VENDOR_MEDIATEK = yes;
+      # Enable SoC interface for MT7915 module, required for MT798X.
+      MT7986_WMAC = whenBetween "5.18" "6.6" yes;
+      MT798X_WMAC = whenAtLeast "6.6" yes;
     };
 
     wireless = {
@@ -562,6 +568,13 @@ let
       KEYS_REQUEST_CACHE               = whenAtLeast "5.3" yes;
       # randomized slab caches
       RANDOM_KMALLOC_CACHES            = whenAtLeast "6.6" yes;
+
+      # NIST SP800-90A DRBG modes - enabled by most distributions
+      #   and required by some out-of-tree modules (ShuffleCake)
+      #   This does not include the NSA-backdoored Dual-EC mode from the same NIST publication.
+      CRYPTO_DRBG_HASH                 = yes;
+      CRYPTO_DRBG_CTR                  = yes;
+
     } // optionalAttrs stdenv.hostPlatform.isx86_64 {
       # Enable Intel SGX
       X86_SGX     = whenAtLeast "5.11" yes;
@@ -665,23 +678,23 @@ let
       VBOXGUEST = option no;
       DRM_VBOXVIDEO = option no;
 
-      XEN                         = option yes;
-      XEN_DOM0                    = option yes;
-      PCI_XEN                     = option yes;
-      HVC_XEN                     = option yes;
-      HVC_XEN_FRONTEND            = option yes;
-      XEN_SYS_HYPERVISOR          = option yes;
-      SWIOTLB_XEN                 = option yes;
-      XEN_BACKEND                 = option yes;
-      XEN_BALLOON                 = option yes;
-      XEN_BALLOON_MEMORY_HOTPLUG  = option yes;
-      XEN_EFI                     = option yes;
-      XEN_HAVE_PVMMU              = option yes;
-      XEN_MCE_LOG                 = option yes;
-      XEN_PVH                     = option yes;
-      XEN_PVHVM                   = option yes;
-      XEN_SAVE_RESTORE            = option yes;
-      XEN_SELFBALLOONING          = whenOlder "5.3" yes;
+      XEN                         = mkIf stdenv.is64bit (option yes);
+      XEN_DOM0                    = mkIf stdenv.is64bit (option yes);
+      PCI_XEN                     = mkIf stdenv.is64bit (option yes);
+      HVC_XEN                     = mkIf stdenv.is64bit (option yes);
+      HVC_XEN_FRONTEND            = mkIf stdenv.is64bit (option yes);
+      XEN_SYS_HYPERVISOR          = mkIf stdenv.is64bit (option yes);
+      SWIOTLB_XEN                 = mkIf stdenv.is64bit (option yes);
+      XEN_BACKEND                 = mkIf stdenv.is64bit (option yes);
+      XEN_BALLOON                 = mkIf stdenv.is64bit (option yes);
+      XEN_BALLOON_MEMORY_HOTPLUG  = mkIf stdenv.is64bit (option yes);
+      XEN_EFI                     = mkIf stdenv.is64bit (option yes);
+      XEN_HAVE_PVMMU              = mkIf stdenv.is64bit (option yes);
+      XEN_MCE_LOG                 = mkIf stdenv.is64bit (option yes);
+      XEN_PVH                     = mkIf stdenv.is64bit (option yes);
+      XEN_PVHVM                   = mkIf stdenv.is64bit (option yes);
+      XEN_SAVE_RESTORE            = mkIf stdenv.is64bit (option yes);
+      XEN_SELFBALLOONING          = mkIf stdenv.is64bit (whenOlder "5.3" yes);
 
       # Enable device detection on virtio-mmio hypervisors
       VIRTIO_MMIO_CMDLINE_DEVICES = yes;
@@ -715,7 +728,6 @@ let
       ZSWAP          = option yes;
       ZPOOL          = yes;
       ZBUD           = option yes;
-      ZSMALLOC       = module;
     };
 
     brcmfmac = {
@@ -838,6 +850,8 @@ let
       # upstream: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0a4ee518185e902758191d968600399f3bc2be31
       CLEANCACHE = whenOlder "5.17" (option yes);
       CRASH_DUMP = option no;
+
+      FSCACHE_STATS = yes;
 
       DVB_DYNAMIC_MINORS = option yes; # we use udev
 

@@ -166,7 +166,6 @@ in {
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
         kernelPatches.export-rt-sched-migrate
-        kernelPatches.dell_xps_regression
       ];
     };
 
@@ -201,17 +200,12 @@ in {
        then latest
        else testing;
 
+    # FIXME: Remove after 23.11 is released
     linux_testing_bcachefs = callPackage ../os-specific/linux/kernel/linux-testing-bcachefs.nix {
       # Pinned on the last version which Kent's commits can be cleany rebased up.
-      kernel = callPackage ../os-specific/linux/kernel/mainline.nix {
-        branch = "6.4";
-      };
-      kernelPatches = [
-        kernelPatches.bridge_stp_helper
-        kernelPatches.request_key_helper
-        kernelPatches.dell_xps_regression
-      ];
-    };
+      kernel = linux_6_5;
+      kernelPatches = linux_6_5.kernelPatches;
+   };
 
     # Using zenKernels like this due lqx&zen came from one source, but may have different base kernel version
     # https://github.com/NixOS/nixpkgs/pull/161773#discussion_r820134708
@@ -261,6 +255,7 @@ in {
     linux_5_15_hardened = hardenedKernelFor kernels.linux_5_15 { };
     linux_6_1_hardened = hardenedKernelFor kernels.linux_6_1 { };
     linux_6_5_hardened = hardenedKernelFor kernels.linux_6_5 { };
+    linux_6_6_hardened = hardenedKernelFor kernels.linux_6_6 { };
 
   } // lib.optionalAttrs config.allowAliases {
     linux_4_9 = throw "linux 4.9 was removed because it will reach its end of life within 22.11";
@@ -349,7 +344,11 @@ in {
 
     fanout = callPackage ../os-specific/linux/fanout { };
 
+    framework-laptop-kmod = callPackage ../os-specific/linux/framework-laptop-kmod { };
+
     fwts-efi-runtime = callPackage ../os-specific/linux/fwts/module.nix { };
+
+    gasket = callPackage ../os-specific/linux/gasket { };
 
     gcadapter-oc-kmod = callPackage ../os-specific/linux/gcadapter-oc-kmod { };
 
@@ -387,6 +386,8 @@ in {
 
     lttng-modules = callPackage ../os-specific/linux/lttng-modules { };
 
+    mstflint_access = callPackage ../os-specific/linux/mstflint_access { };
+
     broadcom_sta = callPackage ../os-specific/linux/broadcom-sta { };
 
     tbs = callPackage ../os-specific/linux/tbs { };
@@ -399,7 +400,8 @@ in {
 
     nvidiabl = callPackage ../os-specific/linux/nvidiabl { };
 
-    nvidiaPackages = dontRecurseIntoAttrs (lib.makeExtensible (_: callPackage ../os-specific/linux/nvidia-x11 { }));
+    nvidiaPackages = dontRecurseIntoAttrs (lib.makeExtensible (_: callPackage ../os-specific/linux/nvidia-x11 { }))
+    // { __attrsFailEvaluation = true; };
 
     nvidia_x11             = nvidiaPackages.stable;
     nvidia_x11_beta        = nvidiaPackages.beta;
@@ -410,6 +412,7 @@ in {
     nvidia_x11_vulkan_beta = nvidiaPackages.vulkan_beta;
     nvidia_dc              = nvidiaPackages.dc;
     nvidia_dc_520          = nvidiaPackages.dc_520;
+    nvidia_dc_535          = nvidiaPackages.dc_535;
 
     # this is not a replacement for nvidia_x11*
     # only the opensource kernel driver exposed for hydra to build
@@ -549,6 +552,10 @@ in {
 
     zenpower = callPackage ../os-specific/linux/zenpower { };
 
+    zfs_2_1 = callPackage ../os-specific/linux/zfs/2_1.nix {
+      configFile = "kernel";
+      inherit pkgs kernel;
+    };
     zfsStable = callPackage ../os-specific/linux/zfs/stable.nix {
       configFile = "kernel";
       inherit pkgs kernel;
@@ -564,6 +571,8 @@ in {
     qc71_laptop = callPackage ../os-specific/linux/qc71_laptop { };
 
     hid-ite8291r3 = callPackage ../os-specific/linux/hid-ite8291r3 { };
+
+    hid-tmff2 = callPackage ../os-specific/linux/hid-tmff2 { };
 
   } // lib.optionalAttrs config.allowAliases {
     ati_drivers_x11 = throw "ati drivers are no longer supported by any kernel >=4.1"; # added 2021-05-18;
@@ -584,6 +593,7 @@ in {
     linux_6_1 = recurseIntoAttrs (packagesFor kernels.linux_6_1);
     linux_6_5 = recurseIntoAttrs (packagesFor kernels.linux_6_5);
     linux_6_6 = recurseIntoAttrs (packagesFor kernels.linux_6_6);
+    __attrsFailEvaluation = true;
   } // lib.optionalAttrs config.allowAliases {
     linux_4_9 = throw "linux 4.9 was removed because it will reach its end of life within 22.11"; # Added 2022-11-08
     linux_4_14 = throw "linux 4.14 was removed because it will reach its end of life within 23.11"; # Added 2023-10-11
@@ -601,6 +611,7 @@ in {
      linux_rt_5_10 = packagesFor kernels.linux_rt_5_10;
      linux_rt_5_15 = packagesFor kernels.linux_rt_5_15;
      linux_rt_6_1 = packagesFor kernels.linux_rt_6_1;
+     __attrsFailEvaluation = true;
   };
 
   rpiPackages = {
@@ -608,12 +619,14 @@ in {
     linux_rpi2 = packagesFor kernels.linux_rpi2;
     linux_rpi3 = packagesFor kernels.linux_rpi3;
     linux_rpi4 = packagesFor kernels.linux_rpi4;
+     __attrsFailEvaluation = true;
   };
 
   packages = recurseIntoAttrs (vanillaPackages // rtPackages // rpiPackages // {
 
     # Intentionally lacks recurseIntoAttrs, as -rc kernels will quite likely break out-of-tree modules and cause failed Hydra builds.
     linux_testing = packagesFor kernels.linux_testing;
+    # FIXME: Remove after 23.11 is released
     linux_testing_bcachefs = recurseIntoAttrs (packagesFor kernels.linux_testing_bcachefs);
 
     linux_hardened = recurseIntoAttrs (packagesFor kernels.linux_hardened);
@@ -624,6 +637,7 @@ in {
     linux_5_15_hardened = recurseIntoAttrs (packagesFor kernels.linux_5_15_hardened);
     linux_6_1_hardened = recurseIntoAttrs (packagesFor kernels.linux_6_1_hardened);
     linux_6_5_hardened = recurseIntoAttrs (packagesFor kernels.linux_6_5_hardened);
+    linux_6_6_hardened = recurseIntoAttrs (packagesFor kernels.linux_6_6_hardened);
 
     linux_zen = recurseIntoAttrs (packagesFor kernels.linux_zen);
     linux_lqx = recurseIntoAttrs (packagesFor kernels.linux_lqx);
@@ -634,6 +648,7 @@ in {
     linux_libre = recurseIntoAttrs (packagesFor kernels.linux_libre);
 
     linux_latest_libre = recurseIntoAttrs (packagesFor kernels.linux_latest_libre);
+    __recurseIntoDerivationForReleaseJobs = true;
   } // lib.optionalAttrs config.allowAliases {
     linux_5_18_hardened = throw "linux 5.18 was removed because it has reached its end of life upstream";
     linux_5_19_hardened = throw "linux 5.19 was removed because it has reached its end of life upstream";
@@ -648,7 +663,7 @@ in {
     linux_mptcp = throw "'linux_mptcp' has been moved to https://github.com/teto/mptcp-flake";
     linux_rt_default = packages.linux_rt_5_4;
     linux_rt_latest = packages.linux_rt_6_1;
-  };
+  } // { __attrsFailEvaluation = true; };
 
   manualConfig = callPackage ../os-specific/linux/kernel/manual-config.nix {};
 

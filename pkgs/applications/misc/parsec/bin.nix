@@ -16,7 +16,7 @@
 , libXfixes
 , libpulseaudio
 , libva
-, ffmpeg
+, ffmpeg_5
 , libpng
 , libjpeg8
 , curl
@@ -24,11 +24,11 @@
 
 stdenvNoCC.mkDerivation {
   pname = "parsec-bin";
-  version = "150_86e";
+  version = "150_91a";
 
   src = fetchurl {
-    url = "https://web.archive.org/web/20230531105208/https://builds.parsec.app/package/parsec-linux.deb";
-    sha256 = "sha256-wwBy86TdrHaH9ia40yh24yd5G84WTXREihR+9I6o6uU=";
+    url = "https://web.archive.org/web/20231209190803if_/https://builds.parsec.app/package/parsec-linux.deb";
+    sha256 = "sha256-/qugI7k0NYpq7p9l9auD2Pp+SFoFZ9jAZswpreVfgO4=";
   };
 
   unpackPhase = ''
@@ -55,7 +55,7 @@ stdenvNoCC.mkDerivation {
     alsa-lib
     libpulseaudio
     libva
-    ffmpeg
+    ffmpeg_5
     libpng
     libjpeg8
     curl
@@ -104,11 +104,11 @@ stdenvNoCC.mkDerivation {
   '';
 
   meta = with lib; {
-    homepage = "https://parsecgaming.com/";
+    homepage = "https://parsec.app/";
     changelog = "https://parsec.app/changelog";
     description = "Remote streaming service client";
     license = licenses.unfree;
-    maintainers = with maintainers; [ arcnmx ];
+    maintainers = with maintainers; [ arcnmx pabloaul ];
     platforms = platforms.linux;
     mainProgram = "parsecd";
   };

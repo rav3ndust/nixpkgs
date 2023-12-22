@@ -2,13 +2,13 @@
 
 buildGoModule rec {
   pname = "pluto";
-  version = "5.18.5";
+  version = "5.19.0";
 
   src = fetchFromGitHub {
     owner = "FairwindsOps";
     repo = "pluto";
     rev = "v${version}";
-    hash = "sha256-zdfzGmEL1ZsU3g3jmkgOfxcIGyffkC9UeiU18jPOr7Y=";
+    hash = "sha256-sudq7HILNZSGTwQgggSovrXAaY7VSTw6IJn+mIYwjv8=";
   };
 
   vendorHash = "sha256-8ZOYp/vM16PugmE+3QK7ZRDwIwRCMEwD0NRyiOBlh14=";
