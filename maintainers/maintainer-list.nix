@@ -1281,9 +1281,11 @@
     githubId = 6060545;
     matrix = "@anpin:matrix.org";
     name = "Pavel Anpin";
-    keys = [{
-      fingerprint = "06E8 4FF6 0CCF 7AFD 5101  76C9 0FBC D3EE 6310 7407";
-    }];
+    keys = [
+      { fingerprint = "06E8 4FF6 0CCF 7AFD 5101  76C9 0FBC D3EE 6310 7407"; }
+      # compare with https://keybase.io/anpin/pgp_keys.asc
+      { fingerprint = "DADF F3EA 06DC 8C1B 100A  24DB 312E 8F17 91C5 DA8C"; }
+    ];
   };
   anpryl = {
     email = "anpryl@gmail.com";
@@ -11036,9 +11038,6 @@
     github = "Ma27";
     githubId = 6025220;
     name = "Maximilian Bosch";
-    keys = [{
-      fingerprint = "62B9 9C26 F046 721E 26B0  04F6 D006 A998 C6AB FDF1";
-    }];
   };
   ma9e = {
     email = "sean@lfo.team";
