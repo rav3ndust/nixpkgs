@@ -342,6 +342,7 @@ in {
   gnome-extensions = handleTest ./gnome-extensions.nix {};
   gnome-flashback = handleTest ./gnome-flashback.nix {};
   gnome-xorg = handleTest ./gnome-xorg.nix {};
+  gns3-server = handleTest ./gns3-server.nix {};
   gnupg = handleTest ./gnupg.nix {};
   go-neb = handleTest ./go-neb.nix {};
   gobgpd = handleTest ./gobgpd.nix {};
@@ -543,6 +544,7 @@ in {
   munin = handleTest ./munin.nix {};
   mutableUsers = handleTest ./mutable-users.nix {};
   mxisd = handleTest ./mxisd.nix {};
+  mympd = handleTest ./mympd.nix {};
   mysql = handleTest ./mysql/mysql.nix {};
   mysql-autobackup = handleTest ./mysql/mysql-autobackup.nix {};
   mysql-backup = handleTest ./mysql/mysql-backup.nix {};

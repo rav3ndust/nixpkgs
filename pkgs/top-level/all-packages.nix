@@ -620,7 +620,9 @@ with pkgs;
 
   dec-decode = callPackage ../development/tools/dec-decode { };
 
-  dnf4 =  with python3Packages; toPythonApplication dnf4;
+  dnf-plugins-core = with python3Packages; toPythonApplication dnf-plugins-core;
+
+  dnf4 = python3Packages.callPackage ../development/python-modules/dnf4/wrapper.nix { };
 
   dnf5 = callPackage ../tools/package-management/dnf5 { };
 
@@ -5746,6 +5748,8 @@ with pkgs;
 
   hyprshade = python311Packages.callPackage ../applications/window-managers/hyprwm/hyprshade { };
 
+  hyprlandPlugins = recurseIntoAttrs (callPackage ../applications/window-managers/hyprwm/hyprland/plugins.nix { });
+
   hysteria = callPackage ../tools/networking/hysteria { };
 
   hyx = callPackage ../tools/text/hyx { };
@@ -5906,6 +5910,8 @@ with pkgs;
   libnss-mysql = callPackage ../os-specific/linux/libnss-mysql { };
 
   libnvme = callPackage ../os-specific/linux/libnvme { };
+
+  libnvidia-container = callPackage ../applications/virtualization/libnvidia-container { };
 
   librenms = callPackage ../servers/monitoring/librenms { };
 
@@ -10834,8 +10840,6 @@ with pkgs;
 
   mb2md = callPackage ../tools/text/mb2md { };
 
-  mbox = callPackage ../tools/security/mbox { };
-
   mbuffer = callPackage ../tools/misc/mbuffer { };
 
   mdsh = callPackage ../development/tools/documentation/mdsh { };
@@ -11747,6 +11751,8 @@ with pkgs;
   openvswitch = callPackage ../os-specific/linux/openvswitch { };
 
   openvswitch-lts = callPackage ../os-specific/linux/openvswitch/lts.nix { };
+
+  ovn-lts = callPackage ../by-name/ov/ovn/lts.nix { };
 
   optifinePackages = callPackage ../tools/games/minecraft/optifine { };
 
@@ -20957,7 +20963,7 @@ with pkgs;
 
   ustream-ssl = callPackage ../development/libraries/ustream-ssl { ssl_implementation = openssl; };
 
-  ustream-ssl-wolfssl = callPackage ../development/libraries/ustream-ssl { ssl_implementation = wolfssl; };
+  ustream-ssl-wolfssl = callPackage ../development/libraries/ustream-ssl { ssl_implementation = wolfssl; additional_buildInputs = [ openssl ]; };
 
   ustream-ssl-mbedtls = callPackage ../development/libraries/ustream-ssl { ssl_implementation = mbedtls_2; };
 
@@ -24227,9 +24233,8 @@ with pkgs;
   mkNvidiaContainerPkg = { name, containerRuntimePath, configTemplate, additionalPaths ? [] }:
     let
       nvidia-container-toolkit = callPackage ../applications/virtualization/nvidia-container-toolkit {
-        inherit containerRuntimePath configTemplate libnvidia-container;
+        inherit containerRuntimePath configTemplate;
       };
-      libnvidia-container =(callPackage ../applications/virtualization/libnvidia-container { });
     in symlinkJoin {
       inherit name;
       paths = [
@@ -30003,9 +30008,7 @@ with pkgs;
 
   stdmanpages = callPackage ../data/documentation/std-man-pages { };
 
-  star-history = callPackage ../tools/misc/star-history {
-    inherit (darwin.apple_sdk.frameworks) Security;
-  };
+  star-history = callPackage ../tools/misc/star-history { };
 
   starfetch = callPackage ../tools/misc/starfetch { };
 
@@ -32482,8 +32485,6 @@ with pkgs;
 
   huggle = libsForQt5.callPackage ../applications/misc/huggle { };
 
-  hugo = callPackage ../applications/misc/hugo { };
-
   ghosttohugo = callPackage ../applications/misc/ghosttohugo {};
 
   gatekeeper = callPackage ../applications/networking/cluster/gatekeeper { };
@@ -32672,9 +32673,7 @@ with pkgs;
 
   rootbar = callPackage ../applications/misc/rootbar { };
 
-  waybar = callPackage ../applications/misc/waybar {
-    wlroots = wlroots_0_15;
-  };
+  waybar = callPackage ../applications/misc/waybar { };
 
   waycorner = callPackage ../applications/misc/waycorner { };
 
@@ -33431,8 +33430,6 @@ with pkgs;
   littlegptracker = callPackage ../applications/audio/littlegptracker {
     inherit (darwin.apple_sdk.frameworks) Foundation;
   };
-
-  ledger = callPackage ../applications/office/ledger { };
 
   ledger-autosync = callPackage  ../applications/office/ledger-autosync { };
 
@@ -35691,7 +35688,7 @@ with pkgs;
   teams = callPackage ../applications/networking/instant-messengers/teams { };
 
   teams-for-linux = callPackage ../applications/networking/instant-messengers/teams-for-linux {
-    electron = electron_27;
+    electron = electron_28;
   };
 
   teamspeak_client = libsForQt5.callPackage ../applications/networking/instant-messengers/teamspeak/client.nix { };

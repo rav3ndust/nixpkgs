@@ -2378,6 +2378,8 @@ self: super: with self; {
 
   cppy = callPackage ../development/python-modules/cppy { };
 
+  cpufeature = callPackage ../development/python-modules/cpufeature { };
+
   cpyparsing = callPackage ../development/python-modules/cpyparsing { };
 
   cram = callPackage ../development/python-modules/cram { };
@@ -3081,6 +3083,8 @@ self: super: with self; {
 
   django-markup = callPackage ../development/python-modules/django-markup { };
 
+  django-markdownx = callPackage ../development/python-modules/django-markdownx { };
+
   django-model-utils = callPackage ../development/python-modules/django-model-utils { };
 
   django-modelcluster = callPackage ../development/python-modules/django-modelcluster { };
@@ -3088,6 +3092,8 @@ self: super: with self; {
   django-multiselectfield = callPackage ../development/python-modules/django-multiselectfield { };
 
   django-maintenance-mode = callPackage ../development/python-modules/django-maintenance-mode { };
+
+  django-mdeditor = callPackage ../development/python-modules/django-mdeditor { };
 
   django-mptt = callPackage ../development/python-modules/django-mptt { };
 
@@ -3258,6 +3264,8 @@ self: super: with self; {
   };
 
   dnachisel = callPackage ../development/python-modules/dnachisel { };
+
+  dnf-plugins-core = callPackage ../development/python-modules/dnf-plugins-core { };
 
   dnf4 = callPackage ../development/python-modules/dnf4 { };
 
@@ -9341,6 +9349,10 @@ self: super: with self; {
 
   pycoolmasternet-async = callPackage ../development/python-modules/pycoolmasternet-async { };
 
+  pycrdt = callPackage ../development/python-modules/pycrdt { };
+
+  pycrdt-websocket = callPackage ../development/python-modules/pycrdt-websocket { };
+
   pyfibaro = callPackage ../development/python-modules/pyfibaro { };
 
   pyfireservicerota = callPackage ../development/python-modules/pyfireservicerota { };
@@ -13800,6 +13812,18 @@ self: super: with self; {
 
   succulent = callPackage ../development/python-modules/succulent { };
 
+  sudachidict-core = callPackage ../development/python-modules/sudachidict { };
+
+  sudachidict-full = callPackage ../development/python-modules/sudachidict {
+    sudachidict = pkgs.sudachidict.override { dict-type = "full"; };
+  };
+
+  sudachidict-small = callPackage ../development/python-modules/sudachidict {
+    sudachidict = pkgs.sudachidict.override { dict-type = "small"; };
+  };
+
+  sudachipy = callPackage ../development/python-modules/sudachipy { };
+
   sumo = callPackage ../development/python-modules/sumo { };
 
   sumtypes = callPackage ../development/python-modules/sumtypes { };
@@ -14102,6 +14126,8 @@ self: super: with self; {
   testcontainers = callPackage ../development/python-modules/testcontainers { };
 
   testfixtures = callPackage ../development/python-modules/testfixtures { };
+
+  texsoup = callPackage ../development/python-modules/texsoup { };
 
   textfsm = callPackage ../development/python-modules/textfsm { };
 
