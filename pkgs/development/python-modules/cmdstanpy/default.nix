@@ -2,22 +2,23 @@
 , buildPythonPackage
 , fetchFromGitHub
 , substituteAll
-
+, fetchpatch
 , cmdstan
-
+, pythonRelaxDepsHook
+, setuptools
 , pandas
 , numpy
 , tqdm
 , stanio
 , xarray
-
 , pytestCheckHook
+, stdenv
 }:
 
 buildPythonPackage rec {
   pname = "cmdstanpy";
   version = "1.2.0";
-  format = "setuptools";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "stan-dev";
@@ -31,12 +32,22 @@ buildPythonPackage rec {
       src = ./use-nix-cmdstan-path.patch;
       cmdstan = "${cmdstan}/opt/cmdstan";
     })
+    (fetchpatch {
+      name = "stan-2.34-fix-parsing-of-unit_e-output-files.patch";
+      url = "https://github.com/stan-dev/cmdstanpy/commit/144d641739ccd1109055d13b5b96e4e76607305d.patch";
+      hash = "sha256-21hcbK3Xs7vGBNRs4hMfY5g7jIwEG49WYnsOxYJ6ccs=";
+    })
   ];
 
   postPatch = ''
     # conftest.py would have used git to clean up, which is unnecessary here
     rm test/conftest.py
   '';
+
+  nativeBuildInputs = [
+    setuptools
+    pythonRelaxDepsHook
+  ];
 
   propagatedBuildInputs = [
     pandas
@@ -48,6 +59,8 @@ buildPythonPackage rec {
   passthru.optional-dependencies = {
     all = [ xarray ];
   };
+
+  pythonRelaxDeps = [ "stanio" ];
 
   preCheck = ''
     export HOME=$(mktemp -d)
@@ -69,6 +82,8 @@ buildPythonPackage rec {
     # These tests use the flag -DSTAN_THREADS which doesn't work in cmdstan (missing file)
     "test_multi_proc_threads"
     "test_compile_force"
+  ] ++ lib.optionals stdenv.isDarwin [
+    "test_init_types" # CmdStan error: error during processing Operation not permitted
   ];
 
   pythonImportsCheck = [ "cmdstanpy" ];
@@ -78,7 +93,6 @@ buildPythonPackage rec {
     description = "A lightweight interface to Stan for Python users";
     changelog = "https://github.com/stan-dev/cmdstanpy/releases/tag/v${version}";
     license = lib.licenses.bsd3;
-    platforms = lib.platforms.linux;
     maintainers = with lib.maintainers; [ tomasajt ];
   };
 }
