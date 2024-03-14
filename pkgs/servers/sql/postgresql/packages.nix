@@ -44,6 +44,8 @@ self: super: {
 
     pgsql-http = super.callPackage ./ext/pgsql-http.nix { };
 
+    pgvecto-rs = super.callPackage ./ext/pgvecto-rs { };
+
     pgvector = super.callPackage ./ext/pgvector.nix { };
 
     plpgsql_check = super.callPackage ./ext/plpgsql_check.nix { };
@@ -86,6 +88,8 @@ self: super: {
     pg_relusage = super.callPackage ./ext/pg_relusage.nix { };
 
     pg_safeupdate = super.callPackage ./ext/pg_safeupdate.nix { };
+
+    pg_squeeze = super.callPackage ./ext/pg_squeeze.nix { };
 
     pg_uuidv7 = super.callPackage ./ext/pg_uuidv7.nix { };
 

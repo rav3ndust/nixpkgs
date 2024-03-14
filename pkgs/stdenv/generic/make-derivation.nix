@@ -249,6 +249,8 @@ let
     "relro"
     "stackprotector"
     "strictoverflow"
+    "trivialautovarinit"
+    "zerocallusedregs"
   ];
   defaultHardeningFlags =
     (if stdenv.hasCC then stdenv.cc else {}).defaultHardeningFlags or
