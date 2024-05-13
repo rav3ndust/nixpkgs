@@ -6,9 +6,11 @@
 , cu2qu
 , defcon
 , fetchPypi
+, fontmath
 , fonttools
 , pytestCheckHook
 , pythonOlder
+, pythonRelaxDepsHook
 , setuptools-scm
 , skia-pathops
 , ufolib2
@@ -16,22 +18,28 @@
 
 buildPythonPackage rec {
   pname = "ufo2ft";
-  version = "2.33.4";
+  version = "3.1.0";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-e6p/H1Vub0Ln0VhQvwsVLuD/p8uNG5oCPhfQPCTl1nY=";
+    hash = "sha256-5EUrML1Yd88tVEP+Kd9TmXm+5Ejk/XIH/USYBakK/wQ=";
   };
 
   nativeBuildInputs = [
     setuptools-scm
+    pythonRelaxDepsHook
+  ];
+
+  pythonRelaxDeps = [
+    "cffsubr"
   ];
 
   propagatedBuildInputs = [
     cu2qu
+    fontmath
     fonttools
     defcon
     compreffor

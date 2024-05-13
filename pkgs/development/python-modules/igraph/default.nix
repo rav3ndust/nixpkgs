@@ -14,7 +14,7 @@
 
 buildPythonPackage rec {
   pname = "igraph";
-  version = "0.11.4";
+  version = "0.11.5";
 
   disabled = pythonOlder "3.8";
 
@@ -24,7 +24,7 @@ buildPythonPackage rec {
     owner = "igraph";
     repo = "python-igraph";
     rev = "refs/tags/${version}";
-    hash = "sha256-sR9OqsBxP2DvcYz1dhIP29rrQ56CRKW02oNAXUNttio=";
+    hash = "sha256-nfXCAjTKxtslVk17h60+v/JQusQTmaTRCPvvFG4/OPk=";
   };
 
   postPatch = ''
@@ -69,6 +69,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "High performance graph data structures and algorithms";
+    mainProgram = "igraph";
     homepage = "https://igraph.org/python/";
     changelog = "https://github.com/igraph/python-igraph/blob/${src.rev}/CHANGELOG.md";
     license = licenses.gpl2Plus;

@@ -13,7 +13,7 @@
 stdenv.mkDerivation rec {
   pname = "${passthru.prettyName}-unwrapped";
   # nixpkgs-update: no auto update
-  version = "unstable-2023-11-24";
+  version = "0-unstable-2023-11-24";
 
   src = fetchFromGitHub {
     owner = "open-watcom";
@@ -46,9 +46,6 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals withDocs [
     ghostscript
   ];
-
-  # Work around https://github.com/NixOS/nixpkgs/issues/166205
-  env.NIX_LDFLAGS = lib.optionalString (stdenv.cc.isClang && stdenv.cc.libcxx != null) "-l${stdenv.cc.libcxx.cxxabi.libName}";
 
   configurePhase = ''
     runHook preConfigure
@@ -92,6 +89,8 @@ stdenv.mkDerivation rec {
     prettyName = "open-watcom-v2";
     updateScript = unstableGitUpdater {
       url = "https://github.com/open-watcom/open-watcom-v2.git";
+      # no numerical releases, monthly "YYYY-MM-DD-Build" tags and daily "Current-build", "Last-CI-build" & "Coverity-scan" retagging
+      hardcodeZeroVersion = true;
     };
   };
 

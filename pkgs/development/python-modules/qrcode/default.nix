@@ -51,10 +51,14 @@ buildPythonPackage rec {
 
   disabledTests = lib.optionals (pythonAtLeast "3.12") [
     "test_change"
+  ] ++ [
+    # Attempts to open a file which doesn't exist in sandbox
+    "test_piped"
   ];
 
   meta = with lib; {
     description = "Python QR Code image generator";
+    mainProgram = "qr";
     homepage = "https://github.com/lincolnloop/python-qrcode";
     changelog = "https://github.com/lincolnloop/python-qrcode/blob/v${version}/CHANGES.rst";
     license = licenses.bsd3;

@@ -55,9 +55,10 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "C-based framework/library for developing CUPS Printer Applications";
+    mainProgram = "pappl-makeresheader";
     homepage = "https://github.com/michaelrsweet/pappl";
     license = licenses.asl20;
     platforms = platforms.linux; # should also work for darwin, but requires additional work
-    maintainers = with maintainers; [ jonringer ChlorideCull ];
+    maintainers = with maintainers; [ jonringer ];
   };
 }

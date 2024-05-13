@@ -2,6 +2,7 @@
 , buildPythonPackage
 , pythonOlder
 , fetchFromGitHub
+, fetchpatch
 , setuptools
 , cryptography
 , mock
@@ -23,6 +24,14 @@ buildPythonPackage rec {
     hash = "sha256-Oc73Jx31SLzuhT9Iym5HHszKfflKZ+3aky5flXudvmI=";
   };
 
+  patches = [
+    # fixes deprecated test assertion, assertRaisesRegexp in python 3
+    (fetchpatch {
+      url = "https://github.com/trishtzy/stem/commit/d5012a1039f05c69ebe832723ce96ecbe8f79fe1.patch";
+      hash = "sha256-ozOTx4/c86sW/9Ss5eZ6ZxX63ByJT5x7JF6wBBd+VFY=";
+    })
+  ];
+
   nativeBuildInputs = [
     setuptools
   ];
@@ -43,6 +52,7 @@ buildPythonPackage rec {
   meta = with lib; {
     changelog = "https://github.com/torproject/stem/blob/${src.rev}/docs/change_log.rst";
     description = "Controller library that allows applications to interact with Tor";
+    mainProgram = "tor-prompt";
     downloadPage = "https://github.com/torproject/stem";
     homepage = "https://stem.torproject.org/";
     license = licenses.lgpl3Only;

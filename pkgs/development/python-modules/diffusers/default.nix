@@ -1,8 +1,9 @@
 { lib
 , stdenv
 , buildPythonPackage
-, fetchFromGitHub
 , pythonOlder
+, fetchFromGitHub
+, fetchpatch
 , writeText
 , setuptools
 , wheel
@@ -35,11 +36,12 @@
 , sentencepiece
 , torchsde
 , transformers
+, pythonAtLeast
 }:
 
 buildPythonPackage rec {
   pname = "diffusers";
-  version = "0.26.3";
+  version = "0.27.2";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -48,15 +50,29 @@ buildPythonPackage rec {
     owner = "huggingface";
     repo = "diffusers";
     rev = "refs/tags/v${version}";
-    hash = "sha256-1pIe1OU+vIrHM6KIZtHRMXklBZrugDV+I/OBNQYqvXI=";
+    hash = "sha256-aRnbU3jN40xaCsoMFyRt1XB+hyIYMJP2b/T1yZho90c=";
   };
 
-  nativeBuildInputs = [
+  patches = [
+    # fix python3.12 build
+    (fetchpatch { # https://github.com/huggingface/diffusers/pull/7455
+      name = "001-remove-distutils.patch";
+      url = "https://github.com/huggingface/diffusers/compare/363699044e365ef977a7646b500402fa585e1b6b...3c67864c5acb30413911730b1ed4a9ad47c0a15c.patch";
+      hash = "sha256-Qyvyp1GyTVXN+A+lA1r2hf887ubTtaUknbKd4r46NZQ=";
+    })
+    (fetchpatch { # https://github.com/huggingface/diffusers/pull/7461
+      name = "002-fix-removed-distutils.patch";
+      url = "https://github.com/huggingface/diffusers/commit/efbbbc38e436a1abb1df41a6eccfd6f9f0333f97.patch";
+      hash = "sha256-scdtpX1RYFFEDHcaMb+gDZSsPafkvnIO/wQlpzrQhLA=";
+    })
+  ];
+
+  build-system = [
     setuptools
     wheel
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     filelock
     huggingface-hub
     importlib-metadata
@@ -143,10 +159,15 @@ buildPythonPackage rec {
     "test_model_cpu_offload_forward_pass"
     # tries to run ruff which we have intentionally removed from nativeCheckInputs
     "test_is_copy_consistent"
+  ] ++ lib.optionals (pythonAtLeast "3.12") [
+
+    # RuntimeError: Dynamo is not supported on Python 3.12+
+    "test_from_save_pretrained_dynamo"
   ];
 
   meta = with lib; {
     description = "State-of-the-art diffusion models for image and audio generation in PyTorch";
+    mainProgram = "diffusers-cli";
     homepage = "https://github.com/huggingface/diffusers";
     changelog = "https://github.com/huggingface/diffusers/releases/tag/${src.rev}";
     license = licenses.asl20;

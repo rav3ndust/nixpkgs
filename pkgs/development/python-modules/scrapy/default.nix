@@ -5,6 +5,7 @@
 , cryptography
 , cssselect
 , fetchPypi
+, fetchpatch
 , glibcLocales
 , installShellFiles
 , itemadapter
@@ -42,6 +43,16 @@ buildPythonPackage rec {
     pname = "Scrapy";
     hash = "sha256-czoDnHQj5StpvygQtTMgk9TkKoSEYDWcB7Auz/j3Pr4=";
   };
+
+  patches = [
+    # https://github.com/scrapy/scrapy/pull/6316
+    # fix test_get_func_args. remove on next update
+    (fetchpatch {
+      name = "test_get_func_args.patch";
+      url = "https://github.com/scrapy/scrapy/commit/b1fe97dc6c8509d58b29c61cf7801eeee1b409a9.patch";
+      hash = "sha256-POlmsuW4SD9baKwZieKfmlp2vtdlb7aKQ62VOmNXsr0=";
+    })
+  ];
 
   nativeBuildInputs = [
     installShellFiles
@@ -142,6 +153,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "High-level web crawling and web scraping framework";
+    mainProgram = "scrapy";
     longDescription = ''
       Scrapy is a fast high-level web crawling and web scraping framework, used to crawl
       websites and extract structured data from their pages. It can be used for a wide
@@ -150,6 +162,6 @@ buildPythonPackage rec {
     homepage = "https://scrapy.org/";
     changelog = "https://github.com/scrapy/scrapy/raw/${version}/docs/news.rst";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ marsam ];
+    maintainers = with maintainers; [ vinnymeller ];
   };
 }

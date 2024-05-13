@@ -22,7 +22,7 @@
 
 buildPythonPackage rec {
   pname = "mako";
-  version = "1.3.0";
+  version = "1.3.3";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -30,7 +30,7 @@ buildPythonPackage rec {
   src = fetchPypi {
     pname = "Mako";
     inherit version;
-    hash = "sha256-46nTiP0A6HBD7b6HkvRYgKwBFOnErcafbpv7LFXjsRs=";
+    hash = "sha256-4WwB2aucEfcpDu8c/vwJP7WkXuSj2gni/sLk0brlTnM=";
   };
 
   nativeBuildInputs = [
@@ -68,6 +68,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "Super-fast templating language";
+    mainProgram = "mako-render";
     homepage = "https://www.makotemplates.org/";
     changelog = "https://docs.makotemplates.org/en/latest/changelog.html";
     license = licenses.mit;

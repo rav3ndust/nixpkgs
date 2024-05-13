@@ -16,7 +16,7 @@
 
 buildPythonPackage rec {
   pname = "ical";
-  version = "7.0.1";
+  version = "8.0.1";
   pyproject = true;
 
   disabled = pythonOlder "3.10";
@@ -25,14 +25,14 @@ buildPythonPackage rec {
     owner = "allenporter";
     repo = "ical";
     rev = "refs/tags/${version}";
-    hash = "sha256-kvZZfmrE42uoB9v0PuXopH3g9Cf0hwLkCvaNi6CGX8M=";
+    hash = "sha256-GA2Kn6OednhQtNzmIq5npN2qXVaMHCzy02Jwx7g3GBA=";
   };
 
-  nativeBuildInputs = [
+  build-system = [
     setuptools
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     python-dateutil
     tzdata
     pydantic

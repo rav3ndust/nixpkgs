@@ -18,14 +18,14 @@
 
 buildPythonPackage rec {
   pname = "fastai";
-  version = "2.7.14";
+  version = "2.7.15";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-QiVyYojI/xs7wYl3umhky0j+xzptNS7Fv+fLMRy/4jc=";
+    hash = "sha256-8swg/RjN9exzjMVtKdVN51iH1IrRX501z1DDjTqFaSM=";
   };
 
   propagatedBuildInputs = [
@@ -48,6 +48,7 @@ buildPythonPackage rec {
   meta = with lib; {
     homepage = "https://github.com/fastai/fastai";
     description = "The fastai deep learning library";
+    mainProgram = "configure_accelerate";
     changelog = "https://github.com/fastai/fastai/blob/${version}/CHANGELOG.md";
     license = licenses.asl20;
     maintainers = with maintainers; [ rxiao ];

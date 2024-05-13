@@ -38,10 +38,11 @@ let
 
   meta = with lib; {
     description = "Conference planning tool: CfP, scheduling, speaker management";
+    mainProgram = "pretalx-manage";
     homepage = "https://github.com/pretalx/pretalx";
     changelog = "https://docs.pretalx.org/en/latest/changelog.html";
     license = licenses.asl20;
-    maintainers = teams.c3d2.members;
+    maintainers = with maintainers; [ hexa] ++ teams.c3d2.members;
     platforms = platforms.linux;
   };
 
@@ -78,6 +79,22 @@ python.pkgs.buildPythonApplication rec {
 
   nativeBuildInputs = [
     gettext
+  ] ++ (with python.pkgs; [
+    pythonRelaxDepsHook
+    setuptools
+  ]);
+
+  pythonRelaxDeps = [
+    "celery"
+    "css-inline"
+    "cssutils"
+    "django-csp"
+    "django-filter"
+    "django-hierarkey"
+    "markdown"
+    "pillow"
+    "python-dateutil"
+    "reportlab"
   ];
 
   propagatedBuildInputs = with python.pkgs; [

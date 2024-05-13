@@ -11,6 +11,7 @@
 , pytestCheckHook
 , pythonOlder
 , readme-renderer
+, setuptools
 , wheel-filename
 }:
 
@@ -53,8 +54,12 @@ buildPythonPackage rec {
   ];
 
   nativeCheckInputs = [
-    jsonschema
     pytestCheckHook
+  ];
+
+  checkInputs = [
+    setuptools
+    jsonschema
   ];
 
   pythonImportsCheck = [
@@ -68,6 +73,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "Extract information from wheels";
+    mainProgram = "wheel2json";
     homepage = "https://github.com/jwodder/wheel-inspect";
     changelog = "https://github.com/wheelodex/wheel-inspect/releases/tag/v${version}";
     license = with licenses; [ mit ];

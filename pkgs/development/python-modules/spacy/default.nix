@@ -5,6 +5,7 @@
 , callPackage
 , catalogue
 , cymem
+, cython_0
 , fetchPypi
 , hypothesis
 , jinja2
@@ -51,11 +52,13 @@ buildPythonPackage rec {
   };
 
   pythonRelaxDeps = [
+    "smart-open"
     "typer"
   ];
 
   nativeBuildInputs = [
     pythonRelaxDepsHook
+    cython_0
   ];
 
   propagatedBuildInputs = [
@@ -122,13 +125,14 @@ buildPythonPackage rec {
       nix-update python3Packages.spacy
 
       # update spacy models as well
-      echo | nix-shell maintainers/scripts/update.nix --argstr package python3Packages.spacy_models.en_core_web_sm
+      echo | nix-shell maintainers/scripts/update.nix --argstr package python3Packages.spacy-models.en_core_web_sm
     '';
     tests.annotation = callPackage ./annotation-test { };
   };
 
   meta = with lib; {
     description = "Industrial-strength Natural Language Processing (NLP)";
+    mainProgram = "spacy";
     homepage = "https://github.com/explosion/spaCy";
     changelog = "https://github.com/explosion/spaCy/releases/tag/v${version}";
     license = licenses.mit;

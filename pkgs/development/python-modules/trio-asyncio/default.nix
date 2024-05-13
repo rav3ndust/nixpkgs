@@ -1,40 +1,42 @@
 { lib
 , buildPythonPackage
-, fetchPypi
+, fetchFromGitHub
 , setuptools
+, greenlet
 , trio
 , outcome
 , sniffio
 , exceptiongroup
 , pytest-trio
 , pytestCheckHook
-, pythonAtLeast
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "trio-asyncio";
-  version = "0.13.0";
+  version = "0.14.1";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
 
-  src = fetchPypi {
-    pname = "trio_asyncio";
-    inherit version;
-    hash = "sha256-fKJLIaGxes3mV1LWkziGuiQoTlL0srDe/k6o7YpjSmI=";
+  src = fetchFromGitHub {
+    owner = "python-trio";
+    repo = "trio-asyncio";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-634fcYAn5J1WW71J/USAMkJaZI8JmKoQneQEhz2gYFc=";
   };
 
   postPatch = ''
     substituteInPlace setup.py \
-      --replace "'pytest-runner'" ""
+      --replace-fail '"pytest-runner"' ""
   '';
 
-  nativeBuildInputs = [
+  build-system = [
     setuptools
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
+    greenlet
     trio
     outcome
     sniffio
@@ -42,13 +44,14 @@ buildPythonPackage rec {
     exceptiongroup
   ];
 
+  pytestFlagsArray = [
+    # RuntimeWarning: Can't run the Python asyncio tests because they're not installed
+    "-W" "ignore::RuntimeWarning"
+  ];
+
   nativeCheckInputs = [
     pytest-trio
     pytestCheckHook
-  ];
-
-  disabledTestPaths = [
-    "tests/python" # tries to import internal API test.test_asyncio
   ];
 
   pythonImportsCheck = [

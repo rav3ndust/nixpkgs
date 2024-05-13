@@ -32,13 +32,13 @@
 stdenv.mkDerivation (finalAttrs: {
   outputs = [ "out" "icons" ];
   pname = "alephone";
-  version = "1.7";
+  version = "1.8";
 
   src = fetchurl {
     url =
-      let date = "20231125";
+      let date = "20240510";
       in "https://github.com/Aleph-One-Marathon/alephone/releases/download/release-${date}/AlephOne-${date}.tar.bz2";
-    sha256 = "sha256-qRHmtkzPi6PKeAzoMPdSbboiilG+L2fCXvXXu3vIchs=";
+    sha256 = "sha256-3+3lTAVOxTTs13uuVsmq4CKmdNkQv+lY7YV1HkIwvDs=";
   };
 
   nativeBuildInputs = [ pkg-config icoutils ];
@@ -84,6 +84,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description =
       "Aleph One is the open source continuation of Bungie’s Marathon 2 game engine";
+    mainProgram = "alephone";
     homepage = "https://alephone.lhowon.org/";
     license = [ lib.licenses.gpl3 ];
     maintainers = with lib.maintainers; [ ehmry ];

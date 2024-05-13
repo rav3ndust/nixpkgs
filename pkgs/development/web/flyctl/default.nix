@@ -2,16 +2,16 @@
 
 buildGo122Module rec {
   pname = "flyctl";
-  version = "0.2.6";
+  version = "0.2.52";
 
   src = fetchFromGitHub {
     owner = "superfly";
     repo = "flyctl";
     rev = "v${version}";
-    hash = "sha256-A0mlfTeAAeMvmzIvWGALmvMGtGOgVU3X9kvSyrvtK54=";
+    hash = "sha256-BCnMXyS94tuD+Un1DLqs3mdGi7XrVBoZGJ/XkpACOQI";
   };
 
-  vendorHash = "sha256-9l9zft37cGqVp6SBCc4bQcyNLpzSrLDbC++0ywkpDYU=";
+  vendorHash = "sha256-eTiY65VGFBgGzCOrnp/WbOo9Lbdk4PYwT7CppjsZ4WE=";
 
   subPackages = [ "." ];
 
@@ -52,12 +52,12 @@ buildGo122Module rec {
     version = "v${flyctl.version}";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Command line tools for fly.io services";
     downloadPage = "https://github.com/superfly/flyctl";
     homepage = "https://fly.io/";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ adtya jsierles techknowlogick ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ adtya jsierles techknowlogick ];
     mainProgram = "flyctl";
   };
 }

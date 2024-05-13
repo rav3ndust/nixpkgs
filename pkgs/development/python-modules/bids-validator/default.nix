@@ -10,14 +10,14 @@
 
 buildPythonPackage rec {
   pname = "bids-validator";
-  version = "1.14.0";
+  version = "1.14.5";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-M7D4ZcGqPjn7klGN8WP6a3lHjRqhAq9S/VNwSl7y6kY=";
+    hash = "sha256-TXIb1ff7D6aM+8L5F47O5Dvupp1Sn4Rnl+GQaUdEgno=";
   };
 
   nativeBuildInputs = [

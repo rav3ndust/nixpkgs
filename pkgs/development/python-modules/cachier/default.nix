@@ -35,14 +35,14 @@ buildPythonPackage rec {
     setuptools
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     watchdog
     portalocker
   ];
 
   preCheck = ''
     substituteInPlace pyproject.toml \
-      --replace  \
+      --replace-fail  \
         '"--cov' \
         '#"--cov'
   '';
@@ -82,6 +82,7 @@ buildPythonPackage rec {
   meta = {
     homepage = "https://github.com/python-cachier/cachier";
     description = "Persistent, stale-free, local and cross-machine caching for functions";
+    mainProgram = "cachier";
     maintainers = with lib.maintainers; [ pbsds ];
     license = lib.licenses.mit;
   };

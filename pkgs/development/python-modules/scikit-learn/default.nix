@@ -7,14 +7,15 @@
 , cython
 , gfortran
 , numpy
-, oldest-supported-numpy
 , scipy
 , setuptools
+, wheel
 
 # native dependencies
 , glibcLocales
 , llvmPackages
 , pytestCheckHook
+, pythonRelaxDepsHook
 , pytest-xdist
 , pillow
 , joblib
@@ -24,15 +25,21 @@
 
 buildPythonPackage rec {
   pname = "scikit-learn";
-  version = "1.4.0";
+  version = "1.4.2";
   pyproject = true;
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.9";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-1Dc8mE66IOOTIW7dUaPj7t5Wy+k9QkdRbSBWQ8O5MSE=";
+    hash = "sha256-2qHEcdlbrQgMbkS0lGyTkKSEKtwwglcsIOT4iE456Vk=";
   };
+
+  # Avoid build-system requirements causing failure
+  prePatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail "numpy==2.0.0rc1" "numpy"
+  '';
 
   buildInputs = [
     pillow
@@ -42,18 +49,25 @@ buildPythonPackage rec {
   ];
 
   nativeBuildInputs = [
-    cython
     gfortran
+    pythonRelaxDepsHook
+  ];
+
+  build-system = [
+    cython
     numpy
-    oldest-supported-numpy
     scipy
     setuptools
+    wheel
   ];
 
   propagatedBuildInputs = [
+    numpy.blas
+  ];
+
+  dependencies = [
     joblib
     numpy
-    numpy.blas
     scipy
     threadpoolctl
   ];
@@ -69,18 +83,12 @@ buildPythonPackage rec {
     export SKLEARN_BUILD_PARALLEL=$NIX_BUILD_CORES
   '';
 
-  doCheck = !stdenv.isAarch64;
+  # PermissionError: [Errno 1] Operation not permitted: '/nix/nix-installer'
+  doCheck = !stdenv.isDarwin;
 
   disabledTests = [
     # Skip test_feature_importance_regression - does web fetch
     "test_feature_importance_regression"
-
-    # failing on macos
-    "check_regressors_train"
-    "check_classifiers_train"
-    "xfail_ignored_in_check_estimator"
-  ] ++ lib.optionals (stdenv.isDarwin) [
-    "test_graphical_lasso"
   ];
 
   pytestFlagsArray = [

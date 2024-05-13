@@ -14,28 +14,28 @@
 , typing-extensions
 
 # tests
-, pytestCheckHook
+, pytest7CheckHook
 , pytest-xdist
 , python-dateutil
 }:
 
 buildPythonPackage rec {
   pname = "alembic";
-  version = "1.13.0";
-  format = "setuptools";
+  version = "1.13.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-q0s7lNLh5fgeNL6Km3t1dfyd1TmPzLC+81HsmxSHJiM=";
+    hash = "sha256-STLIVYv2jy7pK5u8uCGGccYnBk1bCJOUN69td9wF5ZU=";
   };
 
-  nativeBuildInputs = [
+  build-system = [
     setuptools
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     mako
     sqlalchemy
     typing-extensions
@@ -49,7 +49,7 @@ buildPythonPackage rec {
   ];
 
   nativeCheckInputs = [
-    pytestCheckHook
+    pytest7CheckHook
     pytest-xdist
     python-dateutil
   ];

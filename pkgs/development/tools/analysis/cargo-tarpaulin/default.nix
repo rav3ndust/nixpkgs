@@ -10,16 +10,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "cargo-tarpaulin";
-  version = "0.27.3";
+  version = "0.29.2";
 
   src = fetchFromGitHub {
     owner = "xd009642";
     repo = "tarpaulin";
     rev = version;
-    hash = "sha256-ejrnqkeMhCBWCjLCOblhZV/fY4Aib4F1uanufHyUmfw=";
+    hash = "sha256-3OLMTiMX5dsW691MX432YUuVqKOtrmS6Tpk96QVEyo8=";
   };
 
-  cargoHash = "sha256-YO91vSyMwRTrQxRAgWJemL+dlmnEN7VSGrwnE6z7ocI=";
+  cargoHash = "sha256-+xCA0LVEHhBGOgMx+/ABZL1I7NSJEWf21p9gmQJNBJo=";
 
   nativeBuildInputs = [
     pkg-config
@@ -31,6 +31,7 @@ rustPlatform.buildRustPackage rec {
 
   meta = with lib; {
     description = "A code coverage tool for Rust projects";
+    mainProgram = "cargo-tarpaulin";
     homepage = "https://github.com/xd009642/tarpaulin";
     changelog = "https://github.com/xd009642/tarpaulin/blob/${src.rev}/CHANGELOG.md";
     license = with licenses; [ mit /* or */ asl20 ];
