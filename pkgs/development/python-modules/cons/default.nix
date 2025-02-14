@@ -19,7 +19,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pythological";
     repo = "python-cons";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-XssERKiv4A8x7dZhLeFSciN6RCEfGs0or3PAQiYSPII=";
   };
 
@@ -39,7 +39,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "cons" ];
 
   meta = with lib; {
-    description = "An implementation of Lisp/Scheme-like cons in Python";
+    description = "Implementation of Lisp/Scheme-like cons in Python";
     homepage = "https://github.com/pythological/python-cons";
     changelog = "https://github.com/pythological/python-cons/releases/tag/v${version}";
     license = licenses.gpl3Only;

@@ -19,7 +19,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "aaugustin";
     repo = "django-sesame";
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-8jbYhD/PfPnutJZonmdrqLIQdXiUHF12w0M9tuyyDz0=";
   };
 
@@ -45,6 +45,5 @@ buildPythonPackage rec {
     homepage = "https://github.com/aaugustin/django-sesame";
     changelog = "https://github.com/aaugustin/django-sesame/blob/${version}/docs/changelog.rst";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ elohmeier ];
   };
 }

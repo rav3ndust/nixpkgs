@@ -2,7 +2,8 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  boost182,
+  cmake,
+  boost,
   gtest,
   llvmPackages,
   meson,
@@ -15,26 +16,30 @@
   nlohmann_json,
   pkg-config,
   testers,
+  python3,
 }:
 
 let
   common = rec {
-    version = "2.2.0";
+    version = "2.6.1";
 
     src = fetchFromGitHub {
       owner = "nix-community";
       repo = "nixd";
-      rev = version;
-      hash = "sha256-/8Ty1I130vWFidedt+WEaaFHS/zMFVu9vpq4Z3EBjGw=";
+      tag = version;
+      hash = "sha256-HbHqog4Ct8qWJegAHcEcIVNbSyzrmrFspdOk+SVUaHI=";
     };
 
     nativeBuildInputs = [
       meson
       ninja
+      python3
       pkg-config
     ];
 
     mesonBuildType = "release";
+
+    strictDeps = true;
 
     doCheck = true;
 
@@ -46,6 +51,7 @@ let
         inclyc
         Ruixi-rebirth
         aleksana
+        redyf
       ];
       platforms = lib.platforms.unix;
     };
@@ -66,7 +72,7 @@ in
 
       buildInputs = [
         gtest
-        boost182
+        boost
         nlohmann_json
       ];
 
@@ -76,7 +82,7 @@ in
       };
 
       meta = common.meta // {
-        description = "A Nix language frontend, parser & semantic analysis";
+        description = "Nix language frontend, parser & semantic analysis";
         mainProgram = "nixf-tidy";
       };
     }
@@ -97,7 +103,7 @@ in
       buildInputs = [
         nix
         gtest
-        boost182
+        boost
       ];
 
       env.CXXFLAGS = "-include ${nix.dev}/include/nix/config.h";
@@ -108,7 +114,7 @@ in
       };
 
       meta = common.meta // {
-        description = "A supporting library that wraps C++ nix";
+        description = "Supporting library that wraps C++ nix";
       };
     }
   );
@@ -126,8 +132,10 @@ in
         nixt
         llvmPackages.llvm
         gtest
-        boost182
+        boost
       ];
+
+      nativeBuildInputs = common.nativeBuildInputs ++ [ cmake ];
 
       env.CXXFLAGS = "-include ${nix.dev}/include/nix/config.h";
 
@@ -140,7 +148,7 @@ in
       };
 
       meta = common.meta // {
-        description = "A feature-rich Nix language server interoperating with C++ nix";
+        description = "Feature-rich Nix language server interoperating with C++ nix";
         mainProgram = "nixd";
       };
     }

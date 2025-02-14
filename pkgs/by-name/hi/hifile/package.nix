@@ -1,19 +1,24 @@
-{ lib, appimageTools, fetchurl }:
+{
+  lib,
+  appimageTools,
+  fetchurl,
+}:
 
 let
-  version = "0.9.9.12";
+  version = "0.9.9.16";
   pname = "hifile";
 
   src = fetchurl {
     url = "https://www.hifile.app/files/HiFile-${version}.AppImage";
-    hash = "sha256-/1/5n+YDO1IhkUAjRIlr2NnNoU30u3gWbvhTLbN70q0=";
+    hash = "sha256-/5ZAAq6yQQZ8NxlCeXp1jJ+fqewIGuBGD+KpjirfCjU=";
   };
 
   appimageContents = appimageTools.extractType2 {
     inherit pname version src;
   };
 
-in appimageTools.wrapType2 rec {
+in
+appimageTools.wrapType2 rec {
   inherit pname version src;
 
   extraInstallCommands = ''
@@ -22,6 +27,8 @@ in appimageTools.wrapType2 rec {
     substituteInPlace $out/share/applications/HiFile.desktop \
       --replace-fail 'Exec=HiFile' 'Exec=${pname}'
   '';
+
+  passthru.updateScript = ./update.sh;
 
   meta = with lib; {
     description = "Dual-pane graphical file manager for Windows, macOS and Linux";

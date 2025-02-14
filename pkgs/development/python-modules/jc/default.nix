@@ -14,15 +14,15 @@
 
 buildPythonPackage rec {
   pname = "jc";
-  version = "1.25.2";
+  version = "1.25.4";
   format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "kellyjonbrazil";
     repo = pname;
-    rev = "refs/tags/v${version}";
-    hash = "sha256-SDZ92m4TVH5/ldGkVZspzIrR0G1vHOv1OvAOSaWYkZ0=";
+    tag = "v${version}";
+    hash = "sha256-9006FoIGUpmb+tC2d6jLsYpKUPM5OEXxK1ztAREwZ1E=";
   };
 
   propagatedBuildInputs = [

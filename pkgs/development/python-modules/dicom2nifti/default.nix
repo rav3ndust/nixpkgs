@@ -8,23 +8,28 @@
   nibabel,
   numpy,
   pydicom,
+  pylibjpeg,
+  pylibjpeg-libjpeg,
   scipy,
   setuptools,
 }:
 
 buildPythonPackage rec {
   pname = "dicom2nifti";
-  version = "2.4.8";
-  format = "setuptools";
+  version = "2.5.1";
+  pyproject = true;
+
   disabled = pythonOlder "3.6";
 
   # no tests in PyPI dist
   src = fetchFromGitHub {
     owner = "icometrix";
     repo = pname;
-    rev = version;
-    hash = "sha256-2Pspxdeu3pHwXpbjS6bQQnvdeMuITRwYarPuLlmNcv8";
+    tag = version;
+    hash = "sha256-lPaBKqYO8B138fCgeKH6vpwGQhN3JCOnDj5PgaYfRPA=";
   };
+
+  build-system = [ setuptools ];
 
   propagatedBuildInputs = [
     gdcm
@@ -32,18 +37,18 @@ buildPythonPackage rec {
     numpy
     pydicom
     scipy
-    setuptools
   ];
 
-  # python-gdcm just builds the python interface provided by the "gdcm" package, so
-  # we should be able to replace "python-gdcm" with "gdcm" but this doesn't work
-  # (similar to https://github.com/NixOS/nixpkgs/issues/84774)
   postPatch = ''
-    substituteInPlace setup.py --replace "python-gdcm" ""
-    substituteInPlace tests/test_generic.py --replace "from common" "from dicom2nifti.common"
+    substituteInPlace tests/test_generic.py --replace-fail "from common" "from dicom2nifti.common"
+    substituteInPlace tests/test_ge.py --replace-fail "import convert_generic" "import dicom2nifti.convert_generic as convert_generic"
   '';
 
-  nativeCheckInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [
+    pytestCheckHook
+    pylibjpeg
+    pylibjpeg-libjpeg
+  ];
 
   pythonImportsCheck = [ "dicom2nifti" ];
 

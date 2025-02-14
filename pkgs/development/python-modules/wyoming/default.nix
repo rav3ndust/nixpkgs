@@ -17,19 +17,19 @@
 
 buildPythonPackage rec {
   pname = "wyoming";
-  version = "1.5.3";
+  version = "1.6.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "rhasspy";
     repo = "wyoming";
-    rev = "refs/tags/${version}";
-    hash = "sha256-SOPkvFMjoDQiWVP39+1Cx4fFmPH8wcBhZhaKapdZaeA=";
+    tag = version;
+    hash = "sha256-V3bOgL8yT+cmc/oJWd/TuhA4DQlC+HXpox4O8Odi1EQ=";
   };
 
-  nativeBuildInputs = [ setuptools ];
+  build-system = [ setuptools ];
 
-  passthru.optional-dependencies = {
+  optional-dependencies = {
     zeroconf = [ zeroconf ];
   };
 

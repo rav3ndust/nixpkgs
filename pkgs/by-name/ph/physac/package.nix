@@ -1,12 +1,12 @@
 {
   stdenvNoCC,
   fetchFromGitHub,
-  lib
+  lib,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
-  name = "physac";
-  version = "2.5-unstable-2023-12-11";
+  pname = "physac";
+  version = "1.1-unstable-2023-12-11";
 
   src = fetchFromGitHub {
     owner = "victorfisac";

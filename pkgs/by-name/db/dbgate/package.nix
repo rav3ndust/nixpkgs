@@ -2,47 +2,50 @@
   lib,
   stdenv,
   fetchurl,
-  undmg,
+  _7zz,
   appimageTools,
 }:
 let
   pname = "dbgate";
-  version = "5.2.8";
+  version = "6.1.0";
   src =
     fetchurl
       {
         aarch64-linux = {
           url = "https://github.com/dbgate/dbgate/releases/download/v${version}/dbgate-${version}-linux_arm64.AppImage";
-          hash = "sha256-gxojSSk7prhnd9fy56B9H+Cj6COBLc7xPfV8dTvSO0c=";
+          hash = "sha256-gUACJGegHFhOd9t/MVt5imwsTnOKA9Q66dKtzLHzjSo=";
         };
         x86_64-linux = {
           url = "https://github.com/dbgate/dbgate/releases/download/v${version}/dbgate-${version}-linux_x86_64.AppImage";
-          hash = "sha256-/Vfd0R+Mzx1CJKkC7dj99pbuuyh8PJtbYlH3wtwVxSM=";
+          hash = "sha256-hSqBwsroOWcyHuUimkiy13tdTKqdAjXOnECv5J9KRbw=";
         };
         x86_64-darwin = {
           url = "https://github.com/dbgate/dbgate/releases/download/v${version}/dbgate-${version}-mac_x64.dmg";
-          hash = "sha256-1kC5CNgD3KGR3nd14cBHhYKCThualLKR3CE4KGKh/Hs=";
+          hash = "sha256-tUY9TM/wP7N1giZpBlzCQlF+01XT7HA4v/kTrT57jX8=";
+        };
+        aarch64-darwin = {
+          url = "https://github.com/dbgate/dbgate/releases/download/v${version}/dbgate-${version}-mac_universal.dmg";
+          hash = "sha256-b5IJfpe3XnY1bSI6dzQro8PY4L72aFKy9GtolgFZzsA=";
         };
       }
       .${stdenv.system} or (throw "dbgate: ${stdenv.system} is unsupported.");
-
-  meta = with lib; {
-    description = "Database manager for MySQL, PostgreSQL, SQL Server, MongoDB, SQLite and others.";
-    homepage = "https://github.com/dbgate/dbgate";
-    license = licenses.mit;
-    maintainers = with maintainers; [ luftmensch-luftmensch ];
-    changelog = "https://github.com/dbgate/dbgate/blob/master/CHANGELOG.md";
+  meta = {
+    description = "Database manager for MySQL, PostgreSQL, SQL Server, MongoDB, SQLite and others";
+    homepage = "https://dbgate.org/";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ luftmensch-luftmensch ];
+    changelog = "https://github.com/dbgate/dbgate/releases/tag/v${version}";
     mainProgram = "dbgate";
     platforms = [
       "x86_64-linux"
       "x86_64-darwin"
       "aarch64-linux"
+      "aarch64-darwin"
     ];
-
-    sourceProvenance = [ sourceTypes.binaryNativeCode ];
+    sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
   };
 in
-if stdenv.isDarwin then
+if stdenv.hostPlatform.isDarwin then
   stdenv.mkDerivation {
     inherit
       pname
@@ -53,7 +56,9 @@ if stdenv.isDarwin then
 
     sourceRoot = ".";
 
-    nativeBuildInputs = [ undmg ];
+    nativeBuildInputs = [ _7zz ];
+
+    unpackPhase = "7zz x ${src}";
 
     installPhase = ''
       runHook preInstall
@@ -63,6 +68,9 @@ if stdenv.isDarwin then
     '';
   }
 else
+  let
+    appimageContents = appimageTools.extract { inherit pname src version; };
+  in
   appimageTools.wrapType2 {
     inherit
       pname
@@ -70,4 +78,9 @@ else
       src
       meta
       ;
+    extraInstallCommands = ''
+      install -m 444 -D ${appimageContents}/${pname}.desktop -t $out/share/applications
+      substituteInPlace $out/share/applications/${pname}.desktop --replace-warn "Exec=AppRun --no-sandbox" "Exec=$out/bin/${pname}"
+      cp -r ${appimageContents}/usr/share/icons $out/share
+    '';
   }

@@ -9,7 +9,7 @@
 }:
 
 stdenv.mkDerivation {
-  name = "liblapin";
+  pname = "liblapin";
   version = "0-unstable-2024-05-20";
 
   src = fetchFromGitHub {
@@ -47,7 +47,10 @@ stdenv.mkDerivation {
     libudev-zero
   ];
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   meta = {
     description = "Multimedia library for rookies and prototyping";

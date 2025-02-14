@@ -1,36 +1,40 @@
 {
   lib,
   buildPythonPackage,
-  fetchFromGitHub,
-  pytestCheckHook,
   pythonOlder,
+  fetchFromGitHub,
 
-  dask,
-  netcdf4,
+  # build-system
+  setuptools,
+  # dependencies
   numpy,
   packaging,
   pyproj,
   rasterio,
-  setuptools,
   xarray,
+  # tests
+  dask,
+  netcdf4,
+  pytestCheckHook,
+  stdenv,
 }:
 
 buildPythonPackage rec {
   pname = "rioxarray";
-  version = "0.15.5";
+  version = "0.18.2";
   pyproject = true;
   disabled = pythonOlder "3.10";
 
   src = fetchFromGitHub {
     owner = "corteva";
     repo = "rioxarray";
-    rev = version;
-    hash = "sha256-bumFZQktgUqo2lyoLtDXkh6Vv5oS/wobqYpvNYy7La0=";
+    tag = version;
+    hash = "sha256-HNtMLY83e6MQakIlmsJohmhjDWiM5/hqq25qSY1dPBw=";
   };
 
   build-system = [ setuptools ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     numpy
     packaging
     pyproj
@@ -44,13 +48,22 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
-  disabledTests = [ "test_clip_geojson__no_drop" ];
+  disabledTests =
+    [ "test_clip_geojson__no_drop" ]
+    ++ lib.optionals
+      (stdenv.hostPlatform.system == "aarch64-linux" || stdenv.hostPlatform.system == "aarch64-darwin")
+      [
+        # numerical errors
+        "test_clip_geojson"
+        "test_open_rasterio_mask_chunk_clip"
+      ];
 
   pythonImportsCheck = [ "rioxarray" ];
 
   meta = {
     description = "geospatial xarray extension powered by rasterio";
     homepage = "https://corteva.github.io/rioxarray/";
+    changelog = "https://github.com/corteva/rioxarray/releases/tag/${src.tag}";
     license = lib.licenses.asl20;
     maintainers = lib.teams.geospatial.members;
   };

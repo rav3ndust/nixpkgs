@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     homepage = "https://www.smplayer.info";
-    description = "A complete front-end for MPlayer";
+    description = "Complete front-end for MPlayer";
     longDescription = ''
       SMPlayer is a free media player for Windows and Linux with built-in codecs
       that can play virtually all video and audio formats. It doesn't need any
@@ -53,8 +53,8 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     changelog = "https://github.com/smplayer-dev/smplayer/releases/tag/${finalAttrs.src.rev}";
     license = lib.licenses.gpl3Plus;
-    maintainers = with lib.maintainers; [ AndersonTorres ];
+    maintainers = with lib.maintainers; [ ];
     platforms = lib.platforms.linux;
   };
 })
-# TODO [ AndersonTorres ]: create a wrapper including mplayer/mpv
+# TODO [ ]: create a wrapper including mplayer/mpv

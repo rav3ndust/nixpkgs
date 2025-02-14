@@ -1,6 +1,6 @@
 {
   lib,
-  stdenv,
+  buildPythonPackage,
   fetchFromGitHub,
   cmake,
   doxygen,
@@ -11,15 +11,16 @@
   scipy,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+buildPythonPackage rec {
   pname = "eigenpy";
-  version = "3.6.0";
+  version = "3.10.3";
+  pyproject = false; # Built with cmake
 
   src = fetchFromGitHub {
     owner = "stack-of-tasks";
     repo = "eigenpy";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-S6kMfpTOMqJPIFgvdcHHFDvIl2b+GE8dhJH0QFDdC1c=";
+    tag = "v${version}";
+    hash = "sha256-bO1SwBMEopJTKKLhuLQnoAs1X5RPmnyV7fbb11S2doo=";
   };
 
   outputs = [
@@ -49,13 +50,12 @@ stdenv.mkDerivation (finalAttrs: {
     numpy
   ];
 
-  doCheck = true;
   pythonImportsCheck = [ "eigenpy" ];
 
   meta = with lib; {
     description = "Bindings between Numpy and Eigen using Boost.Python";
     homepage = "https://github.com/stack-of-tasks/eigenpy";
-    changelog = "https://github.com/stack-of-tasks/eigenpy/releases/tag/v${finalAttrs.version}";
+    changelog = "https://github.com/stack-of-tasks/eigenpy/releases/tag/${src.tag}";
     license = licenses.bsd2;
     maintainers = with maintainers; [
       nim65s
@@ -63,4 +63,4 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     platforms = platforms.unix;
   };
-})
+}

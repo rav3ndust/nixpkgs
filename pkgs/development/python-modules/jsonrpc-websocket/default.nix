@@ -21,7 +21,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "emlove";
     repo = "jsonrpc-websocket";
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-CdYa4gcbG3EM1glxLU1hyqbNse87KJKjwSRQSFfDMM0=";
   };
 
@@ -46,7 +46,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "jsonrpc_websocket" ];
 
   meta = with lib; {
-    description = "A JSON-RPC websocket client library for asyncio";
+    description = "JSON-RPC websocket client library for asyncio";
     homepage = "https://github.com/emlove/jsonrpc-websocket";
     license = licenses.bsd3;
     maintainers = with maintainers; [ peterhoeg ];

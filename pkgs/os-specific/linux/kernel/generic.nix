@@ -60,7 +60,8 @@ lib.makeOverridable ({ # The kernel source tarball.
   # symbolic name and `patch' is the actual patch.  The patch may
   # optionally be compressed with gzip or bzip2.
   kernelPatches ? []
-, ignoreConfigErrors ? stdenv.hostPlatform.linux-kernel.name != "pc"
+, ignoreConfigErrors ?
+  !lib.elem stdenv.hostPlatform.linux-kernel.name [ "aarch64-multiplatform" "pc" ]
 , extraMeta ? {}
 
 , isZen      ? false
@@ -71,7 +72,7 @@ lib.makeOverridable ({ # The kernel source tarball.
 , autoModules ? stdenv.hostPlatform.linux-kernel.autoModules
 , preferBuiltin ? stdenv.hostPlatform.linux-kernel.preferBuiltin or false
 , kernelArch ? stdenv.hostPlatform.linuxArch
-, kernelTests ? []
+, kernelTests ? {}
 
 , stdenv ? args'.stdenv
 , buildPackages ? args'.buildPackages
@@ -84,7 +85,7 @@ lib.makeOverridable ({ # The kernel source tarball.
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-assert stdenv.isLinux;
+assert stdenv.hostPlatform.isLinux;
 
 let
   # Dirty hack to make sure that `version` & `src` have
@@ -97,7 +98,7 @@ let
   # For further context, see https://github.com/NixOS/nixpkgs/pull/143113#issuecomment-953319957
   basicArgs = builtins.removeAttrs
     args
-    (lib.filter (x: ! (builtins.elem x [ "version" "src" ])) (lib.attrNames args));
+    (lib.filter (x: ! (builtins.elem x [ "version" "pname" "src" ])) (lib.attrNames args));
 
   # Combine the `features' attribute sets of all the kernel patches.
   kernelFeatures = lib.foldr (x: y: (x.features or {}) // y) ({
@@ -108,6 +109,11 @@ let
 
   commonStructuredConfig = import ./common-config.nix {
     inherit lib stdenv version;
+    rustAvailable =
+      lib.any (lib.meta.platformMatch stdenv.hostPlatform) rustc.targetPlatforms
+      && lib.all (p: !lib.meta.platformMatch stdenv.hostPlatform p) rustc.badTargetPlatforms
+      # Known to be broken: https://lore.kernel.org/lkml/31885EDD-EF6D-4EF1-94CA-276BA7A340B7@kernel.org/T/
+      && !(stdenv.hostPlatform.isRiscV && stdenv.cc.isGNU);
 
     features = kernelFeatures; # Ensure we know of all extra patches, etc.
   };
@@ -140,8 +146,7 @@ let
     passAsFile = [ "kernelConfig" ];
 
     depsBuildBuild = [ buildPackages.stdenv.cc ];
-    nativeBuildInputs = [ perl gmp libmpc mpfr ]
-      ++ lib.optionals (lib.versionAtLeast version "4.16") [ bison flex ]
+    nativeBuildInputs = [ perl gmp libmpc mpfr bison flex ]
       ++ lib.optional (lib.versionAtLeast version "5.2") pahole
       ++ lib.optionals withRust [ rust-bindgen rustc ]
     ;
@@ -167,23 +172,18 @@ let
 
     buildPhase = ''
       export buildRoot="''${buildRoot:-build}"
-      export HOSTCC=$CC_FOR_BUILD
-      export HOSTCXX=$CXX_FOR_BUILD
-      export HOSTAR=$AR_FOR_BUILD
-      export HOSTLD=$LD_FOR_BUILD
 
       # Get a basic config file for later refinement with $generateConfig.
       make $makeFlags \
           -C . O="$buildRoot" $kernelBaseConfig \
-          ARCH=$kernelArch \
-          HOSTCC=$HOSTCC HOSTCXX=$HOSTCXX HOSTAR=$HOSTAR HOSTLD=$HOSTLD \
-          CC=$CC OBJCOPY=$OBJCOPY OBJDUMP=$OBJDUMP READELF=$READELF \
+          ARCH=$kernelArch CROSS_COMPILE=${stdenv.cc.targetPrefix} \
           $makeFlags
 
       # Create the config file.
       echo "generating kernel configuration..."
       ln -s "$kernelConfigPath" "$buildRoot/kernel-config"
-      DEBUG=1 ARCH=$kernelArch KERNEL_CONFIG="$buildRoot/kernel-config" AUTO_MODULES=$autoModules \
+      DEBUG=1 ARCH=$kernelArch CROSS_COMPILE=${stdenv.cc.targetPrefix} \
+        KERNEL_CONFIG="$buildRoot/kernel-config" AUTO_MODULES=$autoModules \
         PREFER_BUILTIN=$preferBuiltin BUILD_ROOT="$buildRoot" SRC=. MAKE_FLAGS="$makeFlags" \
         perl -w $generateConfig
     '';
@@ -220,7 +220,7 @@ let
 
     config = {
       CONFIG_MODULES = "y";
-      CONFIG_FW_LOADER = "m";
+      CONFIG_FW_LOADER = "y";
       CONFIG_RUST = if withRust then "y" else "n";
     };
   });
@@ -235,8 +235,8 @@ kernel.overrideAttrs (finalAttrs: previousAttrs: {
 
     # Adds dependencies needed to edit the config:
     # nix-shell '<nixpkgs>' -A linux.configEnv --command 'make nconfig'
-    configEnv = kernel.overrideAttrs (old: {
-      nativeBuildInputs = old.nativeBuildInputs or [] ++ (with buildPackages; [
+    configEnv = finalAttrs.finalPackage.overrideAttrs (previousAttrs: {
+      nativeBuildInputs = previousAttrs.nativeBuildInputs or [ ] ++ (with buildPackages; [
         pkg-config ncurses
       ]);
     });
@@ -277,12 +277,12 @@ kernel.overrideAttrs (finalAttrs: previousAttrs: {
             modDirVersion = throw (explain "modDirVersion");
           }))).version
           emptyFile;
-    in [
-      (nixosTests.kernel-generic.passthru.testsForKernel overridableKernel)
-      versionDoesNotDependOnPatchesEtc
+    in {
+      inherit versionDoesNotDependOnPatchesEtc;
+      testsForKernel = nixosTests.kernel-generic.passthru.testsForKernel overridableKernel;
       # Disabled by default, because the infinite recursion is hard to understand. The other test's error is better and produces a shorter trace.
-      # versionDoesNotDependOnPatchesEtcNixOS
-    ] ++ kernelTests;
+      # inherit versionDoesNotDependOnPatchesEtcNixOS;
+    } // kernelTests;
   };
 
 }));

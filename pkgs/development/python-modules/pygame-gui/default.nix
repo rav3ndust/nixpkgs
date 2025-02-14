@@ -1,7 +1,9 @@
 {
   lib,
   pkgs,
+  stdenv,
   buildPythonPackage,
+  nix-update-script,
   fetchFromGitHub,
   setuptools,
   pygame-ce,
@@ -11,15 +13,15 @@
 
 buildPythonPackage rec {
   pname = "pygame-gui";
-  version = "0610";
+  version = "0613";
   pyproject = true;
   # nixpkgs-update: no auto update
 
   src = fetchFromGitHub {
     owner = "MyreMylar";
     repo = "pygame_gui";
-    rev = "refs/tags/v_${version}";
-    hash = "sha256-PVNi/I174AyEEjc+N2UGtgOYSGAgVQbqrKkWZnjOxFY=";
+    tag = "v_${version}";
+    hash = "sha256-vLDl3VcrjjWpw4hLuKmomK6EykF1VK1CGLkEqjNUQ/Q=";
   };
 
   nativeBuildInputs = [ setuptools ];
@@ -41,23 +43,36 @@ buildPythonPackage rec {
     export SDL_VIDEODRIVER=dummy
   '';
 
-  disabledTests = [
-    # Clipboard doesn't exist in test environment
-    "test_process_event_text_ctrl_c"
-    "test_process_event_text_ctrl_v"
-    "test_process_event_text_ctrl_v_nothing"
-    "test_process_event_ctrl_v_over_limit"
-    "test_process_event_ctrl_v_at_limit"
-    "test_process_event_ctrl_v_over_limit_select_range"
-    "test_process_event_text_ctrl_v_select_range"
-    "test_process_event_text_ctrl_a"
-    "test_process_event_text_ctrl_x"
-  ];
+  disabledTests =
+    [
+      # Clipboard doesn't exist in test environment
+      "test_process_event_text_ctrl_c"
+      "test_process_event_text_ctrl_v"
+      "test_process_event_text_ctrl_v_nothing"
+      "test_process_event_ctrl_v_over_limit"
+      "test_process_event_ctrl_v_at_limit"
+      "test_process_event_ctrl_v_over_limit_select_range"
+      "test_process_event_text_ctrl_v_select_range"
+      "test_process_event_text_ctrl_a"
+      "test_process_event_text_ctrl_x"
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      # fails to determine "/" as an existing path
+      # https://github.com/MyreMylar/pygame_gui/issues/644
+      "test_process_event"
+    ];
 
   disabledTestPaths = [ "tests/test_performance/test_text_performance.py" ];
 
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "v_(.*)"
+    ];
+  };
+
   meta = with lib; {
-    description = "A GUI system for pygame";
+    description = "GUI system for pygame";
     homepage = "https://github.com/MyreMylar/pygame_gui";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [

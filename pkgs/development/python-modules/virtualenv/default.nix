@@ -2,7 +2,6 @@
   lib,
   buildPythonPackage,
   pythonOlder,
-  isPy27,
   isPyPy,
   cython,
   distlib,
@@ -22,14 +21,14 @@
 
 buildPythonPackage rec {
   pname = "virtualenv";
-  version = "20.25.3";
+  version = "20.29.1";
   format = "pyproject";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-e7VUu9/qrMM0n6YU6lv/asMA/HwzXp+s86O8/HA/Rb4=";
+    hash = "sha256-uLiXATjTL7YGGSy5f2zUu2RPpIa+kwj7m2P4EJG13DU=";
   };
 
   nativeBuildInputs = [
@@ -83,11 +82,11 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "virtualenv" ];
 
   meta = with lib; {
-    description = "A tool to create isolated Python environments";
+    description = "Tool to create isolated Python environments";
     mainProgram = "virtualenv";
     homepage = "http://www.virtualenv.org";
     changelog = "https://github.com/pypa/virtualenv/blob/${version}/docs/changelog.rst";
     license = licenses.mit;
-    maintainers = with maintainers; [ goibhniu ];
+    maintainers = [ ];
   };
 }

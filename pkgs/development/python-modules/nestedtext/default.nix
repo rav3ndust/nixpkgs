@@ -23,7 +23,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "KenKundert";
     repo = "nestedtext";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-lNqSmEmzuRGdXs/4mwKSh7yDGHnAykpIDIR+abbLCns=";
   };
 
@@ -62,7 +62,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "nestedtext" ];
 
   meta = with lib; {
-    description = "A human friendly data format";
+    description = "Human friendly data format";
     longDescription = ''
       NestedText is a file format for holding data that is to be entered,
       edited, or viewed by people. It allows data to be organized into a nested

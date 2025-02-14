@@ -1,28 +1,31 @@
-{ lib
-, go
-, buildGoModule
-, fetchFromGitHub
-, nix-update-script
-, installShellFiles
+{
+  lib,
+  go,
+  buildGoModule,
+  fetchFromGitHub,
+  nix-update-script,
+  installShellFiles,
+  testers,
+  updatecli,
 }:
 
 buildGoModule rec {
   pname = "updatecli";
-  version = "0.78.0";
+  version = "0.92.0";
 
   src = fetchFromGitHub {
     owner = "updatecli";
-    repo = pname;
+    repo = "updatecli";
     rev = "v${version}";
-    hash = "sha256-VpMi+r7QUSD99PRzbTeIxXn1O9GdfHNJM1F0OBzvNmc=";
+    hash = "sha256-cdutmuNcsrAq+b38/QhBjTS3e1f3s6Ffarvnxt3NX3k=";
   };
 
-  vendorHash = "sha256-Ji8r5c8LP7StGp/ve9RkQDeL21HBoK3Fln8LGBeqBpw=";
+  vendorHash = "sha256-J2vARkThxgu0bYLQv80AKIC4XmfWdnabZn0gOyhe43U=";
 
   # tests require network access
   doCheck = false;
 
-  CGO_ENABLED = 0;
+  env.CGO_ENABLED = 0;
 
   ldflags = [
     "-s"
@@ -32,7 +35,13 @@ buildGoModule rec {
     "-X github.com/updatecli/updatecli/pkg/core/version.Version=${version}"
   ];
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    updateScript = nix-update-script { };
+    tests.version = testers.testVersion {
+      package = updatecli;
+      command = "updatecli version";
+    };
+  };
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -47,12 +56,12 @@ buildGoModule rec {
   '';
 
   meta = with lib; {
-    description = "A Declarative Dependency Management tool";
+    description = "Declarative Dependency Management tool";
     longDescription = ''
       Updatecli is a command-line tool used to define and apply update strategies.
     '';
     homepage = "https://www.updatecli.io";
-    changelog = "https://github.com/updatecli/updatecli/releases/tag/v${version}";
+    changelog = "https://github.com/updatecli/updatecli/releases/tag/${src.rev}";
     license = licenses.asl20;
     mainProgram = "updatecli";
     maintainers = with maintainers; [ croissong ];

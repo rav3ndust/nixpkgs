@@ -21,10 +21,10 @@ buildPythonPackage rec {
     hash = "sha256-uGZ0XFxnZHSLEWcwoHVd+xMulDRqEIrQ5Lf7886GdlM=";
   };
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
+  cargoDeps = rustPlatform.fetchCargoVendor {
     inherit src;
     name = "${pname}-${version}";
-    hash = "sha256-a4jNofPIHoKwsD82y2hG2QPu+eM5D7FSGCm2nDo2cLA=";
+    hash = "sha256-9kKHLYD0tXMGJFhsCBgO/NpWB4J5QZh0qKIuI3PFn2c=";
   };
 
   nativeBuildInputs = with rustPlatform; [
@@ -35,12 +35,12 @@ buildPythonPackage rec {
 
   checkInputs = [ pytestCheckHook ];
 
-  buildInputs = [ vectorscan ] ++ lib.optional stdenv.isDarwin libiconv;
+  buildInputs = [ vectorscan ] ++ lib.optional stdenv.hostPlatform.isDarwin libiconv;
 
   pythonImportsCheck = [ "pyperscan" ];
 
   meta = with lib; {
-    description = "a hyperscan binding for Python, which supports vectorscan";
+    description = "Hyperscan binding for Python, which supports vectorscan";
     homepage = "https://vlaci.github.io/pyperscan/";
     changelog = "https://github.com/vlaci/pyperscan/releases/tag/${src.rev}";
     platforms = platforms.unix;

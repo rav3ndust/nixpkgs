@@ -18,14 +18,14 @@
 
 buildPythonPackage rec {
   pname = "nilearn";
-  version = "0.10.4";
+  version = "0.11.1";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-lFC9Vqd22ZezJPRd0Yv5bom9jYAWCXT8x1kzP7rqNcI=";
+    hash = "sha256-oB3wj8bI3tPNb7eiEWNGA61Gpt94BQS20FIiwuepcv4=";
   };
 
   nativeBuildInputs = [ hatch-vcs ];
@@ -49,7 +49,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     homepage = "https://nilearn.github.io";
-    description = "A module for statistical learning on neuroimaging data";
+    description = "Module for statistical learning on neuroimaging data";
     changelog = "https://github.com/nilearn/nilearn/releases/tag/${version}";
     license = licenses.bsd3;
   };

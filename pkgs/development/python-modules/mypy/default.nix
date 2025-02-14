@@ -3,6 +3,7 @@
   stdenv,
   buildPythonPackage,
   fetchFromGitHub,
+  gitUpdater,
   pythonAtLeast,
   pythonOlder,
 
@@ -26,11 +27,12 @@
   filelock,
   pytest-xdist,
   pytestCheckHook,
+  nixosTests,
 }:
 
 buildPythonPackage rec {
   pname = "mypy";
-  version = "1.10.0";
+  version = "1.14.1";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -38,8 +40,12 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "python";
     repo = "mypy";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-NCnc4C/YFKHN/kT7RTFCYs/yC00Kt1E7mWCoQuUjxG8=";
+    tag = "v${version}";
+    hash = "sha256-Ha7icLFc4BL7a3NECcwX4dtWmkXctANCqu/IbrEnmjw=";
+  };
+
+  passthru.updateScript = gitUpdater {
+    rev-prefix = "v";
   };
 
   build-system = [
@@ -118,11 +124,17 @@ buildPythonPackage rec {
       "mypyc/test/test_run.py"
     ];
 
-  meta = with lib; {
+  passthru.tests = {
+    # Failing typing checks on the test-driver result in channel blockers.
+    inherit (nixosTests) nixos-test-driver;
+  };
+
+  meta = {
     description = "Optional static typing for Python";
     homepage = "https://www.mypy-lang.org";
-    license = licenses.mit;
+    changelog = "https://github.com/python/mypy/blob/${src.rev}/CHANGELOG.md";
+    license = lib.licenses.mit;
     mainProgram = "mypy";
-    maintainers = with maintainers; [ lnl7 ];
+    maintainers = with lib.maintainers; [ lnl7 ];
   };
 }

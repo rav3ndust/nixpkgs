@@ -8,13 +8,12 @@
   pymupdf,
   pypdf,
   pythonOlder,
-  pythonRelaxDepsHook,
   striprtf,
 }:
 
 buildPythonPackage rec {
   pname = "llama-index-readers-file";
-  version = "0.1.23";
+  version = "0.4.4";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -22,17 +21,16 @@ buildPythonPackage rec {
   src = fetchPypi {
     pname = "llama_index_readers_file";
     inherit version;
-    hash = "sha256-/ejstYjnA4SeUdwPB19W0fXbO8FHndAMIbQuk7gbYmc=";
+    hash = "sha256-4Haz+h5o7qFZTUfOwfZLOE+2Bn8ml8qKriK0ohrSfKc=";
   };
 
   pythonRelaxDeps = [
     "pymupdf"
     "pypdf"
+    "striprtf"
   ];
 
   build-system = [ poetry-core ];
-
-  nativeBuildInputs = [ pythonRelaxDepsHook ];
 
   dependencies = [
     beautifulsoup4

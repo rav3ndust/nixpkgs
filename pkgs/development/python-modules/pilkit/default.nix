@@ -19,7 +19,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "matthewwithanm";
     repo = pname;
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-NmD9PFCkz3lz4AnGoQUpkt35q0zvDVm+kx7lVDFBcHk=";
   };
 
@@ -42,7 +42,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "pilkit" ];
 
   meta = with lib; {
-    description = "A collection of utilities and processors for the Python Imaging Library";
+    description = "Collection of utilities and processors for the Python Imaging Library";
     homepage = "https://github.com/matthewwithanm/pilkit/";
     license = licenses.bsd3;
     maintainers = with maintainers; [ domenkozar ];

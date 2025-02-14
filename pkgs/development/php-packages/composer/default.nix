@@ -2,12 +2,13 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  fetchpatch,
   callPackage,
   php,
   unzip,
   _7zz,
   xz,
-  git,
+  gitMinimal,
   curl,
   cacert,
   makeBinaryWrapper,
@@ -15,13 +16,13 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "composer";
-  version = "2.7.6";
+  version = "2.8.5";
 
   # Hash used by ../../../build-support/php/pkgs/composer-phar.nix to
   # use together with the version from this package to keep the
   # bootstrap phar file up-to-date together with the end user composer
   # package.
-  passthru.pharHash = "sha256-KdyaGe8zU12wYbMRgLKoM6fPjSz0FFszovg1BId7ugg=";
+  passthru.pharHash = "sha256-nO8YIS4iI1GutHa4HeeypTg/d1M2R0Rnv1x8z+hKsMw=";
 
   composer = callPackage ../../../build-support/php/pkgs/composer-phar.nix {
     inherit (finalAttrs) version;
@@ -31,8 +32,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "composer";
     repo = "composer";
-    rev = finalAttrs.version;
-    hash = "sha256-LZwg3PR3zl07Nb6MS8oKkRfjLgqtT/c4sfUOzWE4S+U=";
+    tag = finalAttrs.version;
+    hash = "sha256-/E/fXh+jefPwzsADpmGyrJ+xqW5CSPNok0DVLD1KZDY=";
   };
 
   nativeBuildInputs = [ makeBinaryWrapper ];
@@ -86,7 +87,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
-    outputHash = "sha256-AyX57oV5Jf8U4B9tEl+b2Rnt/Igu7ockEap0wfN9b2Q=";
+    outputHash = "sha256-UcMB0leKqD8cXeExXpjDgPvF8pfhGXnCR0EN4FVWouw=";
   };
 
   installPhase = ''
@@ -101,7 +102,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         lib.makeBinPath [
           _7zz
           curl
-          git
+          gitMinimal
           unzip
           xz
         ]

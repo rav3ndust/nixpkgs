@@ -13,7 +13,7 @@
 
 buildPythonPackage rec {
   pname = "mesa";
-  version = "2.2.4";
+  version = "3.1.3";
   format = "setuptools";
 
   # According to their docs, this library is for Python 3+.
@@ -22,7 +22,7 @@ buildPythonPackage rec {
   src = fetchPypi {
     pname = "mesa";
     inherit version;
-    hash = "sha256-5og3ACS2r36BEGWfqtw6WG6yJwNF5p3M9K25sSmHosM=";
+    hash = "sha256-sM9k3fkk0RMU3OPF8JISOspw+KoR7PXHPK7IMIGAS78=";
   };
 
   propagatedBuildInputs = [
@@ -43,7 +43,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     homepage = "https://github.com/projectmesa/mesa";
-    description = "An agent-based modeling (or ABM) framework in Python";
+    description = "Agent-based modeling (or ABM) framework in Python";
     license = licenses.asl20;
     maintainers = [ maintainers.dpaetzel ];
     broken = true; # missing dependencies

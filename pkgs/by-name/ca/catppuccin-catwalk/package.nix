@@ -8,7 +8,7 @@
   libwebp,
 }:
 let
-  version = "1.3.1";
+  version = "1.3.2";
 in
 rustPlatform.buildRustPackage {
   pname = "catppuccin-catwalk";
@@ -16,13 +16,13 @@ rustPlatform.buildRustPackage {
 
   src = fetchFromGitHub {
     owner = "catppuccin";
-    repo = "toolbox";
-    rev = "refs/tags/catwalk-v${version}";
-    hash = "sha256-Mk4Kv1EfaDiqLUa+aOPeoM4jFlKoUau+VuqmnazRgGI=";
+    repo = "catwalk";
+    tag = "v${version}";
+    hash = "sha256-Yj9xTQJ0eu3Ymi2R9fgYwBJO0V+4bN4MOxXCJGQ8NjU=";
   };
 
-  buildAndTestSubdir = "catwalk";
-  cargoHash = "sha256-qxY8CUOl7fF4afJyFjGeOVk7GX/cewC/hAaJf6m5tfA=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-stO8ejSC4UeEeMZZLIJ8Wabn7A6ZrWQlU5cZDSm2AVc=";
 
   nativeBuildInputs = [
     installShellFiles
@@ -46,7 +46,7 @@ rustPlatform.buildRustPackage {
 
   meta = {
     homepage = "https://github.com/catppuccin/toolbox/tree/main/catwalk";
-    description = "A CLI for Catppuccin that takes in four showcase images and displays them all at once";
+    description = "CLI for Catppuccin that takes in four showcase images and displays them all at once";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ ryanccn ];
     mainProgram = "catwalk";

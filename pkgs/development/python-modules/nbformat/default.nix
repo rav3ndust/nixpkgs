@@ -1,6 +1,7 @@
 {
   lib,
   buildPythonPackage,
+  pythonAtLeast,
   pythonOlder,
   fetchPypi,
   hatchling,
@@ -45,11 +46,19 @@ buildPythonPackage rec {
     testpath
   ];
 
+  disabledTestPaths = lib.optionals (pythonAtLeast "3.13") [
+    # ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffff54954e0>
+    "tests/test_validator.py"
+    "tests/v4/test_convert.py"
+    "tests/v4/test_json.py"
+    "tests/v4/test_validate.py"
+  ];
+
   # Some of the tests use localhost networking.
   __darwinAllowLocalNetworking = true;
 
   meta = {
-    description = "The Jupyter Notebook format";
+    description = "Jupyter Notebook format";
     mainProgram = "jupyter-trust";
     homepage = "https://jupyter.org/";
     license = lib.licenses.bsd3;

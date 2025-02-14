@@ -18,7 +18,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "kaizendorks";
     repo = "pymongo_inmemory";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-FDHHf9x62EqNcHjDF2vH8w8WG/15efEe+fDqGiiOe4A=";
   };
 
@@ -55,7 +55,7 @@ buildPythonPackage rec {
 
   meta = {
     homepage = "https://github.com/kaizendorks/pymongo_inmemory";
-    description = "A mongo mocking library with an ephemeral MongoDB running in memory";
+    description = "Mongo mocking library with an ephemeral MongoDB running in memory";
     maintainers = with lib.maintainers; [ pbsds ];
     license = lib.licenses.mit;
   };

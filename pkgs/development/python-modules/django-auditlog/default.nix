@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   buildPythonPackage,
   fetchFromGitHub,
   setuptools,
@@ -42,6 +43,8 @@ buildPythonPackage rec {
     postgresqlTestHook
   ];
 
+  doCheck = stdenv.hostPlatform.isLinux; # postgres fails to allocate shm on darwin
+
   postgresqlTestUserOptions = "LOGIN SUPERUSER";
 
   checkPhase = ''
@@ -60,7 +63,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     changelog = "https://github.com/jazzband/django-auditlog/blob/v${version}/CHANGELOG.md";
-    description = "A Django app that keeps a log of changes made to an object";
+    description = "Django app that keeps a log of changes made to an object";
     downloadPage = "https://github.com/jazzband/django-auditlog";
     license = licenses.mit;
     maintainers = with maintainers; [ leona ];

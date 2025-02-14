@@ -25,14 +25,14 @@ buildPythonPackage rec {
 
   buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [ libiconv ];
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
+  cargoDeps = rustPlatform.fetchCargoVendor {
     inherit src;
     name = "${pname}-${version}";
-    hash = "sha256-wHObfXWgcbSYxk5d17s44+1qIGYD/Ygefxp+el0fsEc=";
+    hash = "sha256-I6aUSGeosVYrFcHw0w6hprIL++c7ocYEorrQhe4ib+Y=";
   };
 
   meta = with lib; {
-    description = "Python bindings to the Rust regress crate, exposing ECMA regular expressions.";
+    description = "Python bindings to the Rust regress crate, exposing ECMA regular expressions";
     homepage = "https://github.com/Julian/regress";
     license = licenses.mit;
     maintainers = [ maintainers.matthiasbeyer ];

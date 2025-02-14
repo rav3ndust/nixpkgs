@@ -12,54 +12,65 @@
   setuptools,
   wrapGAppsNoGuiHook,
   notify2,
+  glib,
 }:
 
 let
   common = import ./common.nix { inherit lib fetchFromGitHub; };
 in
-buildPythonPackage (common // {
-  pname = "openrazer-daemon";
+buildPythonPackage (
+  common
+  // {
+    pname = "openrazer-daemon";
 
-  outputs = [
-    "out"
-    "man"
-  ];
+    outputs = [
+      "out"
+      "man"
+    ];
 
-  sourceRoot = "${common.src.name}/daemon";
+    sourceRoot = "${common.src.name}/daemon";
 
-  postPatch = ''
-    substituteInPlace openrazer_daemon/daemon.py \
-      --replace-fail "plugdev" "openrazer"
-  '';
+    postPatch = ''
+      substituteInPlace openrazer_daemon/daemon.py \
+        --replace-fail "plugdev" "openrazer"
+    '';
 
-  nativeBuildInputs = [ setuptools wrapGAppsNoGuiHook ];
+    nativeBuildInputs = [
+      setuptools
+      wrapGAppsNoGuiHook
+      gobject-introspection
+    ];
 
-  propagatedBuildInputs = [
-    daemonize
-    dbus-python
-    gobject-introspection
-    gtk3
-    pygobject3
-    pyudev
-    setproctitle
-    notify2
-  ];
+    buildInputs = [
+      glib
+      gtk3
+    ];
 
-  postInstall = ''
-    DESTDIR="$out" PREFIX="" make manpages install-resources install-systemd
-  '';
+    propagatedBuildInputs = [
+      daemonize
+      dbus-python
+      pygobject3
+      pyudev
+      setproctitle
+      notify2
+    ];
 
-  # no tests run
-  doCheck = false;
+    postInstall = ''
+      DESTDIR="$out" PREFIX="" make manpages install-resources install-systemd
+    '';
 
-  dontWrapGApps = true;
+    # no tests run
+    doCheck = false;
 
-  preFixup = ''
-    makeWrapperArgs+=("''${gappsWrapperArgs[@]}")
-  '';
+    dontWrapGApps = true;
 
-  meta = common.meta // {
-    description = "An entirely open source user-space daemon that allows you to manage your Razer peripherals on GNU/Linux";
-    mainProgram = "openrazer-daemon";
-  };
-})
+    preFixup = ''
+      makeWrapperArgs+=("''${gappsWrapperArgs[@]}")
+    '';
+
+    meta = common.meta // {
+      description = "Entirely open source user-space daemon that allows you to manage your Razer peripherals on GNU/Linux";
+      mainProgram = "openrazer-daemon";
+    };
+  }
+)

@@ -20,7 +20,7 @@
 
 buildPythonPackage rec {
   pname = "urwid";
-  version = "2.6.12";
+  version = "2.6.16";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -28,8 +28,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "urwid";
     repo = "urwid";
-    rev = "refs/tags/${version}";
-    hash = "sha256-JGX9v/x8c7ayHnxVjC7u4YLs3OvZmTzPNFUfqGCeIRQ=";
+    tag = version;
+    hash = "sha256-D5NHtU7XQRh8OqkwrN5r8U/VGF87LGwdnaqGhdjN8AE=";
   };
 
   postPatch = ''
@@ -46,7 +46,7 @@ buildPythonPackage rec {
     wcwidth
   ];
 
-  passthru.optional-dependencies = {
+  optional-dependencies = {
     glib = [ pygobject3 ];
     tornado = [ tornado ];
     trio = [
@@ -62,11 +62,16 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     glibcLocales
     pytestCheckHook
-  ] ++ lib.flatten (builtins.attrValues passthru.optional-dependencies);
+  ] ++ lib.flatten (builtins.attrValues optional-dependencies);
 
   env.LC_ALL = "en_US.UTF8";
 
   pytestFlagsArray = [ "tests" ];
+
+  disabledTests = [
+    # Flaky tests
+    "TwistedEventLoopTest"
+  ];
 
   disabledTestPaths = [
     # expect call hangs
@@ -76,11 +81,11 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "urwid" ];
 
   meta = with lib; {
-    description = "A full-featured console (xterm et al.) user interface library";
+    description = "Full-featured console (xterm et al.) user interface library";
     changelog = "https://github.com/urwid/urwid/releases/tag/${version}";
     downloadPage = "https://github.com/urwid/urwid";
     homepage = "https://urwid.org/";
     license = licenses.lgpl21Plus;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

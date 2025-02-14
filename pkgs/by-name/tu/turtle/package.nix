@@ -9,15 +9,15 @@
 
 python3Packages.buildPythonApplication rec {
   pname = "turtle";
-  version = "0.8";
+  version = "0.11";
   pyproject = true;
 
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "philippun1";
     repo = "turtle";
-    rev = version;
-    hash = "sha256-YacuT5S6WrhSz031XXCQTo++r+DBozrIIXrn9BwmrR0=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-st6Y2hIaMiApoAG7IFoyQC9hKXdvothkv+5toXsUdVA=";
   };
 
   postPatch = ''
@@ -38,6 +38,8 @@ python3Packages.buildPythonApplication rec {
   dependencies = with python3Packages; [
     pygobject3
     pygit2
+    secretstorage
+    dbus-python
   ];
 
   postInstall = ''
@@ -68,7 +70,7 @@ python3Packages.buildPythonApplication rec {
     '';
 
   meta = {
-    description = "A graphical interface for version control intended to run on gnome and nautilus";
+    description = "Graphical interface for version control intended to run on gnome and nautilus";
     homepage = "https://gitlab.gnome.org/philippun1/turtle";
     license = lib.licenses.gpl3Plus;
     mainProgram = "turtle_cli";

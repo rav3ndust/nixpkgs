@@ -5,6 +5,7 @@
   fetchPypi,
   isPyPy,
   R,
+  libdeflate,
   rWrapper,
   rPackages,
   pcre,
@@ -25,14 +26,14 @@
 }:
 
 buildPythonPackage rec {
-  version = "3.5.16";
+  version = "3.5.17";
   format = "setuptools";
   pname = "rpy2";
 
   disabled = isPyPy;
   src = fetchPypi {
     inherit version pname;
-    hash = "sha256-g34vdFg2WKXEwzl2GnP5Q08z75ztPjDGTadWIWXCgBs=";
+    hash = "sha256-2/8Iww89eRYZImI4WKWztoo/uo7hdH1q9BvEumjz1YI=";
   };
 
   patches = [
@@ -53,6 +54,7 @@ buildPythonPackage rec {
       bzip2
       zlib
       icu
+      libdeflate
     ]
     ++ (with rPackages; [
       # packages expected by the test framework
@@ -85,7 +87,14 @@ buildPythonPackage rec {
     simplegeneric
   ];
 
-  doCheck = !stdenv.isDarwin;
+  doCheck = !stdenv.hostPlatform.isDarwin;
+
+  # https://github.com/rpy2/rpy2/issues/1111
+  disabledTests = [
+    "test_parse_incomplete_error"
+    "test_parse_error"
+    "test_parse_error_when_evaluting"
+  ];
 
   nativeCheckInputs = [ pytestCheckHook ];
 

@@ -1,35 +1,42 @@
 {
   lib,
   buildPythonPackage,
-  fetchFromGitHub,
-  pytestCheckHook,
   pythonOlder,
+  fetchFromGitHub,
 
-  colormath,
+  # build-system
   cython,
   oldest-supported-numpy,
   setuptools,
+
+  # dependencies
+  numpy,
+
+  # checks
+  colormath,
+  pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "color-operations";
-  version = "0.1.3";
+  version = "0.1.6";
   pyproject = true;
   disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "vincentsarago";
     repo = "color-operations";
-    rev = version;
-    hash = "sha256-KsrgilcNK2ufPKrhtGdf8mdlFzhsHB2jHN+WDlZqabc=";
+    tag = version;
+    hash = "sha256-hHfcScKYemvPg2V5wn1Wsctjg6vgzljk5sAw+I+kS6w=";
   };
 
-  nativeBuildInputs = [
+  build-system = [
     cython
+    oldest-supported-numpy
     setuptools
   ];
 
-  propagatedBuildInputs = [ oldest-supported-numpy ];
+  dependencies = [ numpy ];
 
   nativeCheckInputs = [
     colormath

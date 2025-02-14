@@ -17,7 +17,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "alenrajsp";
     repo = "tcxreader";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-qTAqRzrHFj0nEujlkBohLaprIvvkSYhcDoRfqWIJMjo=";
   };
 
@@ -28,7 +28,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "tcxreader" ];
 
   meta = with lib; {
-    description = "A reader for Garmin’s TCX file format";
+    description = "Reader for Garmin’s TCX file format";
     homepage = "https://github.com/alenrajsp/tcxreader";
     changelog = "https://github.com/alenrajsp/tcxreader/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;

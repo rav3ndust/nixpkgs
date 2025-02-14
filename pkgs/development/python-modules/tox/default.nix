@@ -8,7 +8,6 @@
   py,
   six,
   virtualenv,
-  setuptools-scm,
   toml,
   tomli,
   filelock,
@@ -25,14 +24,14 @@
 
 buildPythonPackage rec {
   pname = "tox";
-  version = "4.15.0";
+  version = "4.23.2";
   format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "tox-dev";
     repo = "tox";
-    rev = "refs/tags/${version}";
-    hash = "sha256-aKk3a0RAcLyrHK6I3Q7rcBdZVJGNBXsBqA8N7Kpdrms=";
+    tag = version;
+    hash = "sha256-rjz+CSGuGlQy9oneISJJo8doQf7abE9gNVpAnhD8Os8=";
   };
 
   postPatch = ''
@@ -67,11 +66,11 @@ buildPythonPackage rec {
   };
 
   meta = with lib; {
-    changelog = "https://github.com/tox-dev/tox/releases/tag/${version}";
-    description = "A generic virtualenv management and test command line tool";
+    changelog = "https://github.com/tox-dev/tox/releases/tag/${src.tag}";
+    description = "Generic virtualenv management and test command line tool";
     mainProgram = "tox";
     homepage = "https://github.com/tox-dev/tox";
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

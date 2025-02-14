@@ -1,33 +1,34 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
   buildPythonPackage,
-  poetry-core,
+  fetchFromGitHub,
+  hatchling,
+  ncurses,
+  procps,
   pytest-rerunfailures,
   pytestCheckHook,
-  procps,
   tmux,
-  ncurses,
 }:
 
 buildPythonPackage rec {
   pname = "libtmux";
-  version = "0.36.0";
+  version = "0.40.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "tmux-python";
-    repo = pname;
-    rev = "refs/tags/v${version}";
-    hash = "sha256-oJ2IGaPFMKA/amUEPZi1UO9vZtjPNQg3SIFjQWzUeSE=";
+    repo = "libtmux";
+    tag = "v${version}";
+    hash = "sha256-rddjRBofI5M28wvlBwH2VwuIgmulThxbfxiJSOCNkPY=";
   };
 
   postPatch = ''
-    sed -i '/addopts/d' pyproject.toml
+    substituteInPlace pyproject.toml \
+      --replace-fail '"--doctest-docutils-modules",' ""
   '';
 
-  nativeBuildInputs = [ poetry-core ];
+  build-system = [ hatchling ];
 
   nativeCheckInputs = [
     procps
@@ -46,14 +47,13 @@ buildPythonPackage rec {
       # Assertion error
       "test_capture_pane_start"
     ]
-    ++ lib.optionals stdenv.isDarwin [
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
       # tests/test_pane.py:113: AssertionError
       "test_capture_pane_start"
     ];
 
-  disabledTestPaths = lib.optionals stdenv.isDarwin [
+  disabledTestPaths = lib.optionals stdenv.hostPlatform.isDarwin [
     "tests/test_test.py"
-    "tests/legacy_api/test_test.py"
   ];
 
   pythonImportsCheck = [ "libtmux" ];

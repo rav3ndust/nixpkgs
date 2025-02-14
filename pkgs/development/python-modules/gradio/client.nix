@@ -1,10 +1,10 @@
 {
   lib,
+  stdenv,
   buildPythonPackage,
   fetchFromGitHub,
   nix-update-script,
   pythonOlder,
-  pythonRelaxDepsHook,
   # pyproject
   hatchling,
   hatch-requirements-txt,
@@ -15,7 +15,6 @@
   httpx,
   huggingface-hub,
   packaging,
-  requests,
   typing-extensions,
   websockets,
   # checkInputs
@@ -25,11 +24,12 @@
   rich,
   tomlkit,
   gradio,
+  safehttpx,
 }:
 
 buildPythonPackage rec {
   pname = "gradio-client";
-  version = "0.20.1";
+  version = "1.5.3";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -38,9 +38,10 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "gradio-app";
     repo = "gradio";
-    rev = "refs/tags/@gradio/client@${version}";
+    # not to be confused with @gradio/client@${version}
+    tag = "gradio_client@${version}";
     sparseCheckout = [ "client/python" ];
-    hash = "sha256-55RxoZR/A6WCWGgYggdwjGornIxF8BcjJpWw3p6jrzU=";
+    hash = "sha256-u4GQYtCeAMDqRRbZGtjfqIHwuHyxUpw6kRE75SJMALg=";
   };
   prePatch = ''
     cd client/python
@@ -57,7 +58,6 @@ buildPythonPackage rec {
     hatchling
     hatch-requirements-txt
     hatch-fancy-pypi-readme
-    pythonRelaxDepsHook
   ];
 
   dependencies = [
@@ -76,6 +76,7 @@ buildPythonPackage rec {
     pydub
     rich
     tomlkit
+    safehttpx
     gradio.sans-reverse-dependencies
   ];
   # ensuring we don't propagate this intermediate build
@@ -93,18 +94,30 @@ buildPythonPackage rec {
     #"-x" "-W" "ignore" # uncomment for debugging help
   ];
 
+  disabledTests = lib.optionals stdenv.hostPlatform.isDarwin [
+    # flaky: OSError: Cannot find empty port in range: 7860-7959
+    "test_layout_components_in_output"
+    "test_layout_and_state_components_in_output"
+    "test_upstream_exceptions"
+    "test_httpx_kwargs"
+  ];
+
   pythonImportsCheck = [ "gradio_client" ];
 
   __darwinAllowLocalNetworking = true;
 
   passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version-regex" "@gradio/client@(.*)" ];
+    extraArgs = [
+      "--version-regex"
+      "gradio_client@(.*)"
+    ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://www.gradio.app/";
+    changelog = "https://github.com/gradio-app/gradio/releases/tag/gradio_client@${version}";
     description = "Lightweight library to use any Gradio app as an API";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ pbsds ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ pbsds ];
   };
 }

@@ -20,7 +20,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "Blueswen";
     repo = "mkdocs-redoc-tag";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-TOGFch+Uto3qeVMaHqK8SEy0v0cKtHofoGE8T1mnBOk=";
   };
 
@@ -37,7 +37,7 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    description = "A MkDocs plugin supports for add Redoc UI in page";
+    description = "MkDocs plugin supports for add Redoc UI in page";
     homepage = "https://github.com/blueswen/mkdocs-redoc-tag";
     changelog = "https://github.com/blueswen/mkdocs-redoc-tag/blob/v${version}/CHANGELOG";
     license = licenses.mit;

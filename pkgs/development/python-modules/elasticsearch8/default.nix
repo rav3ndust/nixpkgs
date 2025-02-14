@@ -4,30 +4,29 @@
   buildPythonPackage,
   elastic-transport,
   fetchPypi,
+  hatchling,
   orjson,
   pythonOlder,
   requests,
-  setuptools,
-  urllib3,
 }:
 
 buildPythonPackage rec {
   pname = "elasticsearch8";
-  version = "8.13.2";
+  version = "8.17.0";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-rl8IoV8kt68AJSkPMDx3d9eB6+2yPBgFpGEU6g+RjQ4=";
+    hash = "sha256-YssNx9OsCHFQpcqcVi3nW0CPPP3aOWgCh8nTq83e3Ho=";
   };
 
-  build-system = [ setuptools ];
+  build-system = [ hatchling ];
 
   dependencies = [ elastic-transport ];
 
-  passthru.optional-dependencies = {
+  optional-dependencies = {
     async = [ aiohttp ];
     requests = [ requests ];
     orjson = [ orjson ];

@@ -1,7 +1,8 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, libcap
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  libcap,
 }:
 stdenv.mkDerivation rec {
   pname = "cpu-energy-meter";
@@ -29,7 +30,7 @@ stdenv.mkDerivation rec {
   '';
 
   meta = with lib; {
-    description = "A tool for measuring energy consumption of Intel CPUs";
+    description = "Tool for measuring energy consumption of Intel CPUs";
     homepage = "https://github.com/sosy-lab/cpu-energy-meter";
     changelog = "https://github.com/sosy-lab/cpu-energy-meter/blob/main/CHANGELOG.md";
     maintainers = with maintainers; [ lorenzleutgeb ];

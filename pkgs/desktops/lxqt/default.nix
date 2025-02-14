@@ -29,6 +29,7 @@ let
     lxqt-session = callPackage ./lxqt-session {};
     lxqt-sudo = callPackage ./lxqt-sudo {};
     lxqt-themes = callPackage ./lxqt-themes {};
+    lxqt-wayland-session = callPackage ./lxqt-wayland-session {};
     pavucontrol-qt = callPackage ./pavucontrol-qt {};
     qtermwidget = callPackage ./qtermwidget {};
 
@@ -75,6 +76,11 @@ let
       libfm-qt = libfm-qt_1_4;
       inherit (pkgs.libsForQt5) qtbase qtsvg qttools libdbusmenu;
     };
+    qtermwidget_1_4 = callPackage ./qtermwidget {
+      version = "1.4.0";
+      lxqt-build-tools = lxqt-build-tools_0_13;
+      inherit (pkgs.libsForQt5) qtbase qttools;
+    };
 
     preRequisitePackages = [
       kdePackages.kwindowsystem # provides some QT plugins needed by lxqt-panel
@@ -109,6 +115,7 @@ let
       lxqt-session
       lxqt-sudo
       lxqt-themes
+      lxqt-wayland-session
       pavucontrol-qt
 
       ### CORE 2

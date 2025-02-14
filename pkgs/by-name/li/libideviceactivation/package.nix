@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libimobiledevice";
     repo = "libideviceactivation";
-    rev = "refs/tags/${finalAttrs.version}";
+    tag = finalAttrs.version;
     hash = "sha256-owcQpCN4+A785oy9pCboJIyfpgZ6X+8PRzqGtWpYl2w=";
   };
 
@@ -42,7 +42,7 @@ stdenv.mkDerivation (finalAttrs: {
   installFlags = [ "PREFIX=$(out)" ];
 
   meta = {
-    description = "A library to manage the activation process of Apple iOS devices.";
+    description = "Library to manage the activation process of Apple iOS devices";
     homepage = "https://libimobiledevice.org";
     license = with lib.licenses; [
       lgpl21

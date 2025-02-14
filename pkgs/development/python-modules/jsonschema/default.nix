@@ -29,27 +29,27 @@
 
 buildPythonPackage rec {
   pname = "jsonschema";
-  version = "4.21.1";
-  format = "pyproject";
+  version = "4.23.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-hXJ8ACefX6a+2+YjjSqmQDvt2LSGSrESB9B988wbLuU=";
+    hash = "sha256-1xSX/vJjUaMyZTN/p3/+uCQj8+ohKDzZRnuwOZkma8Q=";
   };
 
   postPatch = ''
     patchShebangs json/bin/jsonschema_suite
   '';
 
-  nativeBuildInputs = [
+  build-system = [
     hatch-fancy-pypi-readme
     hatch-vcs
     hatchling
   ];
 
-  propagatedBuildInputs =
+  dependencies =
     [
       attrs
       jsonschema-specifications
@@ -61,7 +61,7 @@ buildPythonPackage rec {
       pkgutil-resolve-name
     ];
 
-  passthru.optional-dependencies = {
+  optional-dependencies = {
     format = [
       fqdn
       idna
@@ -92,10 +92,11 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "jsonschema" ];
 
   meta = with lib; {
-    description = "An implementation of JSON Schema validation";
-    mainProgram = "jsonschema";
+    description = "Implementation of JSON Schema validation";
     homepage = "https://github.com/python-jsonschema/jsonschema";
+    changelog = "https://github.com/python-jsonschema/jsonschema/blob/v${version}/CHANGELOG.rst";
     license = licenses.mit;
     maintainers = with maintainers; [ domenkozar ];
+    mainProgram = "jsonschema";
   };
 }

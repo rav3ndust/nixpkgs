@@ -14,7 +14,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "benmoran56";
     repo = "esper";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-DZAF2B40ulSn2MQadklT32Svcm1j0e/hIxrxISO07TI=";
   };
 
@@ -24,7 +24,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "esper" ];
 
   meta = {
-    description = "An ECS (Entity Component System) for Python";
+    description = "ECS (Entity Component System) for Python";
     homepage = "https://github.com/benmoran56/esper";
     changelog = "https://github.com/benmoran56/esper/blob/${src.rev}/RELEASE_NOTES";
     license = lib.licenses.mit;

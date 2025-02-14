@@ -22,7 +22,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "banesullivan";
     repo = "scooby";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-KXhLN8KPz61l+4v88+kVSvodT6OXDJ3Pw9A9aFWSqYE=";
   };
 
@@ -55,7 +55,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     changelog = "https://github.com/banesullivan/scooby/releases/tag/v${version}";
-    description = "A lightweight tool for reporting Python package versions and hardware resources";
+    description = "Lightweight tool for reporting Python package versions and hardware resources";
     mainProgram = "scooby";
     homepage = "https://github.com/banesullivan/scooby";
     license = licenses.mit;

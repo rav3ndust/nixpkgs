@@ -1,5 +1,6 @@
 {
   mkKdeDerivation,
+  fetchpatch,
   pkg-config,
   qtquick3d,
   qtsensors,
@@ -8,10 +9,12 @@
   qtwayland,
   libinput,
   xorg,
+  xwayland,
+  libcanberra,
   libdisplay-info,
-  mesa,
+  libei,
+  libgbm,
   lcms2,
-  libcap,
   pipewire,
   krunner,
   python3,
@@ -27,6 +30,13 @@ mkKdeDerivation {
     ./0003-plugins-qpa-allow-using-nixos-wrapper.patch
     ./0001-NixOS-Unwrap-executable-name-for-.desktop-search.patch
     ./0001-Lower-CAP_SYS_NICE-from-the-ambient-set.patch
+
+    # Backport recommended crash fix
+    # FIXME: remove in 6.3.1
+    (fetchpatch {
+      url = "https://invent.kde.org/plasma/kwin/-/commit/c97bc26ca9de8b1462f6ccb05fb2dafe01cd82cb.patch";
+      hash = "sha256-g8CsSKt3flTXAm80NbFuq+sT8l93mfyUBl2aBpP5zqY=";
+    })
   ];
 
   postPatch = ''
@@ -39,7 +49,10 @@ mkKdeDerivation {
     "--set-default TZDIR /etc/zoneinfo"
   ];
 
-  extraNativeBuildInputs = [pkg-config python3];
+  extraNativeBuildInputs = [
+    pkg-config
+    python3
+  ];
   extraBuildInputs = [
     qtquick3d
     qtsensors
@@ -49,13 +62,16 @@ mkKdeDerivation {
 
     krunner
 
-    mesa # libgbm
+    libgbm
     lcms2
-    libcap
+    libcanberra
     libdisplay-info
+    libei
     libinput
     pipewire
 
     xorg.libxcvt
+    # we need to provide this so it knows our xwayland supports new features
+    xwayland
   ];
 }

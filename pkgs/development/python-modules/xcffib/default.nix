@@ -10,14 +10,14 @@
 
 buildPythonPackage rec {
   pname = "xcffib";
-  version = "1.5.0";
+  version = "1.7.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-qVyUZfL5e0/O3mBr0eCEB6Mt9xy3YP1Xv+U2d9tpGsw=";
+    hash = "sha256-M3dcHQRh8ZJV/FTiLOkU4QoT+2W8e7oOq6/ufwh4z9s=";
   };
 
   postPatch = ''
@@ -32,7 +32,7 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     pytestCheckHook
     xorg.xeyes
-    xorg.xorgserver
+    xorg.xvfb
   ];
 
   preCheck = ''
@@ -46,7 +46,7 @@ buildPythonPackage rec {
   __darwinAllowLocalNetworking = true;
 
   meta = with lib; {
-    description = "A drop in replacement for xpyb, an XCB python binding";
+    description = "Drop in replacement for xpyb, an XCB python binding";
     homepage = "https://github.com/tych0/xcffib";
     changelog = "https://github.com/tych0/xcffib/releases/tag/v${version}";
     license = licenses.asl20;

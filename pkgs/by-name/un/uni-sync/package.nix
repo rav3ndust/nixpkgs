@@ -1,8 +1,9 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, pkg-config
-, libudev-zero
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  pkg-config,
+  libudev-zero,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "uni-sync";
@@ -23,10 +24,11 @@ rustPlatform.buildRustPackage rec {
     ./ignore_read-only_filesystem.patch
   ];
 
-  cargoHash = "sha256-DdmjP0h15cXkHJZxvOcINgoZ/EhTgu/7iYb+bgsIXxU=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-Qb0TPpYGDjsqHkI4B8QRz5c9rqZ+H98YjOg5K++zpBg=";
 
   meta = with lib; {
-    description = "A synchronization tool for Lian Li Uni Controllers";
+    description = "Synchronization tool for Lian Li Uni Controllers";
     homepage = "https://github.com/EightB1ts/uni-sync";
     license = licenses.mit;
     maintainers = with maintainers; [ yunfachi ];

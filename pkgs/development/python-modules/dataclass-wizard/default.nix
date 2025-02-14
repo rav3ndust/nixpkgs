@@ -25,15 +25,18 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ ] ++ lib.optionals (pythonOlder "3.9") [ typing-extensions ];
 
-  passthru.optional-dependencies = {
+  optional-dependencies = {
     timedelta = [ pytimeparse ];
     yaml = [ pyyaml ];
   };
 
-  nativeCheckInputs = [
-    pytestCheckHook
-    pytest-mock
-  ] ++ passthru.optional-dependencies.timedelta ++ passthru.optional-dependencies.yaml;
+  nativeCheckInputs =
+    [
+      pytestCheckHook
+      pytest-mock
+    ]
+    ++ optional-dependencies.timedelta
+    ++ optional-dependencies.yaml;
 
   disabledTests =
     [ ]
@@ -50,7 +53,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "dataclass_wizard" ];
 
   meta = with lib; {
-    description = "A set of simple, yet elegant wizarding tools for interacting with the Python dataclasses module";
+    description = "Set of simple, yet elegant wizarding tools for interacting with the Python dataclasses module";
     mainProgram = "wiz";
     homepage = "https://github.com/rnag/dataclass-wizard";
     changelog = "https://github.com/rnag/dataclass-wizard/releases/tag/v${version}";

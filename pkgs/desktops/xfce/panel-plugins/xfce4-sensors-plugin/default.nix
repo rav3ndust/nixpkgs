@@ -2,8 +2,8 @@
   stdenv,
   lib,
   fetchurl,
+  gettext,
   pkg-config,
-  intltool,
   gtk3,
   libxfce4ui,
   libxfce4util,
@@ -12,8 +12,8 @@
   lm_sensors,
   hddtemp,
   netcat-gnu,
-  nvidiaSupport ? true,
   libXNVCtrl,
+  nvidiaSupport ? lib.meta.availableOn stdenv.hostPlatform libXNVCtrl,
   gitUpdater,
 }:
 
@@ -23,16 +23,16 @@ in
 
 stdenv.mkDerivation rec {
   pname = "xfce4-sensors-plugin";
-  version = "1.4.4";
+  version = "1.4.5";
 
   src = fetchurl {
     url = "mirror://xfce/src/${category}/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.bz2";
-    sha256 = "sha256-bBYFpzjl30DghNCKyT+WLNRFCTOW3h6b+tx6tFiMNrY=";
+    sha256 = "sha256-9p/febf3bSqBckgoEkpvznaAOpEipMgt6PPfo++7F5o=";
   };
 
   nativeBuildInputs = [
+    gettext
     pkg-config
-    intltool
   ];
 
   buildInputs = [
@@ -66,7 +66,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     homepage = "https://docs.xfce.org/panel-plugins/xfce4-sensors-plugin";
-    description = "A panel plug-in for different sensors using acpi, lm_sensors and hddtemp";
+    description = "Panel plug-in for different sensors using acpi, lm_sensors and hddtemp";
     mainProgram = "xfce4-sensors";
     license = licenses.gpl2Plus;
     platforms = platforms.unix;

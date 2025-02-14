@@ -16,7 +16,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "clarkperkins";
     repo = pname;
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-4QpQzg0yFuOFymGiTI+A8o6LyX78iTJMqr0ernYbilI=";
   };
 
@@ -32,7 +32,7 @@ buildPythonPackage rec {
   preCheck = "export HOME=$(mktemp -d)";
 
   meta = with lib; {
-    description = "An extension to click that easily turns your click app into a shell utility";
+    description = "Extension to click that easily turns your click app into a shell utility";
     longDescription = ''
       This is an extension to click that easily turns your click app into a
       shell utility. It is built on top of the built in python cmd module,

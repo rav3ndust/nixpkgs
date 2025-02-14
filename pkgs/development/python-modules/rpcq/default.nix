@@ -23,7 +23,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "rigetti";
     repo = "rpcq";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-J7jtGXJIF3jp0a0IQZmSR4TWf9D02Luau+Bupmi/d68=";
   };
 
@@ -56,7 +56,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "rpcq" ];
 
   meta = with lib; {
-    description = "The RPC framework and message specification for rigetti Quantum Cloud services";
+    description = "RPC framework and message specification for rigetti Quantum Cloud services";
     homepage = "https://github.com/rigetti/rpcq";
     license = licenses.asl20;
     maintainers = with maintainers; [ fab ];

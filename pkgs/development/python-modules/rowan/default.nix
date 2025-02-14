@@ -1,10 +1,11 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, setuptools
-, pytestCheckHook
-, scipy
-, numpy
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  setuptools,
+  pytestCheckHook,
+  scipy,
+  numpy,
 }:
 
 buildPythonPackage rec {
@@ -34,7 +35,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "rowan" ];
 
   meta = with lib; {
-    description = "A Python package for working with quaternions";
+    description = "Python package for working with quaternions";
     homepage = "https://github.com/glotzerlab/rowan";
     changelog = "https://github.com/glotzerlab/rowan/blob/${src.rev}/ChangeLog.rst";
     license = licenses.bsd3;

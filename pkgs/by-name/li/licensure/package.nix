@@ -1,25 +1,37 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, openssl
-, git
-, gitls
+{
+  lib,
+  stdenv,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  openssl,
+  git,
+  gitls,
+  darwin,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "licensure";
-  version = "0.4.1";
+  version = "0.6.0";
 
   src = fetchFromGitHub {
     owner = "chasinglogic";
     repo = "licensure";
     rev = version;
-    hash = "sha256-1ncQjg/loYX9rAGP4FzI0ttd+GMPLkNPlJ6Xzb7umr0=";
+    hash = "sha256-YPdVVHJ/ldILGbg95x7D06chG8Q6a+NnTAimuvBScpE=";
   };
 
-  cargoHash = "sha256-449p+y7qUcTxBOttyQPt+nRtK+s9HJBoVKGdMQaszLQ=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-+lZ70D62je+vCExN77LQqNiIqJFUO8FUjyOZbdfbM/c=";
   nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ openssl git gitls ];
+  buildInputs =
+    [
+      openssl
+      git
+      gitls
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      darwin.apple_sdk.frameworks.SystemConfiguration
+    ];
 
   checkFlags = [
     # Checking for files in the git repo (git ls-files),
@@ -28,11 +40,11 @@ rustPlatform.buildRustPackage rec {
   ];
 
   meta = with lib; {
-    description = "A FOSS License management tool for your projects";
+    description = "FOSS License management tool for your projects";
     homepage = "https://github.com/chasinglogic/licensure";
     license = licenses.gpl3Plus;
     mainProgram = "licensure";
     maintainers = [ maintainers.soispha ];
-    platforms = platforms.linux;
+    platforms = platforms.linux ++ platforms.darwin;
   };
 }

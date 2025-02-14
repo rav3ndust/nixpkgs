@@ -1,8 +1,9 @@
-{ lib
-, python3Packages
-, fetchFromGitHub
+{
+  lib,
+  python3Packages,
+  fetchFromGitHub,
 
-, ffmpeg
+  ffmpeg,
 }:
 
 python3Packages.buildPythonApplication rec {
@@ -68,7 +69,7 @@ python3Packages.buildPythonApplication rec {
   '';
 
   meta = with lib; {
-    description = "A scriptable music downloader for Qobuz, Tidal, SoundCloud, and Deezer";
+    description = "Scriptable music downloader for Qobuz, Tidal, SoundCloud, and Deezer";
     homepage = "https://github.com/nathom/streamrip";
     license = licenses.gpl3Only;
     maintainers = with maintainers; [ paveloom ];

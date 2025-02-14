@@ -13,14 +13,14 @@
 
 buildPythonPackage rec {
   pname = "prometheus-api-client";
-  version = "0.5.5";
+  version = "0.5.6";
   format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "4n4nd";
     repo = "prometheus-api-client-python";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-tUu0+ZUOFxBCj//lHhNm88rhFbS01j1x508+nqIkCfQ=";
+    tag = "v${version}";
+    hash = "sha256-0vnG0m+RV2Z9GIMJ/R0edjcjyPH1OvB8zERCMeyRuRg=";
   };
 
   propagatedBuildInputs = [
@@ -40,14 +40,14 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "prometheus_api_client" ];
 
   meta = with lib; {
-    description = "A Python wrapper for the Prometheus HTTP API";
+    description = "Python wrapper for the Prometheus HTTP API";
     longDescription = ''
       The prometheus-api-client library consists of multiple modules which
       assist in connecting to a Prometheus host, fetching the required metrics
       and performing various aggregation operations on the time series data.
     '';
     homepage = "https://github.com/4n4nd/prometheus-api-client-python";
-    changelog = "https://github.com/4n4nd/prometheus-api-client-python/blob/${src.rev}/CHANGELOG.md";
+    changelog = "https://github.com/4n4nd/prometheus-api-client-python/blob/${src.tag}/CHANGELOG.md";
     license = licenses.mit;
     maintainers = with maintainers; [ azahi ];
   };

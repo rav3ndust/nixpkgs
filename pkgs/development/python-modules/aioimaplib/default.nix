@@ -1,55 +1,45 @@
 {
   lib,
-  asynctest,
   buildPythonPackage,
-  docutils,
   fetchFromGitHub,
   imaplib2,
   mock,
+  poetry-core,
   pyopenssl,
+  pytest-asyncio,
   pytestCheckHook,
-  pythonAtLeast,
   pythonOlder,
   pytz,
-  setuptools,
-  tzlocal,
 }:
 
 buildPythonPackage rec {
   pname = "aioimaplib";
-  version = "1.0.1";
+  version = "2.0.1";
   pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "bamthomas";
     repo = "aioimaplib";
-    rev = "refs/tags/${version}";
-    hash = "sha256-7Ta0BhtQSm228vvUa5z+pzM3UC7+BskgBNjxsbEb9P0=";
+    tag = version;
+    hash = "sha256-njzSpKPis033eLoRKXL538ljyMOB43chslio1wodrKU=";
   };
 
-  build-system = [ setuptools ];
+  build-system = [ poetry-core ];
 
   nativeCheckInputs = [
-    asynctest
-    docutils
     imaplib2
     mock
     pyopenssl
+    pytest-asyncio
     pytestCheckHook
     pytz
-    tzlocal
   ];
 
-  # https://github.com/bamthomas/aioimaplib/issues/54
-  doCheck = pythonOlder "3.11";
-
   disabledTests = [
-    # https://github.com/bamthomas/aioimaplib/issues/77
-    "test_get_quotaroot"
-    # asyncio.exceptions.TimeoutError
-    "test_idle"
+    # TimeoutError
+    "test_idle_start__exits_queue_get_without_timeout_error"
   ];
 
   pythonImportsCheck = [ "aioimaplib" ];

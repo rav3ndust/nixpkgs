@@ -25,7 +25,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "dlanger";
     repo = "inlinestyler";
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-9TKXqW+5SiiNXnHW2lOVh3zhFhodM7a1UB2yXsEuX3I=";
   };
 
@@ -53,10 +53,10 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    description = "A simple CSS inliner for generating HTML email messages";
+    description = "Simple CSS inliner for generating HTML email messages";
     homepage = "https://github.com/dlanger/inlinestyler";
     changelog = "https://github.com/dlanger/inlinestyler/blob/${src.rev}/CHANGELOG";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

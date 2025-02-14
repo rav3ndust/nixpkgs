@@ -18,7 +18,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "albertodonato";
     repo = "snap-helpers";
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-7JBvrD4WNOcFSVx3xauk4JgiVGKWuUEdUMRlH7mudE4=";
   };
 
@@ -36,7 +36,7 @@ buildPythonPackage rec {
   passthru.updateScript = nix-update-script { };
 
   meta = {
-    description = "Interact with snap configuration and properties from inside a snap.";
+    description = "Interact with snap configuration and properties from inside a snap";
     homepage = "https://github.com/albertodonato/snap-helpers";
     changelog = "https://github.com/albertodonato/snap-helpers/releases/tag/${version}";
     license = lib.licenses.lgpl3Only;

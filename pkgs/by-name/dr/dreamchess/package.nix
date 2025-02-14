@@ -1,21 +1,22 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, bison
-, flex
-, gettext
-, SDL2
-, SDL2_image
-, SDL2_mixer
-, expat
-, glew
-, freetype
-, libSM
-, libXext
-, libGL
-, libGLU
-, xorg
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  bison,
+  flex,
+  gettext,
+  SDL2,
+  SDL2_image,
+  SDL2_mixer,
+  expat,
+  glew,
+  freetype,
+  libSM,
+  libXext,
+  libGL,
+  libGLU,
+  xorg,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -62,7 +63,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     homepage = "https://github.com/dreamchess/dreamchess";
-    description = "An OpenGL Chess Game";
+    description = "OpenGL Chess Game";
     license = lib.licenses.gpl3Only;
     maintainers = with lib.maintainers; [ spk ];
     platforms = lib.platforms.linux;

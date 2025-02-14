@@ -19,7 +19,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "cgarciae";
     repo = pname;
-    rev = "refs/tags/${version}";
+    tag = version;
     hash = "sha256-0py7sKjq6WqdsZwTq61jqaIbULTfwtpz29TTpt8M2Zw=";
   };
 
@@ -44,7 +44,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "treeo" ];
 
   meta = with lib; {
-    description = "A small library for creating and manipulating custom JAX Pytree classes.";
+    description = "Small library for creating and manipulating custom JAX Pytree classes";
     homepage = "https://github.com/cgarciae/treeo";
     license = licenses.mit;
     maintainers = with maintainers; [ ndl ];

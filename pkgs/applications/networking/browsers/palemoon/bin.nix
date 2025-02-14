@@ -1,26 +1,27 @@
-{ stdenv
-, lib
-, fetchzip
-, alsa-lib
-, autoPatchelfHook
-, copyDesktopItems
-, dbus-glib
-, ffmpeg
-, gtk2-x11
-, withGTK3 ? true
-, gtk3
-, libglvnd
-, libXt
-, libpulseaudio
-, makeDesktopItem
-, wrapGAppsHook3
-, writeScript
-, testers
+{
+  stdenv,
+  lib,
+  fetchzip,
+  alsa-lib,
+  autoPatchelfHook,
+  copyDesktopItems,
+  dbus-glib,
+  ffmpeg,
+  gtk2-x11,
+  withGTK3 ? true,
+  gtk3,
+  libglvnd,
+  libXt,
+  libpulseaudio,
+  makeDesktopItem,
+  wrapGAppsHook3,
+  writeScript,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "palemoon-bin";
-  version = "33.1.1";
+  version = "33.6.0";
 
   src = finalAttrs.passthru.sources."gtk${if withGTK3 then "3" else "2"}";
 
@@ -34,76 +35,80 @@ stdenv.mkDerivation (finalAttrs: {
     wrapGAppsHook3
   ];
 
-  buildInputs = [
-    alsa-lib
-    dbus-glib
-    gtk2-x11
-    libXt
-    stdenv.cc.cc.lib
-  ] ++ lib.optionals withGTK3 [
-    gtk3
-  ];
+  buildInputs =
+    [
+      alsa-lib
+      dbus-glib
+      gtk2-x11
+      libXt
+      (lib.getLib stdenv.cc.cc)
+    ]
+    ++ lib.optionals withGTK3 [
+      gtk3
+    ];
 
-  desktopItems = [(makeDesktopItem rec {
-    name = "palemoon-bin";
-    desktopName = "Pale Moon Web Browser";
-    comment = "Browse the World Wide Web";
-    keywords = [
-      "Internet"
-      "WWW"
-      "Browser"
-      "Web"
-      "Explorer"
-    ];
-    exec = "palemoon %u";
-    terminal = false;
-    type = "Application";
-    icon = "palemoon";
-    categories = [
-      "Network"
-      "WebBrowser"
-    ];
-    mimeTypes = [
-      "text/html"
-      "text/xml"
-      "application/xhtml+xml"
-      "application/xml"
-      "application/rss+xml"
-      "application/rdf+xml"
-      "image/gif"
-      "image/jpeg"
-      "image/png"
-      "x-scheme-handler/http"
-      "x-scheme-handler/https"
-      "x-scheme-handler/ftp"
-      "x-scheme-handler/chrome"
-      "video/webm"
-      "application/x-xpinstall"
-    ];
-    startupNotify = true;
-    startupWMClass = "Pale moon";
-    extraConfig = {
-      X-MultipleArgs = "false";
-    };
-    actions = {
-      "NewTab" = {
-        name = "Open new tab";
-        exec = "palemoon -new-tab https://start.palemoon.org";
+  desktopItems = [
+    (makeDesktopItem rec {
+      name = "palemoon-bin";
+      desktopName = "Pale Moon Web Browser";
+      comment = "Browse the World Wide Web";
+      keywords = [
+        "Internet"
+        "WWW"
+        "Browser"
+        "Web"
+        "Explorer"
+      ];
+      exec = "palemoon %u";
+      terminal = false;
+      type = "Application";
+      icon = "palemoon";
+      categories = [
+        "Network"
+        "WebBrowser"
+      ];
+      mimeTypes = [
+        "text/html"
+        "text/xml"
+        "application/xhtml+xml"
+        "application/xml"
+        "application/rss+xml"
+        "application/rdf+xml"
+        "image/gif"
+        "image/jpeg"
+        "image/png"
+        "x-scheme-handler/http"
+        "x-scheme-handler/https"
+        "x-scheme-handler/ftp"
+        "x-scheme-handler/chrome"
+        "video/webm"
+        "application/x-xpinstall"
+      ];
+      startupNotify = true;
+      startupWMClass = "Pale moon";
+      extraConfig = {
+        X-MultipleArgs = "false";
       };
-      "NewWindow" = {
-        name = "Open new window";
-        exec = "palemoon -new-window";
+      actions = {
+        "NewTab" = {
+          name = "Open new tab";
+          exec = "palemoon -new-tab https://start.palemoon.org";
+        };
+        "NewWindow" = {
+          name = "Open new window";
+          exec = "palemoon -new-window";
+        };
+        "NewPrivateWindow" = {
+          name = "Open new private window";
+          exec = "palemoon -private-window";
+        };
+        "ProfileManager" = {
+          name = "Open the Profile Manager";
+          exec = "palemoon --ProfileManager";
+        };
       };
-      "NewPrivateWindow" = {
-        name = "Open new private window";
-        exec = "palemoon -private-window";
-      };
-      "ProfileManager" = {
-        name = "Open the Profile Manager";
-        exec = "palemoon --ProfileManager";
-      };
-    };
-  })];
+    })
+  ];
 
   dontConfigure = true;
   dontBuild = true;
@@ -138,33 +143,42 @@ stdenv.mkDerivation (finalAttrs: {
   preFixup = ''
     # Make optional dependencies available
     gappsWrapperArgs+=(
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [
-        ffmpeg
-        libglvnd
-        libpulseaudio
-      ]}"
+      --prefix LD_LIBRARY_PATH : "${
+        lib.makeLibraryPath [
+          ffmpeg
+          libglvnd
+          libpulseaudio
+        ]
+      }"
     )
     wrapGApp $out/lib/palemoon/palemoon
   '';
 
   passthru = {
-    sources = let
-      urlRegionVariants = buildVariant: map
-        (region: "https://rm-${region}.palemoon.org/release/palemoon-${finalAttrs.version}.linux-x86_64-${buildVariant}.tar.xz")
-        [
-          "eu"
-          "us"
-        ];
-    in {
-      gtk3 = fetchzip {
-        urls = urlRegionVariants "gtk3";
-        hash = "sha256-0i0hXC6mC1SY2V6ANMXHS4LZ/HZk8FUsSDQfQUE14IM=";
+    sources =
+      let
+        urlRegionVariants =
+          buildVariant:
+          map
+            (
+              region:
+              "https://rm-${region}.palemoon.org/release/palemoon-${finalAttrs.version}.linux-x86_64-${buildVariant}.tar.xz"
+            )
+            [
+              "eu"
+              "us"
+            ];
+      in
+      {
+        gtk3 = fetchzip {
+          urls = urlRegionVariants "gtk3";
+          hash = "sha256-fOha0D8drFbKtfl/UA4MqzBhhBrvS3T81XP09RZQc9c=";
+        };
+        gtk2 = fetchzip {
+          urls = urlRegionVariants "gtk2";
+          hash = "sha256-r8sAkQ7XiYs39VZjvegVgx7KrfB8WyZfcl/XgGV/kwA=";
+        };
       };
-      gtk2 = fetchzip {
-        urls = urlRegionVariants "gtk2";
-        hash = "sha256-RnBlCxIsWxm6BbtAS0YKHtix93N6t9jihFItqhtLhRU=";
-      };
-    };
 
     tests.version = testers.testVersion {
       package = finalAttrs.finalPackage;
@@ -184,17 +198,14 @@ stdenv.mkDerivation (finalAttrs: {
       )"
 
       for variant in gtk3 gtk2; do
-        # The script will not perform an update when the version attribute is up to date from previous platform run
-        # We need to clear it before each run
-        update-source-version palemoon-bin 0 "${lib.fakeHash}" --source-key="sources.$variant"
-        update-source-version palemoon-bin "$version" --source-key="sources.$variant"
+        update-source-version palemoon-bin "$version" --ignore-same-version --source-key="sources.$variant"
       done
     '';
   };
 
   meta = with lib; {
     homepage = "https://www.palemoon.org/";
-    description = "An Open Source, Goanna-based web browser focusing on efficiency and customization";
+    description = "Open Source, Goanna-based web browser focusing on efficiency and customization";
     longDescription = ''
       Pale Moon is an Open Source, Goanna-based web browser focusing on
       efficiency and customization.
@@ -219,6 +230,6 @@ stdenv.mkDerivation (finalAttrs: {
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     mainProgram = "palemoon";
     platforms = [ "x86_64-linux" ];
-    hydraPlatforms = [];
+    hydraPlatforms = [ ];
   };
 })

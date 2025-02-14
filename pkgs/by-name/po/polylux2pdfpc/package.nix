@@ -1,7 +1,8 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, nix-update-script
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  nix-update-script,
 }:
 
 let
@@ -20,12 +21,13 @@ rustPlatform.buildRustPackage rec {
   };
   sourceRoot = "${src.name}/${dirname}";
 
-  cargoHash = "sha256-vmCaQxPkzz1ZVmtX7L3VeQb3kWhVqyPoQ1NrTSiJN9Y=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-9nA18f+Dwps45M/OIY0jtx7QgyJDTVUsPndFdNBKHCQ=";
 
   passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
-    description = "A tool to make pdfpc interpret slides created by polylux correctly";
+    description = "Tool to make pdfpc interpret slides created by polylux correctly";
     homepage = "https://github.com/andreasKroepelin/polylux/tree/main/pdfpc-extractor";
     license = licenses.mit;
     mainProgram = "polylux2pdfpc";

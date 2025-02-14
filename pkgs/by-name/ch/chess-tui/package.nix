@@ -1,6 +1,7 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -14,10 +15,11 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-LtxaZ/7p/lqStoUmckVVaegQp02Ci3L46fMFEgledj4=";
   };
 
-  cargoHash = "sha256-RUnT5b9pBcopTPT/1J48xZ4pfn3C0mIuYTDvgf3zvn0=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-Ydn/y7HF8VppEjkRy3ayibgxpcLc1NiHlR5oLi3D11A=";
 
-  meta = with lib;{
-    description = "A chess TUI implementation in rust";
+  meta = with lib; {
+    description = "Chess TUI implementation in rust";
     homepage = "https://github.com/thomas-mauran/chess-tui";
     maintainers = with maintainers; [ ByteSudoer ];
     license = licenses.mit;

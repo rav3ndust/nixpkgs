@@ -1,10 +1,11 @@
-{ lib
-, fetchFromGitHub
-, python3
-, libseccomp
-, nixosTests
-, testers
-, benchexec
+{
+  lib,
+  fetchFromGitHub,
+  python3,
+  libseccomp,
+  nixosTests,
+  testers,
+  benchexec,
 }:
 python3.pkgs.buildPythonApplication rec {
   pname = "benchexec";
@@ -39,10 +40,12 @@ python3.pkgs.buildPythonApplication rec {
 
   passthru.tests =
     let
-      testVersion = result: testers.testVersion {
-        command = "${result} --version";
-        package = benchexec;
-      };
+      testVersion =
+        result:
+        testers.testVersion {
+          command = "${result} --version";
+          package = benchexec;
+        };
     in
     {
       nixos = nixosTests.benchexec;
@@ -53,7 +56,7 @@ python3.pkgs.buildPythonApplication rec {
     };
 
   meta = with lib; {
-    description = "A Framework for Reliable Benchmarking and Resource Measurement.";
+    description = "Framework for Reliable Benchmarking and Resource Measurement";
     homepage = "https://github.com/sosy-lab/benchexec";
     maintainers = with maintainers; [ lorenzleutgeb ];
     license = licenses.asl20;

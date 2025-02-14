@@ -1,4 +1,5 @@
 {
+  lib,
   mkDerivation,
   writeShellScript,
   mtree,
@@ -8,10 +9,9 @@
   makeMinimal,
   mandoc,
   groff,
-  rsync,
   compatIfNeeded,
   fts,
-
+  stdenv,
 }:
 
 # HACK: to ensure parent directories exist. This emulates GNU
@@ -26,11 +26,9 @@ let
 in
 mkDerivation {
   path = "usr.bin/xinstall";
-  version = "9.2";
-  sha256 = "1f6pbz3qv1qcrchdxif8p5lbmnwl8b9nq615hsd3cyl4avd5bfqj";
   extraPaths = [
-    mtree.src
-    make.src
+    mtree.path
+    make.path
   ];
   nativeBuildInputs = [
     bsdSetupHook
@@ -38,7 +36,6 @@ mkDerivation {
     makeMinimal
     mandoc
     groff
-    rsync
   ];
   skipIncludesPhase = true;
   buildInputs =

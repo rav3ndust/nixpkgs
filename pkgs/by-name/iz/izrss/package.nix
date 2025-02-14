@@ -14,7 +14,7 @@ buildGoModule {
   src = fetchFromGitHub {
     owner = "isabelroses";
     repo = "izrss";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-Op9aiCQrBH8TuhMTt+3Wthd8UY3lU2g9yJ110v7TtXA=";
   };
 
@@ -27,7 +27,7 @@ buildGoModule {
   vendorHash = "sha256-/TRCD6akZV2qDqJz62p7UzFIGuTAKLnUtYqqvdw3rCI=";
 
   meta = {
-    description = "An RSS feed reader for the terminal written in Go";
+    description = "RSS feed reader for the terminal written in Go";
     changelog = "https://github.com/isabelroses/izrss/releases/v${version}";
     homepage = "https://github.com/isabelroses/izrss";
     license = lib.licenses.gpl3Plus;

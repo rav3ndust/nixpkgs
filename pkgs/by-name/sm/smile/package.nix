@@ -1,14 +1,16 @@
-{ lib
-, python3
-, fetchFromGitHub
-, desktop-file-utils
-, glib
-, gobject-introspection
-, gtk4
-, meson
-, ninja
-, wrapGAppsHook4
-, libadwaita
+{
+  lib,
+  python3,
+  fetchFromGitHub,
+  desktop-file-utils,
+  glib,
+  gobject-introspection,
+  meson,
+  ninja,
+  wrapGAppsHook4,
+  libadwaita,
+  xdotool,
+  wl-clipboard,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -45,16 +47,27 @@ python3.pkgs.buildPythonApplication rec {
   dontWrapGApps = true;
 
   preFixup = ''
-    makeWrapperArgs+=("''${gappsWrapperArgs[@]}")
+    makeWrapperArgs+=(
+      "''${gappsWrapperArgs[@]}"
+      --prefix PATH : ${
+        lib.makeBinPath [
+          xdotool
+          wl-clipboard
+        ]
+      }
+    )
   '';
 
   meta = {
     changelog = "https://smile.mijorus.it/changelog";
-    description = "An emoji picker for linux, with custom tags support and localization";
+    description = "Emoji picker for linux, with custom tags support and localization";
     downloadPage = "https://github.com/mijorus/smile";
     homepage = "https://mijorus.it/projects/smile/";
     license = lib.licenses.gpl3Plus;
     mainProgram = "smile";
-    maintainers = with lib.maintainers; [ koppor aleksana ];
+    maintainers = with lib.maintainers; [
+      koppor
+      aleksana
+    ];
   };
 }

@@ -1,70 +1,76 @@
-{ lib, stdenv, fetchurl }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+}:
 
 let
-  mkNixBackground = {
-    name,
-    src,
-    description,
-    license ? lib.licenses.free
-  }:
+  mkNixBackground =
+    {
+      name,
+      src,
+      description,
+      license ? lib.licenses.free,
+    }:
 
-  let
-    pkg = stdenv.mkDerivation {
-      inherit name src;
+    let
+      pkg = stdenv.mkDerivation {
+        inherit name src;
 
-      dontUnpack = true;
+        dontUnpack = true;
 
-      installPhase = ''
-        runHook preInstall
+        installPhase = ''
+                  runHook preInstall
 
-        # GNOME
-        mkdir -p $out/share/backgrounds/nixos
-        ln -s $src $out/share/backgrounds/nixos/${src.name}
+                  # GNOME
+                  mkdir -p $out/share/backgrounds/nixos
+                  ln -s $src $out/share/backgrounds/nixos/${src.name}
 
-        mkdir -p $out/share/gnome-background-properties/
-        cat <<EOF > $out/share/gnome-background-properties/${name}.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
-<wallpapers>
-  <wallpaper deleted="false">
-    <name>${name}</name>
-    <filename>${src}</filename>
-    <options>zoom</options>
-    <shade_type>solid</shade_type>
-    <pcolor>#ffffff</pcolor>
-    <scolor>#000000</scolor>
-  </wallpaper>
-</wallpapers>
-EOF
+                  mkdir -p $out/share/gnome-background-properties/
+                  cat <<EOF > $out/share/gnome-background-properties/${name}.xml
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+          <wallpapers>
+            <wallpaper deleted="false">
+              <name>${name}</name>
+              <filename>${src}</filename>
+              <options>zoom</options>
+              <shade_type>solid</shade_type>
+              <pcolor>#ffffff</pcolor>
+              <scolor>#000000</scolor>
+            </wallpaper>
+          </wallpapers>
+          EOF
 
-        # TODO: is this path still needed?
-        mkdir -p $out/share/artwork/gnome
-        ln -s $src $out/share/artwork/gnome/${src.name}
+                  # TODO: is this path still needed?
+                  mkdir -p $out/share/artwork/gnome
+                  ln -s $src $out/share/artwork/gnome/${src.name}
 
-        # KDE
-        mkdir -p $out/share/wallpapers/${name}/contents/images
-        ln -s $src $out/share/wallpapers/${name}/contents/images/${src.name}
-        cat >>$out/share/wallpapers/${name}/metadata.desktop <<_EOF
-[Desktop Entry]
-Name=${name}
-X-KDE-PluginInfo-Name=${name}
-_EOF
+                  # KDE
+                  mkdir -p $out/share/wallpapers/${name}/contents/images
+                  ln -s $src $out/share/wallpapers/${name}/contents/images/${src.name}
+                  cat >>$out/share/wallpapers/${name}/metadata.desktop <<_EOF
+          [Desktop Entry]
+          Name=${name}
+          X-KDE-PluginInfo-Name=${name}
+          _EOF
 
-        runHook postInstall
-      '';
+                  runHook postInstall
+        '';
 
-      passthru = {
-        gnomeFilePath = "${pkg}/share/backgrounds/nixos/${src.name}";
-        kdeFilePath = "${pkg}/share/wallpapers/${name}/contents/images/${src.name}";
+        passthru = {
+          gnomeFilePath = "${pkg}/share/backgrounds/nixos/${src.name}";
+          kdeFilePath = "${pkg}/share/wallpapers/${name}/contents/images/${src.name}";
+        };
+
+        meta = with lib; {
+          inherit description license;
+          homepage = "https://github.com/NixOS/nixos-artwork";
+          platforms = platforms.all;
+        };
       };
-
-      meta = with lib; {
-        inherit description license;
-        homepage = "https://github.com/NixOS/nixos-artwork";
-        platforms = platforms.all;
-      };
-    };
-in pkg;
+    in
+    pkg;
 
 in
 
@@ -274,7 +280,7 @@ rec {
 
   simple-dark-gray-bootloader = mkNixBackground {
     name = "simple-dark-gray-bootloader-2018-08-28";
-    description = "Simple dark gray background for NixOS, specifically bootloaders.";
+    description = "Simple dark gray background for NixOS, specifically bootloaders";
     src = fetchurl {
       url = "https://raw.githubusercontent.com/NixOS/nixos-artwork/9d1f11f652ed5ffe460b6c602fbfe2e7e9a08dff/bootloader/nix-wallpaper-simple-dark-gray_bootloader.png";
       hash = "sha256-Sd52CEw/pHmk6Cs+yrM/8wscG9bvYuECylQd27ybRmw=";
@@ -284,7 +290,7 @@ rec {
 
   simple-dark-gray-bottom = mkNixBackground {
     name = "simple-dark-gray-2018-08-28";
-    description = "Simple dark gray background for NixOS, specifically bootloaders and graphical login.";
+    description = "Simple dark gray background for NixOS, specifically bootloaders and graphical login";
     src = fetchurl {
       url = "https://raw.githubusercontent.com/NixOS/nixos-artwork/783c38b22de09f6ee33aacc817470a4513392d83/wallpapers/nix-wallpaper-simple-dark-gray_bottom.png";
       hash = "sha256-JUyzf9dYRyLQmxJPKptDxXL7yRqAFt5uM0C9crkkEY4=";

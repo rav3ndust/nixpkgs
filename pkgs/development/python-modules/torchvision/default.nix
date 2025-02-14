@@ -1,16 +1,27 @@
 {
-  buildPythonPackage,
-  fetchFromGitHub,
   lib,
-  libjpeg_turbo,
+  stdenv,
+  torch,
+  apple-sdk_13,
+  buildPythonPackage,
+  darwinMinVersionHook,
+  fetchFromGitHub,
+
+  # nativeBuildInputs
   libpng,
   ninja,
+  which,
+
+  # buildInputs
+  libjpeg_turbo,
+
+  # dependencies
   numpy,
   pillow,
-  pytest,
   scipy,
-  torch,
-  which,
+
+  # tests
+  pytest,
 }:
 
 let
@@ -18,7 +29,7 @@ let
   inherit (cudaPackages) backendStdenv;
 
   pname = "torchvision";
-  version = "0.18.0";
+  version = "0.20.1";
 in
 buildPythonPackage {
   inherit pname version;
@@ -26,8 +37,8 @@ buildPythonPackage {
   src = fetchFromGitHub {
     owner = "pytorch";
     repo = "vision";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-VWbalbLSV5a+t9eAO7QzQ/e11KkhGg6MHgd5vXcAUXc=";
+    tag = "v${version}";
+    hash = "sha256-BXvi4LoO2LZtNSE8lvFzcN4H2nN2fRg5/s7KRci7rMM=";
   };
 
   nativeBuildInputs = [
@@ -36,13 +47,22 @@ buildPythonPackage {
     which
   ] ++ lib.optionals cudaSupport [ cudaPackages.cuda_nvcc ];
 
-  buildInputs = [
-    libjpeg_turbo
-    libpng
-    torch.cxxdev
-  ];
+  buildInputs =
+    [
+      libjpeg_turbo
+      libpng
+      torch.cxxdev
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      # This should match the SDK used by `torch` above
+      apple-sdk_13
 
-  propagatedBuildInputs = [
+      # error: unknown type name 'MPSGraphCompilationDescriptor'; did you mean 'MPSGraphExecutionDescriptor'?
+      # https://developer.apple.com/documentation/metalperformanceshadersgraph/mpsgraphcompilationdescriptor/
+      (darwinMinVersionHook "12.0")
+    ];
+
+  dependencies = [
     numpy
     pillow
     torch
@@ -73,11 +93,12 @@ buildPythonPackage {
 
   nativeCheckInputs = [ pytest ];
 
-  meta = with lib; {
+  meta = {
     description = "PyTorch vision library";
     homepage = "https://pytorch.org/";
-    license = licenses.bsd3;
-    platforms = with platforms; linux ++ lib.optionals (!cudaSupport) darwin;
-    maintainers = with maintainers; [ ericsagnes ];
+    changelog = "https://github.com/pytorch/vision/releases/tag/v${version}";
+    license = lib.licenses.bsd3;
+    platforms = with lib.platforms; linux ++ lib.optionals (!cudaSupport) darwin;
+    maintainers = with lib.maintainers; [ ericsagnes ];
   };
 }

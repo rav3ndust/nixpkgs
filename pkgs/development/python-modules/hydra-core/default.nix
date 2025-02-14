@@ -24,7 +24,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "facebookresearch";
     repo = "hydra";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-kD4BStnstr5hwyAOxdpPzLAJ9MZqU/CPiHkaD2HnUPI=";
   };
 
@@ -82,7 +82,7 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    description = "A framework for configuring complex applications";
+    description = "Framework for configuring complex applications";
     homepage = "https://hydra.cc";
     license = licenses.mit;
     maintainers = with maintainers; [ bcdarwin ];

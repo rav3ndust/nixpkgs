@@ -12,7 +12,7 @@ python3Packages.buildPythonApplication rec {
   src = fetchFromGitHub {
     owner = "The-Compiler";
     repo = "journalwatch";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha512-60+ewzOIox2wsQFXMAgD7XN+zvPA1ScPz6V4MB5taVDhqCxUTMVOxodf+4AMhxtNQloXZ3ye7/0bjh1NPDjxQg==";
   };
 
@@ -31,7 +31,7 @@ python3Packages.buildPythonApplication rec {
   pythonImportsCheck = [ "journalwatch" ];
 
   meta = with lib; {
-    description = "A tool to find error messages in the systemd journal";
+    description = "Tool to find error messages in the systemd journal";
     homepage = "https://github.com/The-Compiler/journalwatch";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ florianjacob ];

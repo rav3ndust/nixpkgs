@@ -21,18 +21,19 @@ rustPlatform.buildRustPackage {
 
   cargoPatches = [ ./update-sqlx.patch ];
 
-  cargoHash = "sha256-3A3bf7iq1acsWttKmcJmxWM74B0qUIcROBAkjDZFKxE=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-K9oo0QrqcPNdV7WMlgSCVc+7AVfoyDkovvJLqKJPvTQ=";
 
   buildInputs =
     with darwin.apple_sdk.frameworks;
-    lib.optionals stdenv.isDarwin [
+    lib.optionals stdenv.hostPlatform.isDarwin [
       CoreFoundation
       Security
       SystemConfiguration
     ];
 
   meta = {
-    description = "A cross-platform TUI database management tool written in Rust";
+    description = "Cross-platform TUI database management tool written in Rust";
     homepage = "https://github.com/tako8ki/gobang";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ figsoda ];

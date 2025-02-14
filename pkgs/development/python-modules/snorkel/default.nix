@@ -32,7 +32,7 @@ buildPythonPackage {
   src = fetchFromGitHub {
     owner = "snorkel-team";
     repo = pname;
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-1DgkMHYToiI3266yCND1bXiui80x8AaBttxM83kJImw=";
   };
 
@@ -61,7 +61,7 @@ buildPythonPackage {
   ] ++ dask.optional-dependencies.distributed;
 
   meta = with lib; {
-    description = "A system for quickly generating training data with weak supervision";
+    description = "System for quickly generating training data with weak supervision";
     homepage = "https://github.com/snorkel-team/snorkel";
     changelog = "https://github.com/snorkel/snorkel/releases/tag/v${version}";
     license = licenses.asl20;

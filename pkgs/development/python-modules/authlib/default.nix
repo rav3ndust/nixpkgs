@@ -1,6 +1,7 @@
 {
   lib,
   buildPythonPackage,
+  cacert,
   cachelib,
   cryptography,
   fetchFromGitHub,
@@ -12,27 +13,29 @@
   pytestCheckHook,
   pythonOlder,
   requests,
+  setuptools,
   starlette,
   werkzeug,
 }:
 
 buildPythonPackage rec {
   pname = "authlib";
-  version = "1.3.0";
-  format = "setuptools";
+  version = "1.4.1";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "lepture";
     repo = "authlib";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-XHzABjGpZN6ilYuBYyGF3Xy/+AT2DXick8/A4JkyWBA=";
+    tag = "v${version}";
+    hash = "sha256-1Iygc35+Vc1zyn8rjubnSLmpvjckY4TRKOtf2bkrkdI=";
   };
 
-  propagatedBuildInputs = [
+  build-system = [ setuptools ];
+
+  dependencies = [
     cryptography
-    requests
   ];
 
   nativeCheckInputs = [
@@ -43,9 +46,15 @@ buildPythonPackage rec {
     mock
     pytest-asyncio
     pytestCheckHook
+    requests
     starlette
     werkzeug
   ];
+
+  preCheck = ''
+    # httpx 0.28.0+ requires SSL_CERT_FILE or SSL_CERT_DIR
+    export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
+  '';
 
   pythonImportsCheck = [ "authlib" ];
 

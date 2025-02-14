@@ -8,7 +8,7 @@
 
 buildPythonPackage rec {
   pname = "pysnooper";
-  version = "1.2.0";
+  version = "1.2.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.8";
@@ -16,7 +16,7 @@ buildPythonPackage rec {
   src = fetchPypi {
     inherit version;
     pname = "PySnooper";
-    hash = "sha256-gQZp4WKiUKBm2GYuVzrbxa93DpN8W1V48ou3NV0chZs=";
+    hash = "sha256-2DLd8myARAqUVrOmZNr/lX9zfnMTxAt2JQ69tczbajE=";
   };
 
   nativeCheckInputs = [ pytestCheckHook ];
@@ -24,7 +24,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "pysnooper" ];
 
   meta = with lib; {
-    description = "A poor man's debugger for Python";
+    description = "Poor man's debugger for Python";
     homepage = "https://github.com/cool-RR/PySnooper";
     license = licenses.mit;
     maintainers = with maintainers; [ seqizz ];

@@ -12,7 +12,7 @@
 
 buildPythonPackage rec {
   pname = "pims";
-  version = "0.6.1";
+  version = "0.7";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -20,8 +20,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "soft-matter";
     repo = pname;
-    rev = "refs/tags/v${version}";
-    hash = "sha256-QdllA1QTSJ8vWaSJ0XoUanX53sb4RaOmdXBCFEsoWMU=";
+    tag = "v${version}";
+    hash = "sha256-3SBZk11w6eTZFmETMRJaYncxY38CYne1KzoF5oRgzuY=";
   };
 
   propagatedBuildInputs = [
@@ -57,6 +57,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/soft-matter/pims";
     changelog = "https://github.com/soft-matter/pims/releases/tag/v${version}";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

@@ -1,20 +1,21 @@
-{ lib
-, stdenv
-, fetchurl
-, ncurses
-, xmlto
-, docbook_xml_dtd_44
-, docbook_xsl
-, installShellFiles
+{
+  lib,
+  stdenv,
+  fetchurl,
+  ncurses,
+  xmlto,
+  docbook_xml_dtd_44,
+  docbook_xsl,
+  installShellFiles,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "vms-empire";
-  version = "1.17";
+  version = "1.18";
 
-  src = fetchurl{
+  src = fetchurl {
     url = "http://www.catb.org/~esr/vms-empire/vms-empire-${finalAttrs.version}.tar.gz";
-    hash = "sha256-AmHs6ojVcfglvvFvC9JzNWVS2t4Coqg8WwyNCM+sEno=";
+    hash = "sha256-JWCmrGS4jClSi6MCcGNiq8zUH+92fiqMtk58B+wMKQk=";
   };
 
   nativeBuildInputs = [
@@ -54,7 +55,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     homepage = "http://catb.org/~esr/vms-empire/";
-    description = "The ancestor of all expand/explore/exploit/exterminate games";
+    description = "Ancestor of all expand/explore/exploit/exterminate games";
     longDescription = ''
       Empire is a simulation of a full-scale war between two emperors, the
       computer and you. Naturally, there is only room for one, so the object of
@@ -65,7 +66,7 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.gpl2Only;
     mainProgram = "vms-empire";
-    maintainers = with lib.maintainers; [ AndersonTorres ];
+    maintainers = with lib.maintainers; [ ];
     platforms = lib.platforms.unix;
   };
 })

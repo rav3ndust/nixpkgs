@@ -4,50 +4,54 @@
   buildPythonPackage,
   defang,
   dnspython,
+  eval-type-backport,
   fetchFromGitHub,
   playwrightcapture,
   poetry-core,
+  pydantic,
   pythonOlder,
   redis,
   requests,
-  pythonRelaxDepsHook,
-  sphinx,
   ua-parser,
 }:
 
 buildPythonPackage rec {
   pname = "lacuscore";
-  version = "1.9.5";
+  version = "1.12.10";
   pyproject = true;
 
-  disabled = pythonOlder "3.8";
+  disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "ail-project";
     repo = "LacusCore";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-PSxNBgehKOWjf6y/RidIegE+P5rg9OzU4p8ZZrXAdq4=";
+    tag = "v${version}";
+    hash = "sha256-IKH7c1/MgjlfJ9tKVeTXW8MdLIc7P+jitvQkZn9f75Y=";
   };
 
   pythonRelaxDeps = [
+    "pydantic"
     "redis"
     "requests"
   ];
 
   build-system = [ poetry-core ];
 
-  nativeBuildInputs = [ pythonRelaxDepsHook ];
-
-  dependencies = [
-    async-timeout
-    defang
-    dnspython
-    playwrightcapture
-    redis
-    requests
-    sphinx
-    ua-parser
-  ];
+  dependencies =
+    [
+      defang
+      dnspython
+      playwrightcapture
+      pydantic
+      redis
+      requests
+      ua-parser
+    ]
+    ++ playwrightcapture.optional-dependencies.recaptcha
+    ++ redis.optional-dependencies.hiredis
+    ++ ua-parser.optional-dependencies.regex
+    ++ lib.optionals (pythonOlder "3.11") [ async-timeout ]
+    ++ lib.optionals (pythonOlder "3.10") [ eval-type-backport ];
 
   # Module has no tests
   doCheck = false;
@@ -55,7 +59,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "lacuscore" ];
 
   meta = with lib; {
-    description = "The modulable part of Lacus";
+    description = "Modulable part of Lacus";
     homepage = "https://github.com/ail-project/LacusCore";
     changelog = "https://github.com/ail-project/LacusCore/releases/tag/v${version}";
     license = licenses.bsd3;
