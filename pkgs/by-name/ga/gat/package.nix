@@ -1,20 +1,21 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
 }:
 
 buildGoModule rec {
   pname = "gat";
-  version = "0.20.3";
+  version = "0.23.0";
 
   src = fetchFromGitHub {
     owner = "koki-develop";
     repo = "gat";
     tag = "v${version}";
-    hash = "sha256-97rFnJPdnLv8RLI5ZGMpdEX2UwLUNBVn3Fe4vv5MFRY=";
+    hash = "sha256-NZ2pa2jewYmEGkRITfOfXeVWhfkfU0TQFKbkwkTsHNs=";
   };
 
-  vendorHash = "sha256-C3iUsS1p/+8U1KO/B5htYwCKnQThOusjE/jhOqoCFQo=";
+  vendorHash = "sha256-Fcj0APGk1C4leZoUphrj0Vi7XWClMfQsOb9wDoMfQrU=";
 
   env.CGO_ENABLED = 0;
 

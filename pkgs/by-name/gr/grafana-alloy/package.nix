@@ -17,17 +17,17 @@
 
 buildGoModule rec {
   pname = "grafana-alloy";
-  version = "1.6.1";
+  version = "1.8.2";
 
   src = fetchFromGitHub {
     owner = "grafana";
     repo = "alloy";
     tag = "v${version}";
-    hash = "sha256-7NcSe+6MqS5Bxu64qaJKKxSsQYYEqeGGRgDpcag8t1I=";
+    hash = "sha256-xbMbCxgwH3Ea3SBKZXzCIEv+AX7OQJmIqAx9PZkmkHo=";
   };
 
   proxyVendor = true;
-  vendorHash = "sha256-DmSyEgEIJEMOOfOQxDZUGT81Iw6QO0gOhSkXSilL16g=";
+  vendorHash = "sha256-Vqhdc+WZC8IACEzox5c4PsOvYwQ2WFL3lDM+hB1foE0=";
 
   nativeBuildInputs = [
     fixup-yarn-lock
@@ -70,7 +70,7 @@ buildGoModule rec {
 
   yarnOfflineCache = fetchYarnDeps {
     yarnLock = "${src}/internal/web/ui/yarn.lock";
-    hash = "sha256-4vZr3mPvk5IXoqSPuqhzYobAuK2NDK0dceNZUIQILvI=";
+    hash = "sha256-gKCjJe3TVpaHm/gwaNh4zeL5k4jlbWfF94aDYQ1brU8=";
   };
 
   preBuild = ''
@@ -127,7 +127,12 @@ buildGoModule rec {
         package = grafana-alloy;
       };
     };
-    updateScript = nix-update-script { };
+    updateScript = nix-update-script {
+      extraArgs = [
+        "--version-regex"
+        "v(.+)"
+      ];
+    };
     # alias for nix-update to be able to find and update this attribute
     offlineCache = yarnOfflineCache;
   };
@@ -141,7 +146,6 @@ buildGoModule rec {
     maintainers = with maintainers; [
       azahi
       flokli
-      emilylange
       hbjydev
     ];
     platforms = lib.platforms.unix;

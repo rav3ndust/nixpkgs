@@ -16,7 +16,7 @@
 
 buildPythonPackage rec {
   pname = "pipdeptree";
-  version = "2.25.0";
+  version = "2.26.0";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -25,7 +25,7 @@ buildPythonPackage rec {
     owner = "tox-dev";
     repo = "pipdeptree";
     tag = version;
-    hash = "sha256-U1zr38eZks7uMXKgsbRZUZlDsxScUsKaq+scH/mLRG4=";
+    hash = "sha256-Nq+xXzi5PeDDNTtkTaMTWO4HpxkjSUptE4jwfjBoauY=";
   };
 
   postPatch = ''
@@ -66,7 +66,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Command line utility to show dependency tree of packages";
     homepage = "https://github.com/tox-dev/pipdeptree";
-    changelog = "https://github.com/tox-dev/pipdeptree/releases/tag/${version}";
+    changelog = "https://github.com/tox-dev/pipdeptree/releases/tag/${src.tag}";
     license = licenses.mit;
     maintainers = with maintainers; [ charlesbaynham ];
     mainProgram = "pipdeptree";

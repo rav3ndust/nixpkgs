@@ -69,7 +69,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "gnome-shell";
-  version = "47.3";
+  version = "47.4";
 
   outputs = [
     "out"
@@ -78,7 +78,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "mirror://gnome/sources/gnome-shell/${lib.versions.major finalAttrs.version}/gnome-shell-${finalAttrs.version}.tar.xz";
-    hash = "sha256-eD3rmghlEeSlPbEFdL+7ppVXb2mAeCGMpsgMse/sKT4=";
+    hash = "sha256-aAuvaU9F+PyDLSRa2mxjtfxLAwzPvrv8Dg47wo2i5G0=";
   };
 
   patches = [
@@ -190,6 +190,13 @@ stdenv.mkDerivation (finalAttrs: {
     rm data/theme/gnome-shell-{light,dark}.css
   '';
 
+  preInstall = ''
+    # gnome-shell contains GSettings schema overrides for Mutter.
+    schemadir="$out/share/glib-2.0/schemas"
+    mkdir -p "$schemadir"
+    cp "${glib.getSchemaPath mutter}/org.gnome.mutter.gschema.xml" "$schemadir"
+  '';
+
   postInstall = ''
     # Pull in WebP and JXL support for gnome-backgrounds.
     # In postInstall to run before gappsWrapperArgsHook.
@@ -236,7 +243,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.gnome.org/GNOME/gnome-shell";
     changelog = "https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/${finalAttrs.version}/NEWS?ref_type=tags";
     license = licenses.gpl2Plus;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
     platforms = platforms.linux;
   };
 

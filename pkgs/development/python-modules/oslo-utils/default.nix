@@ -31,13 +31,13 @@
 
 buildPythonPackage rec {
   pname = "oslo-utils";
-  version = "8.0.0";
+  version = "8.2.0";
   pyproject = true;
 
   src = fetchPypi {
-    pname = "oslo.utils";
+    pname = "oslo_utils";
     inherit version;
-    hash = "sha256-kG/PHIb2cfIkwZJbKo03WgU5FD+2FYsT4gKnndjmxpQ=";
+    hash = "sha256-3PeNFLlo+3sUJjx3J4srkwp4YdPKqIfTpYsokPZlmDU=";
   };
 
   patches = [
@@ -74,6 +74,7 @@ buildPythonPackage rec {
     ddt
     eventlet
     fixtures
+    libredirect.hook
     oslotest
     qemu-utils
     stestr
@@ -87,7 +88,6 @@ buildPythonPackage rec {
   checkPhase = ''
     echo "nameserver 127.0.0.1" > resolv.conf
     export NIX_REDIRECTS=/etc/protocols=${iana-etc}/etc/protocols:/etc/resolv.conf=$(realpath resolv.conf)
-    export LD_PRELOAD=${libredirect}/lib/libredirect.so
 
     stestr run -e <(echo "
       oslo_utils.tests.test_netutils.NetworkUtilsTest.test_is_valid_ip
@@ -101,6 +101,6 @@ buildPythonPackage rec {
     description = "Oslo Utility library";
     homepage = "https://github.com/openstack/oslo.utils";
     license = licenses.asl20;
-    maintainers = teams.openstack.members;
+    teams = [ teams.openstack ];
   };
 }

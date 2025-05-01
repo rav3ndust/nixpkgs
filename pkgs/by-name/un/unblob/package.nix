@@ -1,6 +1,5 @@
 {
   lib,
-  fetchpatch,
   python3,
   fetchFromGitHub,
   gitUpdater,
@@ -87,6 +86,8 @@ python3.pkgs.buildPythonApplication rec {
     "jefferson"
     "ubi-reader"
   ];
+
+  pythonRelaxDeps = [ "rich" ];
 
   pythonImportsCheck = [ "unblob" ];
 

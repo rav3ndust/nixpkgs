@@ -65,7 +65,7 @@ let
     else
       "2.0-0.lib";
 
-  systemtap' = buildPackages.linuxPackages.systemtap.override { withStap = false; };
+  systemtap' = buildPackages.systemtap-sdt;
 
   withDtrace =
     lib.meta.availableOn stdenv.buildPlatform systemtap'
@@ -76,7 +76,7 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "glib";
-  version = "2.82.4";
+  version = "2.82.5";
 
   outputs = [
     "bin"
@@ -89,7 +89,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "mirror://gnome/sources/glib/${lib.versions.majorMinor finalAttrs.version}/glib-${finalAttrs.version}.tar.xz";
-    hash = "sha256-N90Id/6WTNFemicQsEShgw+xvZNlKm0Mtriy3/GHxwk=";
+    hash = "sha256-BcIDH5vfa1q6egbKhPC0rO0osZvxtQxqslzGdSd8vD8=";
   };
 
   patches =
@@ -249,7 +249,6 @@ stdenv.mkDerivation (finalAttrs: {
       "-Dlibelf=disabled"
     ]
     ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
-      "-Db_lundef=false"
       "-Dxattr=false"
       "-Dsysprof=disabled" # sysprof-capture does not build on FreeBSD
     ];
@@ -396,12 +395,11 @@ stdenv.mkDerivation (finalAttrs: {
     description = "C library of programming buildings blocks";
     homepage = "https://gitlab.gnome.org/GNOME/glib";
     license = licenses.lgpl21Plus;
-    maintainers =
-      teams.gnome.members
-      ++ (with maintainers; [
-        lovek323
-        raskin
-      ]);
+    maintainers = with maintainers; [
+      lovek323
+      raskin
+    ];
+    teams = [ teams.gnome ];
     pkgConfigModules = [
       "gio-2.0"
       "gobject-2.0"

@@ -1,19 +1,20 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, nix-update-script
-, meson
-, ninja
-, pkg-config
-, vala
-, wrapGAppsHook4
-, glib
-, granite7
-, gsettings-desktop-schemas
-, gtk4
-, pantheon-wayland
-, systemd
-, xorg
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  nix-update-script,
+  meson,
+  ninja,
+  pkg-config,
+  vala,
+  wrapGAppsHook4,
+  glib,
+  granite7,
+  gsettings-desktop-schemas,
+  gtk4,
+  pantheon-wayland,
+  systemd,
+  xorg,
 }:
 
 stdenv.mkDerivation rec {
@@ -58,6 +59,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/elementary/portals";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
-    maintainers = teams.pantheon.members;
+    teams = [ teams.pantheon ];
   };
 }

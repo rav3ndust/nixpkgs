@@ -37,11 +37,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "gnome-initial-setup";
-  version = "47.2";
+  version = "47.4";
 
   src = fetchurl {
     url = "mirror://gnome/sources/gnome-initial-setup/${lib.versions.major finalAttrs.version}/gnome-initial-setup-${finalAttrs.version}.tar.xz";
-    hash = "sha256-T00Y61YnXMVqGZOlofTRPVpkJoad5nCWuS8rKcryIjw=";
+    hash = "sha256-LAKZ3CtxaBGCNZUNWJijUclMuduP2AjarV1uS6lbh7g=";
   };
 
   patches = [
@@ -100,6 +100,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://gitlab.gnome.org/GNOME/gnome-initial-setup/-/blob/${finalAttrs.version}/NEWS?ref_type=tags";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = teams.gnome.members;
+    teams = [ teams.gnome ];
   };
 })

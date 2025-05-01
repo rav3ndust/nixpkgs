@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   buildPythonPackage,
   fetchFromGitHub,
 
@@ -31,26 +32,20 @@
 
 buildPythonPackage rec {
   pname = "plotpy";
-  version = "2.7.1";
+  version = "2.7.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "PlotPyStack";
     repo = "PlotPy";
     tag = "v${version}";
-    hash = "sha256-Ava3rtF/W6MdL/iaK8zbwYBCD5WFAhpzcQnHwfuXOzc=";
+    hash = "sha256-Z8aCDTBRdksbjjH5P+OXln3CHciw1MuYQN3K6KOcouk=";
   };
 
   build-system = [
     cython
     setuptools
   ];
-  # Both numpy versions are supported, see:
-  # https://github.com/PlotPyStack/PlotPy/blob/v2.6.2/pyproject.toml#L8-L9
-  postConfigure = ''
-    substituteInPlace pyproject.toml \
-      --replace-fail 'numpy >= 2.0.0' numpy
-  '';
 
   dependencies = [
     guidata
@@ -75,6 +70,13 @@ buildPythonPackage rec {
     # https://github.com/NixOS/nixpkgs/issues/255262
     cd $out
   '';
+
+  disabledTests = lib.optionals stdenv.hostPlatform.isDarwin [
+    # Fatal Python error: Segmentation fault
+    # in plotpy/widgets/resizedialog.py", line 99 in __init__
+    "test_resize_dialog"
+    "test_tool"
+  ];
 
   pythonImportsCheck = [
     "plotpy"

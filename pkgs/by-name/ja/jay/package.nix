@@ -1,16 +1,18 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, libGL
-, libinput
-, libxkbcommon
-, libgbm
-, pango
-, udev
-, shaderc
-, libglvnd
-, vulkan-loader
-, autoPatchelfHook
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  libGL,
+  libinput,
+  pkgconf,
+  xkeyboard_config,
+  libgbm,
+  pango,
+  udev,
+  shaderc,
+  libglvnd,
+  vulkan-loader,
+  autoPatchelfHook,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -19,7 +21,7 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchFromGitHub {
     owner = "mahkoh";
-    repo = pname;
+    repo = "jay";
     rev = "v${version}";
     sha256 = "sha256-dUp3QYno2rB3wuJmSvBpCqowSpfMQIJqUYc0lDVqVPA=";
   };
@@ -31,11 +33,12 @@ rustPlatform.buildRustPackage rec {
 
   nativeBuildInputs = [
     autoPatchelfHook
+    pkgconf
   ];
 
   buildInputs = [
     libGL
-    libxkbcommon
+    xkeyboard_config
     libgbm
     pango
     udev
@@ -57,7 +60,7 @@ rustPlatform.buildRustPackage rec {
     description = "Wayland compositor written in Rust";
     homepage = "https://github.com/mahkoh/jay";
     license = licenses.gpl3;
-    platforms   = platforms.linux;
+    platforms = platforms.linux;
     maintainers = with maintainers; [ dit7ya ];
     mainProgram = "jay";
   };

@@ -1,41 +1,39 @@
 {
   lib,
-  callPackage,
   fetchFromGitHub,
   buildNpmPackage,
   pkg-config,
+  anytype-heart,
   libsecret,
   electron,
   makeDesktopItem,
   copyDesktopItems,
   commandLineArgs ? "",
-  nix-update-script,
 }:
 
 let
-  anytype-heart = callPackage ./anytype-heart { };
   pname = "anytype";
-  version = "0.44.0";
+  version = "0.45.3";
 
   src = fetchFromGitHub {
     owner = "anyproto";
     repo = "anytype-ts";
     tag = "v${version}";
-    hash = "sha256-a2ZnTEAFzzTb+lxtQkC6QLG5SP1+gDSjI9dqUNZWfCg=";
+    hash = "sha256-fwfxmNca75xAAHKeT2nddz+XZexDomzHbw188LXxZqA=";
   };
   description = "P2P note-taking tool";
 
   locales = fetchFromGitHub {
     owner = "anyproto";
     repo = "l10n-anytype-ts";
-    rev = "a5c81ad55383c4e6e9bb7893ecfcb879bac87bea";
-    hash = "sha256-evSB0ohHm++tZiazXRMR4vj34IfW3HIkfZ2gwsi/2dk=";
+    rev = "687106c4e37297f86fab79f77ef83599b61ab65c";
+    hash = "sha256-Y0irD0jzqYobnjtD2M1+hTDRUUYnuygUx9+tE1gUoTw=";
   };
 in
 buildNpmPackage {
   inherit pname version src;
 
-  npmDepsHash = "sha256-DDVsrXgijYYOeCc1gIe2nVb+oL8v4Hqq80d7l5b6MR0=";
+  npmDepsHash = "sha256-9BI+rXzTYonlMhcH8uiWyyF18JGv8GL1U9hZ9Z6X3As=";
 
   env = {
     ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
@@ -46,6 +44,11 @@ buildNpmPackage {
     copyDesktopItems
   ];
   buildInputs = [ libsecret ];
+
+  npmFlags = [
+    # keytar needs to be built against electron's ABI
+    "--nodedir=${electron.headers}"
+  ];
 
   buildPhase = ''
     runHook preBuild
@@ -62,13 +65,20 @@ buildNpmPackage {
     runHook postBuild
   '';
 
+  # remove unnecessary files
+  preInstall = ''
+    npm prune --omit=dev
+    chmod u+w -R dist
+    find -type f \( -name "*.ts" -o -name "*.map" \) -exec rm -rf {} +
+  '';
+
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/lib/node_modules/anytype
-    cp -r electron.js electron dist node_modules package.json $out/lib/node_modules/anytype/
+    mkdir -p $out/lib/anytype
+    cp -r electron.js electron dist node_modules package.json $out/lib/anytype/
 
-    for icon in $out/lib/node_modules/anytype/electron/img/icons/*.png; do
+    for icon in $out/lib/anytype/electron/img/icons/*.png; do
       mkdir -p "$out/share/icons/hicolor/$(basename $icon .png)/apps"
       ln -s "$icon" "$out/share/icons/hicolor/$(basename $icon .png)/apps/anytype.png"
     done
@@ -78,7 +88,7 @@ buildNpmPackage {
     makeWrapper '${lib.getExe electron}' $out/bin/anytype \
       --set-default ELECTRON_IS_DEV 0 \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
-      --add-flags $out/lib/node_modules/anytype/ \
+      --add-flags $out/lib/anytype/ \
       --add-flags ${lib.escapeShellArg commandLineArgs}
 
     runHook postInstall
@@ -101,17 +111,6 @@ buildNpmPackage {
     })
   ];
 
-  passthru.updateScript = nix-update-script {
-    # Prevent updating to versions with '-' in them.
-    # Necessary since Anytype uses Electron-based 'MAJOR.MINOR.PATCH(-{alpha,beta})?' versioning scheme where each
-    #  {alpha,beta} version increases the PATCH version, releasing a new full release version in GitHub instead of a
-    #  pre-release version.
-    extraArgs = [
-      "--version-regex"
-      "[^-]*"
-    ];
-  };
-
   meta = {
     inherit description;
     homepage = "https://anytype.io/";
@@ -120,6 +119,7 @@ buildNpmPackage {
     maintainers = with lib.maintainers; [
       running-grass
       autrimpo
+      adda
     ];
     platforms = [
       "x86_64-linux"

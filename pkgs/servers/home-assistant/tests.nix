@@ -14,7 +14,7 @@ let
       ibeacon-ble
     ];
     hassio = getComponentDeps "homeassistant_yellow";
-    homeassistant_hardware = getComponentDeps "zha";
+    homeassistant_hardware = getComponentDeps "otbr" ++ getComponentDeps "zha";
     homeassistant_sky_connect = getComponentDeps "zha";
     homeassistant_yellow = getComponentDeps "zha";
     husqvarna_automower_ble = getComponentDeps "gardena_bluetooth";
@@ -67,6 +67,10 @@ let
       # tries to retrieve file from github
       "test_non_text_stdout_capture"
     ];
+    stream = [
+      # crashes with x265>=4.0
+      "test_h265_video_is_hvc1"
+    ];
     websocket_api = [
       # AssertionError: assert 'unknown_error' == 'template_error'
       "test_render_template_with_timeout"
@@ -74,6 +78,14 @@ let
   };
 
   extraPytestFlagsArray = {
+    backup = [
+      # outdated snapshot
+      "--deselect tests/components/backup/test_sensors.py::test_sensors"
+    ];
+    bmw_connected_drive = [
+      # outdated snapshot
+      "--deselect tests/components/bmw_connected_drive/test_select.py::test_entity_state_attrs"
+    ];
     dnsip = [
       # Tries to resolve DNS entries
       "--deselect tests/components/dnsip/test_config_flow.py::test_options_flow"
@@ -83,6 +95,10 @@ let
       "--deselect tests/components/jellyfin/test_media_source.py::test_resolve"
       "--deselect tests/components/jellyfin/test_media_source.py::test_audio_codec_resolve"
       "--deselect tests/components/jellyfin/test_media_source.py::test_music_library"
+    ];
+    matter = [
+      # outdated snapshot in eve_weather_sensor variant
+      "--deselect tests/components/matter/test_number.py::test_numbers"
     ];
     modem_callerid = [
       # aioserial mock produces wrong state

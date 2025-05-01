@@ -14,12 +14,12 @@ let
   # kernel config in the xanmod version commit
   variants = {
     lts = {
-      version = "6.12.12";
-      hash = "sha256-k+nRkmqZXqHTYVT4r+Lt7SG9uLDsefM3ivV5Ps6VL8c=";
+      version = "6.12.24";
+      hash = "sha256-W4c/MqkwWzLhun700MfT4RzmrHaXyQfKqJ2MKahTMP4=";
     };
     main = {
-      version = "6.12.12";
-      hash = "sha256-k+nRkmqZXqHTYVT4r+Lt7SG9uLDsefM3ivV5Ps6VL8c=";
+      version = "6.13.12";
+      hash = "sha256-O0sZ26nWfPfgCI9/J7mGZKtLzk9beawKEHoww1euoic=";
     };
   };
 
@@ -79,6 +79,7 @@ let
             zzzsy
             eljamm
           ];
+          teams = [ ];
           description = "Built with custom settings and new features built to provide a stable, responsive and smooth desktop experience";
           broken = stdenv.hostPlatform.isAarch64;
         };

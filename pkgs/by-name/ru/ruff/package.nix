@@ -10,24 +10,23 @@
   versionCheckHook,
 
   # passthru
-  ruff-lsp,
   nixosTests,
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "ruff";
-  version = "0.9.6";
+  version = "0.11.7";
 
   src = fetchFromGitHub {
     owner = "astral-sh";
     repo = "ruff";
-    tag = version;
-    hash = "sha256-xKlvj+8ox5UdkH3s9IOIMOVPCDQMLnGUKDOhKAZZgg4=";
+    tag = finalAttrs.version;
+    hash = "sha256-DXu9/DRwcffZtsql/Qk+6GyzhiYXUyW6R9FCAvLhn6o=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-m9U4OFefSumTT6heNz4qOdRBhsJvP3wcXeZcMVD+NqA=";
+  cargoHash = "sha256-4TK7HEdSCvUGqsAH+dnPgMBYmT/0mOnvQXHr/PtcsT0=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -35,7 +34,7 @@ rustPlatform.buildRustPackage rec {
     rust-jemalloc-sys
   ];
 
-  postInstall =
+  postInstall = lib.optionalString (stdenv.hostPlatform.emulatorAvailable buildPackages) (
     let
       emulator = stdenv.hostPlatform.emulator buildPackages;
     in
@@ -44,7 +43,8 @@ rustPlatform.buildRustPackage rec {
         --bash <(${emulator} $out/bin/ruff generate-shell-completion bash) \
         --fish <(${emulator} $out/bin/ruff generate-shell-completion fish) \
         --zsh <(${emulator} $out/bin/ruff generate-shell-completion zsh)
-    '';
+    ''
+  );
 
   # Run cargo tests
   checkType = "debug";
@@ -65,24 +65,20 @@ rustPlatform.buildRustPackage rec {
   nativeInstallCheckInputs = [
     versionCheckHook
   ];
-  versionCheckProgramArg = [ "--version" ];
+  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   passthru = {
-    tests =
-      {
-        inherit ruff-lsp;
-      }
-      // lib.optionalAttrs stdenv.hostPlatform.isLinux {
-        nixos-test-driver-busybox = nixosTests.nixos-test-driver.busybox;
-      };
+    tests = lib.optionalAttrs stdenv.hostPlatform.isLinux {
+      nixos-test-driver-busybox = nixosTests.nixos-test-driver.busybox;
+    };
     updateScript = nix-update-script { };
   };
 
   meta = {
     description = "Extremely fast Python linter and code formatter";
     homepage = "https://github.com/astral-sh/ruff";
-    changelog = "https://github.com/astral-sh/ruff/releases/tag/${version}";
+    changelog = "https://github.com/astral-sh/ruff/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
     mainProgram = "ruff";
     maintainers = with lib.maintainers; [
@@ -90,4 +86,4 @@ rustPlatform.buildRustPackage rec {
       GaetanLepage
     ];
   };
-}
+})

@@ -8,16 +8,16 @@
 
 buildGoModule rec {
   pname = "minio-warp";
-  version = "1.0.8";
+  version = "1.1.2";
 
   src = fetchFromGitHub {
     owner = "minio";
     repo = "warp";
     rev = "v${version}";
-    hash = "sha256-kME4yafNZtHDF/EAIG8qR4PH6HlokIfdBAJH+ibl5ro=";
+    hash = "sha256-loyEGnJ6ExWMUyArNNpQGzpagFgwlNzaNBO8EPXkMws=";
   };
 
-  vendorHash = "sha256-073ssCOh0CiiJaatwzhNrwpe2QO21iC6GSkwVtsmYjs=";
+  vendorHash = "sha256-/+vKs5NzzyP9Ihz+zbxGf/OEHD0kaf0wZzE0Sg++3bE=";
 
   # See .goreleaser.yml
   ldflags = [
@@ -36,7 +36,7 @@ buildGoModule rec {
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
-  versionCheckProgramArg = [ "--version" ];
+  versionCheckProgramArg = "--version";
 
   passthru.updateScript = nix-update-script { };
 

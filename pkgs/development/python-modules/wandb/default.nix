@@ -13,7 +13,7 @@
 
   ## wandb
   buildPythonPackage,
-  substituteAll,
+  replaceVars,
 
   # build-system
   hatchling,
@@ -25,12 +25,14 @@
   platformdirs,
   protobuf,
   psutil,
+  pydantic,
   pyyaml,
   requests,
-  sentry-sdk_2,
+  sentry-sdk,
   setproctitle,
   setuptools,
   pythonOlder,
+  eval-type-backport,
   typing-extensions,
 
   # tests
@@ -56,7 +58,6 @@
   parameterized,
   pillow,
   plotly,
-  pydantic,
   pyfakefs,
   pyte,
   pytest-asyncio,
@@ -75,12 +76,12 @@
 }:
 
 let
-  version = "0.19.6";
+  version = "0.19.8";
   src = fetchFromGitHub {
     owner = "wandb";
     repo = "wandb";
     tag = "v${version}";
-    hash = "sha256-snyr0IlE4otk1ctWUrJEFAmHYsXe+k6qULCaO3aW0e4=";
+    hash = "sha256-hveMyGeu9RhdtWMbV/4GQ4KUNfjSt0CKyW7Yx8QtlLM=";
   };
 
   gpu-stats = rustPlatform.buildRustPackage {
@@ -102,7 +103,7 @@ let
       versionCheckHook
     ];
     versionCheckProgram = "${placeholder "out"}/bin/gpu_stats";
-    versionCheckProgramArg = [ "--version" ];
+    versionCheckProgramArg = "--version";
     doInstallCheck = true;
 
     meta = {
@@ -133,7 +134,7 @@ let
     nativeInstallCheckInputs = [
       versionCheckHook
     ];
-    versionCheckProgramArg = [ "--version" ];
+    versionCheckProgramArg = "--version";
     doInstallCheck = true;
 
     __darwinAllowLocalNetworking = true;
@@ -150,8 +151,7 @@ buildPythonPackage rec {
 
   patches = [
     # Replace git paths
-    (substituteAll {
-      src = ./hardcode-git-path.patch;
+    (replaceVars ./hardcode-git-path.patch {
       git = lib.getExe git;
     })
   ];
@@ -185,12 +185,16 @@ buildPythonPackage rec {
       platformdirs
       protobuf
       psutil
+      pydantic
       pyyaml
       requests
-      sentry-sdk_2
+      sentry-sdk
       setproctitle
       # setuptools is necessary since pkg_resources is required at runtime.
       setuptools
+    ]
+    ++ lib.optionals (pythonOlder "3.10") [
+      eval-type-backport
     ]
     ++ lib.optionals (pythonOlder "3.12") [
       typing-extensions
@@ -221,7 +225,6 @@ buildPythonPackage rec {
     parameterized
     pillow
     plotly
-    pydantic
     pyfakefs
     pyte
     pytest-asyncio
@@ -247,6 +250,9 @@ buildPythonPackage rec {
   disabledTestPaths = [
     # Require docker access
     "tests/system_tests"
+
+    # broke somewhere between sentry-sdk 2.15.0 and 2.22.0
+    "tests/unit_tests/test_analytics/test_sentry.py"
   ];
 
   disabledTests =

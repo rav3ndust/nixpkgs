@@ -2,7 +2,7 @@
 # Do not edit!
 
 {
-  version = "2025.2.3";
+  version = "2025.4.4";
   components = {
     "3_day_blinds" =
       ps: with ps; [
@@ -280,6 +280,9 @@
     "api" =
       ps: with ps; [
       ];
+    "apollo_automation" =
+      ps: with ps; [
+      ];
     "appalachianpower" =
       ps: with ps; [
       ];
@@ -493,6 +496,10 @@
       ps: with ps; [
         azure-servicebus
       ];
+    "azure_storage" =
+      ps: with ps; [
+        azure-storage-blob
+      ];
     "backup" =
       ps: with ps; [
         aiohasupervisor
@@ -675,6 +682,10 @@
       ps: with ps; [
         bond-async
       ];
+    "bosch_alarm" =
+      ps: with ps; [
+        bosch-alarm-mode2
+      ];
     "bosch_shc" =
       ps: with ps; [
         boschshcpy
@@ -769,6 +780,9 @@
     "buienradar" =
       ps: with ps; [
         buienradar
+      ];
+    "burbank_water_and_power" =
+      ps: with ps; [
       ];
     "button" =
       ps: with ps; [
@@ -1025,7 +1039,8 @@
       ]; # missing inputs: decora
     "decora_wifi" =
       ps: with ps; [
-      ]; # missing inputs: decora-wifi
+        decora-wifi
+      ];
     "decorquip" =
       ps: with ps; [
       ];
@@ -1286,13 +1301,10 @@
       ]; # missing inputs: dweepy
     "dynalite" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         dynalite-devices
         dynalite-panel
         home-assistant-frontend
         pillow
-        securetar
       ];
     "eafm" =
       ps: with ps; [
@@ -1780,8 +1792,9 @@
       ];
     "forked_daapd" =
       ps: with ps; [
+        pylibrespot-java
         spotifyaio
-      ]; # missing inputs: pyforked-daapd pylibrespot-java
+      ]; # missing inputs: pyforked-daapd
     "fortios" =
       ps: with ps; [
         fortiosapi
@@ -1791,6 +1804,9 @@
         libpyfoscam
       ];
     "foursquare" =
+      ps: with ps; [
+      ];
+    "frankever" =
       ps: with ps; [
       ];
     "free_mobile" =
@@ -1834,11 +1850,8 @@
       ];
     "frontend" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         home-assistant-frontend
         pillow
-        securetar
       ];
     "frontier_silicon" =
       ps: with ps; [
@@ -2020,7 +2033,7 @@
       ];
     "google_generative_ai_conversation" =
       ps: with ps; [
-        google-generativeai
+        google-genai
         ha-ffmpeg
         hassil
         home-assistant-intents
@@ -2179,6 +2192,9 @@
       ps: with ps; [
         heatmiserv3
       ];
+    "heicko" =
+      ps: with ps; [
+      ];
     "heiwa" =
       ps: with ps; [
       ];
@@ -2225,7 +2241,7 @@
       ];
     "hive" =
       ps: with ps; [
-        pyhiveapi
+        pyhive-integration
       ];
     "hko" =
       ps: with ps; [
@@ -2241,7 +2257,7 @@
       ];
     "home_connect" =
       ps: with ps; [
-        homeconnect
+        aiohomeconnect
       ];
     "home_plus_control" =
       ps: with ps; [
@@ -2256,18 +2272,21 @@
     "homeassistant_green" =
       ps: with ps; [
         aiohasupervisor
+        ha-silabs-firmware-client
         psutil-home-assistant
         universal-silabs-flasher
       ];
     "homeassistant_hardware" =
       ps: with ps; [
         aiohasupervisor
+        ha-silabs-firmware-client
         universal-silabs-flasher
       ];
     "homeassistant_sky_connect" =
       ps: with ps; [
         aiohasupervisor
         aiousbwatcher
+        ha-silabs-firmware-client
         psutil-home-assistant
         pyserial
         universal-silabs-flasher
@@ -2275,6 +2294,7 @@
     "homeassistant_yellow" =
       ps: with ps; [
         aiohasupervisor
+        ha-silabs-firmware-client
         psutil-home-assistant
         universal-silabs-flasher
       ];
@@ -2623,15 +2643,12 @@
       ];
     "insteon" =
       ps: with ps; [
-        aiohasupervisor
         aiousbwatcher
-        cronsim
         home-assistant-frontend
         insteon-frontend-home-assistant
         pillow
         pyinsteon
         pyserial
-        securetar
       ];
     "integration" =
       ps: with ps; [
@@ -2649,6 +2666,10 @@
     "intesishome" =
       ps: with ps; [
         pyintesishome
+      ];
+    "iometer" =
+      ps: with ps; [
+        iometer
       ];
     "ios" =
       ps: with ps; [
@@ -2759,9 +2780,12 @@
         jellyfin-apiclient-python
       ];
     "jewish_calendar" =
-      ps: with ps; [
+      ps:
+      with ps;
+      [
         hdate
-      ];
+      ]
+      ++ hdate.optional-dependencies.astral;
     "joaoapps_join" =
       ps: with ps; [
       ]; # missing inputs: python-join-api
@@ -2887,12 +2911,9 @@
       ];
     "knx" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         home-assistant-frontend
         knx-frontend
         pillow
-        securetar
         xknx
         xknxproject
       ];
@@ -2987,13 +3008,10 @@
       ];
     "lcn" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         home-assistant-frontend
         lcn-frontend
         pillow
         pypck
-        securetar
       ];
     "ld2410_ble" =
       ps: with ps; [
@@ -3125,9 +3143,15 @@
       ps: with ps; [
         limitlessled
       ];
+    "linak" =
+      ps: with ps; [
+      ];
     "linear_garage_door" =
       ps: with ps; [
         linear-garage-door
+      ];
+    "linkedgo" =
+      ps: with ps; [
       ];
     "linkplay" =
       ps: with ps; [
@@ -3143,6 +3167,9 @@
     "linux_battery" =
       ps: with ps; [
         batinfo
+      ];
+    "linx" =
+      ps: with ps; [
       ];
     "lirc" =
       ps: with ps; [
@@ -3185,13 +3212,10 @@
       ];
     "logbook" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         fnv-hash-fast
         home-assistant-frontend
         pillow
         psutil-home-assistant
-        securetar
         sqlalchemy
       ];
     "logentries" =
@@ -3228,10 +3252,7 @@
       ];
     "lovelace" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         pillow
-        securetar
       ];
     "luci" =
       ps: with ps; [
@@ -3686,11 +3707,8 @@
       ];
     "my" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         home-assistant-frontend
         pillow
-        securetar
       ];
     "myq" =
       ps: with ps; [
@@ -3940,6 +3958,9 @@
       ps: with ps; [
         oemthermostat
       ];
+    "ogemray" =
+      ps: with ps; [
+      ];
     "ohmconnect" =
       ps: with ps; [
         defusedxml
@@ -3968,10 +3989,7 @@
       ];
     "onboarding" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         pillow
-        securetar
       ];
     "oncue" =
       ps: with ps; [
@@ -4120,14 +4138,13 @@
       ps: with ps; [
         aiohasupervisor
         aiousbwatcher
-        cronsim
+        ha-silabs-firmware-client
         ifaddr
         pillow
         psutil-home-assistant
         pyroute2
         pyserial
         python-otbr-api
-        securetar
         universal-silabs-flasher
         zeroconf
         zha
@@ -4203,18 +4220,16 @@
       ];
     "panel_custom" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
         home-assistant-frontend
         pillow
-        securetar
       ];
     "pcs_lighting" =
       ps: with ps; [
       ];
     "peblar" =
       ps: with ps; [
-      ]; # missing inputs: peblar
+        peblar
+      ];
     "peco" =
       ps: with ps; [
         peco
@@ -4247,6 +4262,12 @@
     "pge" =
       ps: with ps; [
       ];
+    "pglab" =
+      ps: with ps; [
+        aiohasupervisor
+        paho-mqtt
+        pypglab
+      ];
     "philips_js" =
       ps: with ps; [
         ha-philipsjs
@@ -4257,7 +4278,7 @@
       ];
     "picnic" =
       ps: with ps; [
-        python-picnic-api
+        python-picnic-api2
       ];
     "picotts" =
       ps: with ps; [
@@ -4410,6 +4431,10 @@
       ];
     "psoklahoma" =
       ps: with ps; [
+      ];
+    "pterodactyl" =
+      ps: with ps; [
+        py-dactyl
       ];
     "pulseaudio_loopback" =
       ps: with ps; [
@@ -4671,6 +4696,10 @@
       ]; # missing inputs: RtmAPI
     "remote" =
       ps: with ps; [
+      ];
+    "remote_calendar" =
+      ps: with ps; [
+        ical
       ];
     "remote_rpi_gpio" =
       ps: with ps; [
@@ -5022,6 +5051,11 @@
         sensorpush-ble
         zeroconf
       ];
+    "sensorpush_cloud" =
+      ps: with ps; [
+        sensorpush-api
+        sensorpush-ha
+      ];
     "sensoterra" =
       ps: with ps; [
         sensoterra
@@ -5187,25 +5221,15 @@
       ps: with ps; [
         smart-meter-texas
       ];
+    "smart_rollos" =
+      ps: with ps; [
+      ];
     "smarther" =
       ps: with ps; [
       ];
     "smartthings" =
       ps: with ps; [
-        aiohasupervisor
-        cronsim
-        ha-ffmpeg
-        hass-nabucasa
-        hassil
-        home-assistant-intents
-        mutagen
-        pymicro-vad
-        pysmartapp
         pysmartthings
-        pyspeex-noise
-        python-matter-server
-        pyturbojpeg
-        securetar
       ];
     "smarttub" =
       ps: with ps; [
@@ -5216,7 +5240,7 @@
       ]; # missing inputs: pysmarty2
     "smhi" =
       ps: with ps; [
-        smhi-pkg
+        pysmhi
       ];
     "smlight" =
       ps: with ps; [
@@ -5244,6 +5268,10 @@
     "snmp" =
       ps: with ps; [
         pysnmp
+      ];
+    "snoo" =
+      ps: with ps; [
+        python-snoo
       ];
     "snooz" =
       ps: with ps; [
@@ -5350,6 +5378,8 @@
       ];
     "sql" =
       ps: with ps; [
+        fnv-hash-fast
+        psutil-home-assistant
         sqlalchemy
         sqlparse
       ];
@@ -5427,14 +5457,13 @@
       ];
     "suez_water" =
       ps: with ps; [
-        pysuez
+        pysuezv2
       ];
     "sun" =
       ps: with ps; [
       ];
     "sunweg" =
       ps: with ps; [
-        sunweg
       ];
     "supervisord" =
       ps: with ps; [
@@ -5838,7 +5867,8 @@
       ];
     "touchline" =
       ps: with ps; [
-      ]; # missing inputs: pytouchline
+        pytouchline-extended
+      ];
     "touchline_sl" =
       ps: with ps; [
         pytouchlinesl
@@ -5961,6 +5991,9 @@
         twitterapi
       ];
     "ubiwizz" =
+      ps: with ps; [
+      ];
+    "ublockout" =
       ps: with ps; [
       ];
     "ubus" =
@@ -6219,6 +6252,10 @@
     "weatherkit" =
       ps: with ps; [
         apple-weatherkit
+      ];
+    "webdav" =
+      ps: with ps; [
+        aiowebdav2
       ];
     "webhook" =
       ps: with ps; [
@@ -6496,8 +6533,7 @@
       ];
     "zengge" =
       ps: with ps; [
-        bluepy
-      ]; # missing inputs: zengge
+      ];
     "zeroconf" =
       ps: with ps; [
         ifaddr
@@ -6519,10 +6555,9 @@
       ps: with ps; [
         aiohasupervisor
         aiousbwatcher
-        cronsim
+        ha-silabs-firmware-client
         pillow
         pyserial
-        securetar
         universal-silabs-flasher
         zha
       ];
@@ -6633,6 +6668,7 @@
     "azure_data_explorer"
     "azure_devops"
     "azure_event_hub"
+    "azure_storage"
     "backup"
     "baf"
     "balboa"
@@ -6651,6 +6687,7 @@
     "bluetooth_le_tracker"
     "bmw_connected_drive"
     "bond"
+    "bosch_alarm"
     "bosch_shc"
     "braviatv"
     "bring"
@@ -6932,6 +6969,7 @@
     "intellifire"
     "intent"
     "intent_script"
+    "iometer"
     "ios"
     "iotty"
     "ipma"
@@ -7144,11 +7182,13 @@
     "palazzetti"
     "panasonic_viera"
     "panel_custom"
+    "peblar"
     "peco"
     "pegel_online"
     "permobil"
     "persistent_notification"
     "person"
+    "pglab"
     "philips_js"
     "pi_hole"
     "picnic"
@@ -7167,6 +7207,7 @@
     "prosegur"
     "proximity"
     "prusalink"
+    "pterodactyl"
     "pure_energie"
     "purpleair"
     "push"
@@ -7202,6 +7243,7 @@
     "reddit"
     "refoss"
     "remote"
+    "remote_calendar"
     "renault"
     "renson"
     "reolink"
@@ -7248,6 +7290,7 @@
     "sensor"
     "sensorpro"
     "sensorpush"
+    "sensorpush_cloud"
     "sensoterra"
     "sentry"
     "senz"
@@ -7283,6 +7326,7 @@
     "snapcast"
     "snips"
     "snmp"
+    "snoo"
     "snooz"
     "solaredge"
     "solarlog"
@@ -7438,6 +7482,7 @@
     "weatherflow"
     "weatherflow_cloud"
     "weatherkit"
+    "webdav"
     "webhook"
     "webmin"
     "webostv"

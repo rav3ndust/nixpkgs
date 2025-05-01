@@ -1,7 +1,7 @@
 {
   # utils
   stdenv,
-  fetchurl,
+  fetchFromGitHub,
   lib,
 
   # runtime dependencies
@@ -12,11 +12,13 @@
   # build dependencies
   bison,
   flex,
+  makeWrapper,
   perl,
   pkg-config,
 
   # passthru / meta
   postgresql,
+  buildPackages,
 
   # GSSAPI
   gssSupport ? with stdenv.hostPlatform; !isWindows && !isStatic,
@@ -29,11 +31,14 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libpq";
-  version = "17.2";
+  version = "17.4";
 
-  src = fetchurl {
-    url = "mirror://postgresql/source/v${finalAttrs.version}/postgresql-${finalAttrs.version}.tar.bz2";
-    hash = "sha256-gu8nwK83UWldf2Ti2WNYMAX7tqDD32PQ5LQiEdcCEWQ=";
+  src = fetchFromGitHub {
+    owner = "postgres";
+    repo = "postgres";
+    # rev, not tag, on purpose: see generic.nix.
+    rev = "refs/tags/REL_17_4";
+    hash = "sha256-TEpvX28chR3CXiOQsNY12t8WfM9ywoZVX1e/6mj9DqE=";
   };
 
   __structuredAttrs = true;
@@ -62,6 +67,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     bison
     flex
+    makeWrapper
     perl
     pkg-config
   ];
@@ -102,16 +108,19 @@ stdenv.mkDerivation (finalAttrs: {
     ./patches/socketdir-in-run-13+.patch
   ];
 
+  postPatch = ''
+    cat ${./pg_config.env.mk} >> src/common/Makefile
+  '';
+
   installPhase = ''
     runHook preInstall
 
-    make -C src/bin/pg_config install
-    make -C src/common install
+    make -C src/common install pg_config.env
     make -C src/include install
     make -C src/interfaces/libpq install
     make -C src/port install
 
-    moveToOutput bin/pg_config "$dev"
+    install -D src/common/pg_config.env "$dev/nix-support/pg_config.env"
     moveToOutput "lib/*.a" "$dev"
 
     rm -rfv $out/share
@@ -132,11 +141,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false;
 
+  passthru.pg_config = buildPackages.callPackage ./pg_config.nix {
+    inherit (finalAttrs) finalPackage;
+  };
+
   meta = {
     inherit (postgresql.meta)
       homepage
       license
-      maintainers
+      teams
       platforms
       ;
     description = "C application programmer's interface to PostgreSQL";

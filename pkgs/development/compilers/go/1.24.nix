@@ -3,9 +3,8 @@
   stdenv,
   fetchurl,
   tzdata,
-  substituteAll,
+  replaceVars,
   iana-etc,
-  xcbuild,
   mailcap,
   buildPackages,
   pkgsBuildTarget,
@@ -29,6 +28,7 @@ let
       "armv6l" = "arm";
       "armv7l" = "arm";
       "i686" = "386";
+      "loongarch64" = "loong64";
       "mips" = "mips";
       "mips64el" = "mips64le";
       "mipsel" = "mipsle";
@@ -49,11 +49,11 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "go";
-  version = "1.24.0";
+  version = "1.24.2";
 
   src = fetchurl {
     url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
-    hash = "sha256-0UEgYUrLKdEryrcr1onyV+tL6eC2+IqPt+Qaxl+FVuU=";
+    hash = "sha256-ncd/+twW2DehvzLZnGJMtN8GR87nsRnt2eexvMBfLgA=";
   };
 
   strictDeps = true;
@@ -61,10 +61,6 @@ stdenv.mkDerivation (finalAttrs: {
     [ ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [ stdenv.cc.libc.out ]
     ++ lib.optionals (stdenv.hostPlatform.libc == "glibc") [ stdenv.cc.libc.static ];
-
-  depsTargetTargetPropagated = lib.optionals stdenv.targetPlatform.isDarwin [
-    xcbuild
-  ];
 
   depsBuildTarget = lib.optional isCross targetCC;
 
@@ -75,20 +71,17 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   patches = [
-    (substituteAll {
-      src = ./iana-etc-1.17.patch;
+    (replaceVars ./iana-etc-1.17.patch {
       iana = iana-etc;
     })
     # Patch the mimetype database location which is missing on NixOS.
     # but also allow static binaries built with NixOS to run outside nix
-    (substituteAll {
-      src = ./mailcap-1.17.patch;
+    (replaceVars ./mailcap-1.17.patch {
       inherit mailcap;
     })
     # prepend the nix path to the zoneinfo files but also leave the original value for static binaries
     # that run outside a nix server
-    (substituteAll {
-      src = ./tzdata-1.19.patch;
+    (replaceVars ./tzdata-1.19.patch {
       inherit tzdata;
     })
     ./remove-tools-1.11.patch
@@ -169,7 +162,7 @@ stdenv.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
     mkdir -p $out/share/go
-    cp -a bin pkg src lib misc api doc go.env $out/share/go
+    cp -a bin pkg src lib misc api doc go.env VERSION $out/share/go
     mkdir -p $out/bin
     ln -s $out/share/go/bin/* $out/bin
     runHook postInstall
@@ -194,7 +187,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Go Programming language";
     homepage = "https://go.dev/";
     license = licenses.bsd3;
-    maintainers = teams.golang.members;
+    teams = [ teams.golang ];
     platforms = platforms.darwin ++ platforms.linux ++ platforms.wasi ++ platforms.freebsd;
     mainProgram = "go";
   };

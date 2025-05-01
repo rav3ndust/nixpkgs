@@ -1,6 +1,5 @@
 {
   mkKdeDerivation,
-  fetchpatch,
   pkg-config,
   qtquick3d,
   qtsensors,
@@ -18,6 +17,7 @@
   pipewire,
   krunner,
   python3,
+  fetchpatch,
 }:
 mkKdeDerivation {
   pname = "kwin";
@@ -31,11 +31,11 @@ mkKdeDerivation {
     ./0001-NixOS-Unwrap-executable-name-for-.desktop-search.patch
     ./0001-Lower-CAP_SYS_NICE-from-the-ambient-set.patch
 
-    # Backport recommended crash fix
-    # FIXME: remove in 6.3.1
+    # Backport crash fix
+    # FIXME: remove in 6.3.5
     (fetchpatch {
-      url = "https://invent.kde.org/plasma/kwin/-/commit/c97bc26ca9de8b1462f6ccb05fb2dafe01cd82cb.patch";
-      hash = "sha256-g8CsSKt3flTXAm80NbFuq+sT8l93mfyUBl2aBpP5zqY=";
+      url = "https://invent.kde.org/plasma/kwin/-/commit/93bf2f98ae22e654d997c7140b7fe9936fa3f2d3.patch";
+      hash = "sha256-Jaa7IVuYMfxzUv0y2rUo5hdYavjaUkEW9/yteL5katE=";
     })
   ];
 

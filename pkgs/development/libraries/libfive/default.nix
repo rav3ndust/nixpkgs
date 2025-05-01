@@ -7,7 +7,7 @@
   cmake,
   ninja,
   pkg-config,
-  eigen,
+  eigen_3_4_0,
   zlib,
   libpng,
   boost,
@@ -36,7 +36,7 @@ stdenv.mkDerivation {
     python.pkgs.pythonImportsCheckHook
   ];
   buildInputs = [
-    eigen
+    eigen_3_4_0
     zlib
     libpng
     boost

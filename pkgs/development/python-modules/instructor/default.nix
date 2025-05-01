@@ -10,9 +10,11 @@
   # dependencies
   aiohttp,
   docstring-parser,
+  jinja2,
   jiter,
   openai,
   pydantic,
+  requests,
   rich,
   tenacity,
   typer,
@@ -22,7 +24,6 @@
   diskcache,
   fastapi,
   google-generativeai,
-  jinja2,
   pytest-asyncio,
   pytestCheckHook,
   python-dotenv,
@@ -31,7 +32,7 @@
 
 buildPythonPackage rec {
   pname = "instructor";
-  version = "1.7.2";
+  version = "1.7.9";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -40,17 +41,21 @@ buildPythonPackage rec {
     owner = "jxnl";
     repo = "instructor";
     tag = version;
-    hash = "sha256-65qNalbcg9MR5QhUJeutp3Y2Uox7cKX+ffo21LACeXE=";
+    hash = "sha256-3IwvbepDrylOIlL+IteyFChqYc/ZIu6IieIkbAPL+mw=";
   };
 
   build-system = [ hatchling ];
 
+  pythonRelaxDeps = [ "rich" ];
+
   dependencies = [
     aiohttp
     docstring-parser
+    jinja2
     jiter
     openai
     pydantic
+    requests
     rich
     tenacity
     typer
@@ -61,7 +66,6 @@ buildPythonPackage rec {
     diskcache
     fastapi
     google-generativeai
-    jinja2
     pytest-asyncio
     pytestCheckHook
     python-dotenv
@@ -93,7 +97,7 @@ buildPythonPackage rec {
   meta = {
     description = "Structured outputs for llm";
     homepage = "https://github.com/jxnl/instructor";
-    changelog = "https://github.com/jxnl/instructor/releases/tag/${version}";
+    changelog = "https://github.com/jxnl/instructor/releases/tag/${src.tag}";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ mic92 ];
     mainProgram = "instructor";

@@ -1,16 +1,17 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i python3 -p "python3.withPackages(ps: [ ps.beautifulsoup4 ps.click ps.httpx ps.jinja2 ps.pyyaml ])"
+#!nix-shell -i python3 -p "python3.withPackages(ps: [ ps.beautifulsoup4 ps.click ps.httpx ps.jinja2 ps.packaging ps.pyyaml ])" nix-update
 import base64
 import binascii
 import json
 import pathlib
-from typing import Optional
+import subprocess
 from urllib.parse import urljoin, urlparse
 
 import bs4
 import click
 import httpx
 import jinja2
+import packaging.version as v
 
 import utils
 
@@ -29,7 +30,13 @@ ROOT_TEMPLATE = jinja2.Template('''
   {{ p }} = callPackage ./{{ p }} { };
   {%- endfor %}
 }
-'''.strip());
+'''.strip())
+
+PROJECTS_WITH_RUST = {
+    "akonadi-search",
+    "angelfish",
+    "kdepim-addons",
+}
 
 def to_sri(hash):
     raw = binascii.unhexlify(hash)
@@ -64,7 +71,7 @@ def to_sri(hash):
     type=str,
     default=None,
 )
-def main(set: str, version: str, nixpkgs: pathlib.Path, sources_url: Optional[str]):
+def main(set: str, version: str, nixpkgs: pathlib.Path, sources_url: str | None):
     root_dir = nixpkgs / "pkgs/kde"
     set_dir = root_dir / set
     generated_dir = root_dir / "generated"
@@ -104,6 +111,12 @@ def main(set: str, version: str, nixpkgs: pathlib.Path, sources_url: Optional[st
         hash = client.get(url + ".sha256").text.split(" ", maxsplit=1)[0]
         assert hash
 
+        if existing := results.get(project_name):
+            old_version = existing["version"]
+            if v.parse(old_version) > v.parse(version):
+                print(f"{project_name} {old_version} is newer than {version}, skipping...")
+                continue
+
         results[project_name] = {
             "version": version,
             "url": "mirror://kde" + urlparse(url).path,
@@ -112,6 +125,18 @@ def main(set: str, version: str, nixpkgs: pathlib.Path, sources_url: Optional[st
 
         pkg_dir = set_dir / project_name
         pkg_file = pkg_dir / "default.nix"
+
+        if project_name in PROJECTS_WITH_RUST:
+            print(f"Updating cargoDeps hash for {set}/{project_name}...")
+            subprocess.run([
+                "nix-update",
+                f"kdePackages.{project_name}",
+                "--version",
+                "skip",
+                "--override-filename",
+                pkg_file
+            ])
+
         if not pkg_file.exists():
             print(f"Generated new package: {set}/{project_name}")
             pkg_dir.mkdir(parents=True, exist_ok=True)

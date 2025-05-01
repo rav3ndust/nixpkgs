@@ -300,7 +300,7 @@ stdenv.mkDerivation {
         nginx-unix-socket
         ;
       variants = lib.recurseIntoAttrs nixosTests.nginx-variants;
-      acme-integration = nixosTests.acme;
+      acme-integration = nixosTests.acme.nginx;
     } // passthru.tests;
   };
 
@@ -314,14 +314,15 @@ stdenv.mkDerivation {
         mainProgram = "nginx";
         homepage = "http://nginx.org";
         license = [ licenses.bsd2 ] ++ concatMap (m: m.meta.license) modules;
+        broken = lib.any (m: m.meta.broken or false) modules;
         platforms = platforms.all;
-        maintainers =
-          with maintainers;
-          [
-            fpletz
-            raitobezarius
-          ]
-          ++ teams.helsinki-systems.members
-          ++ teams.stridtech.members;
+        maintainers = with maintainers; [
+          fpletz
+          raitobezarius
+        ];
+        teams = with teams; [
+          helsinki-systems
+          stridtech
+        ];
       };
 }

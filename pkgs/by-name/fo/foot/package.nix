@@ -27,7 +27,7 @@
 }:
 
 let
-  version = "1.20.2";
+  version = "1.22.2";
 
   # build stimuli file for PGO build and the script to generate it
   # independently of the foot's build, so we can cache the result
@@ -103,8 +103,8 @@ stdenv.mkDerivation {
     domain = "codeberg.org";
     owner = "dnkl";
     repo = "foot";
-    rev = version;
-    hash = "sha256-tnBoRRKHcuvBSnqvJ/772UWuepvpUiSg6t+gx4MZ0VQ=";
+    tag = version;
+    hash = "sha256-eX9nSAl2pHbJU8g80q3RifDlFh00LSi8GvYU4+rlIsA=";
   };
 
   separateDebugInfo = true;
@@ -199,6 +199,9 @@ stdenv.mkDerivation {
     "terminfo"
     "themes"
   ];
+
+  passthru = { inherit stimulusGenerator; };
+  passthru.updateScript = ./update.sh;
 
   passthru.tests = {
     clang-default-compilation = foot.override {

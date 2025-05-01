@@ -1,6 +1,7 @@
 {
   jdk17,
   jdk21,
+  jdk23,
 }:
 
 rec {
@@ -212,14 +213,12 @@ rec {
             binaryNativeCode
           ];
           license = licenses.asl20;
-          maintainers =
-            with maintainers;
-            [
-              britter
-              liff
-              lorenzleutgeb
-            ]
-            ++ lib.teams.java.members;
+          maintainers = with maintainers; [
+            britter
+            liff
+            lorenzleutgeb
+          ];
+          teams = [ lib.teams.java ];
           mainProgram = "gradle";
         }
         // meta;
@@ -230,8 +229,8 @@ rec {
   # https://docs.gradle.org/current/userguide/compatibility.html
 
   gradle_8 = gen {
-    version = "8.12";
-    hash = "sha256-egDVH7kxR4Gaq3YCT+7OILa4TkIGlBAfJ2vpUuCL7wM=";
+    version = "8.13";
+    hash = "sha256-IPGxF2I3JUpvwgTYQ0GW+hGkz7OHVnUZxhVW6HEK7Xg=";
     defaultJava = jdk21;
   };
 
@@ -251,6 +250,7 @@ rec {
       concatTextFile,
       makeSetupHook,
       nix-update-script,
+      runCommand,
     }:
     gradle-unwrapped: updateAttrPath:
     lib.makeOverridable (
@@ -259,7 +259,8 @@ rec {
         gradle = gradle-unwrapped.override args;
       in
       symlinkJoin {
-        name = "gradle-${gradle.version}";
+        pname = "gradle";
+        inherit (gradle) version;
 
         paths = [
           (makeSetupHook { name = "gradle-setup-hook"; } (concatTextFile {
@@ -280,8 +281,33 @@ rec {
         passthru =
           {
             fetchDeps = callPackage ./fetch-deps.nix { inherit mitm-cache; };
-            inherit (gradle) jdk tests;
+            inherit (gradle) jdk;
             unwrapped = gradle;
+            tests = {
+              toolchains =
+                let
+                  javaVersion = lib.versions.major (lib.getVersion jdk23);
+                in
+                runCommand "detects-toolchains-from-nix-env"
+                  {
+                    # Use JDKs that are not the default for any of the gradle versions
+                    nativeBuildInputs = [
+                      (gradle.override {
+                        javaToolchains = [
+                          jdk23
+                        ];
+                      })
+                    ];
+                    src = ./tests/toolchains;
+                  }
+                  ''
+                    cp -a $src/* .
+                    substituteInPlace ./build.gradle --replace-fail '@JAVA_VERSION@' '${javaVersion}'
+                    env GRADLE_USER_HOME=$TMPDIR/gradle org.gradle.native.dir=$TMPDIR/native \
+                    gradle run --no-daemon --quiet --console plain > $out
+                    test "$(<$out)" = "${javaVersion}"
+                  '';
+            } // gradle.tests;
           }
           // lib.optionalAttrs (updateAttrPath != null) {
             updateScript = nix-update-script {

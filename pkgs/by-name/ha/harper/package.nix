@@ -2,22 +2,25 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "harper";
-  version = "0.20.0";
+  version = "0.30.0";
 
   src = fetchFromGitHub {
     owner = "Automattic";
     repo = "harper";
     rev = "v${version}";
-    hash = "sha256-8JeF1HxsP+Y+C1g3YJ0B0+JHoRFkBjz4/T8rVr2KgGw=";
+    hash = "sha256-Xs0/9LkvPvfLGxou1GZbvDAKnrSuEtKzyAwcT92mrB8=";
   };
 
   buildAndTestSubdir = "harper-ls";
   useFetchCargoVendor = true;
-  cargoHash = "sha256-uVjDFo5mJi4Xbq0Z+XOjy5VqXqkm0a+4xu+dVnjWXCU=";
+  cargoHash = "sha256-gY3Zm+frVdUqeNFUEwEPrWZog9arWQtL1CyGhlMgwFw=";
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Grammar Checker for Developers";

@@ -20,14 +20,14 @@
 
 buildPythonPackage rec {
   pname = "islpy";
-  version = "2025.1";
+  version = "2025.1.5";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "inducer";
     repo = "islpy";
     tag = "v${version}";
-    hash = "sha256-njwNijl7kAbU7v6Bd6p0J9KnYzXZi9gVdqSf8qD0FXE=";
+    hash = "sha256-hzqxVLNKm63XliX5rDB54f6n1nJPVJJSAMmNTInbOEE=";
   };
 
   build-system = [
