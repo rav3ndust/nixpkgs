@@ -9,7 +9,6 @@
   jq,
   lib,
   llvmPackages,
-  llvmPackages_14,
   moreutils,
   protobuf,
   python3Packages,
@@ -824,6 +823,8 @@ let
           license = lib.licenses.mpl20;
         };
       };
+
+      budparr.language-hugo-vscode = callPackage ./budparr.language-hugo-vscode { };
 
       bungcip.better-toml = buildVscodeMarketplaceExtension {
         mktplcRef = {
@@ -2109,8 +2110,8 @@ let
           publisher = "github";
           name = "copilot";
           # Verify which version is available with nix run nixpkgs#vsce -- show github.copilot --json
-          version = "1.309.0";
-          hash = "sha256-i1PcbbOBgULd+inwypezE/ZsePrJaqM2z6qrDcNBLVA=";
+          version = "1.317.0";
+          hash = "sha256-w8HH1ibkOrpuKi3Yhzr+DjVIY7HWZ2L4rYzNYrHkfbc=";
         };
 
         meta = {
@@ -4310,8 +4311,8 @@ let
         mktplcRef = {
           name = "sas-lsp";
           publisher = "SAS";
-          version = "1.13.1";
-          hash = "sha256-Ol79+z/W4RzAQ0jjDMkxPrg8eOWanOqtIF7ZxNrskOk=";
+          version = "1.14.0";
+          hash = "sha256-layaVQGcIOS8tToHt99yjaFlrw0hsOoiUW66FPJz+AY=";
         };
         meta = {
           changelog = "https://marketplace.visualstudio.com/items/SAS.sas-lsp/changelog";
@@ -5119,7 +5120,7 @@ let
         };
       };
 
-      vadimcn.vscode-lldb = callPackage ./vadimcn.vscode-lldb { llvmPackages = llvmPackages_14; };
+      vadimcn.vscode-lldb = callPackage ./vadimcn.vscode-lldb { };
 
       valentjn.vscode-ltex = vscode-utils.buildVscodeMarketplaceExtension rec {
         mktplcRef = {
@@ -5592,6 +5593,8 @@ let
           maintainers = [ ];
         };
       };
+
+      yy0931.vscode-sqlite3-editor = callPackage ./yy0931.vscode-sqlite3-editor { };
 
       yzane.markdown-pdf = callPackage ./yzane.markdown-pdf { };
 
