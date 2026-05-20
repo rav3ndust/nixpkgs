@@ -2,46 +2,37 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  git,
   nixosTests,
   python3,
+  dart-sass,
   vaultwarden,
 }:
 
-let
-  version = "2025.1.1";
-
-  suffix = lib.head (lib.match "[0-9.]*([a-z]*)" version);
-
-  bw_web_builds = fetchFromGitHub {
-    owner = "dani-garcia";
-    repo = "bw_web_builds";
-    rev = "v${version}";
-    hash = "sha256-wQGpl7N0D83FrrV4T+LFe9h3n5Q/MqLbGGO2F5R9k2g=";
-  };
-
-in
 buildNpmPackage rec {
   pname = "vaultwarden-webvault";
-  inherit version;
+  version = "2026.4.1+0";
 
   src = fetchFromGitHub {
-    owner = "bitwarden";
-    repo = "clients";
-    rev = "web-v${lib.removeSuffix suffix version}";
-    hash = "sha256-Bq133V8CsDMnLeaKrW5JmLTGRaZVLRbp+tTgG725tqE=";
+    owner = "vaultwarden";
+    repo = "vw_web_builds";
+    tag = "v${version}";
+    hash = "sha256-CIKhdCQwx1zS8rkOtZoG9WDxtweSmrCNL6HfZXi+mM8=";
   };
 
-  npmDepsHash = "sha256-bWcp3VJI2bObLH/XBx3cdxXQY9Cw+IFpeNA2TXVTtFg=";
-
+  # Upstream lockfile is out of sync for @napi-rs/cli (spec 3.5.1, resolved
+  # 3.2.0), which makes offline `npm ci` hit the registry. The desktop
+  # workspace is unused here. https://github.com/bitwarden/clients/pull/20480
   postPatch = ''
-    ln -s ${bw_web_builds}/{patches,resources} ..
-    PATH="${git}/bin:$PATH" VAULT_VERSION="${lib.removePrefix "web-" src.rev}" \
-      bash ${bw_web_builds}/scripts/apply_patches.sh
+    substituteInPlace package-lock.json \
+      --replace-fail '"@napi-rs/cli": "3.5.1"' '"@napi-rs/cli": "3.2.0"'
   '';
+
+  npmDepsFetcherVersion = 2;
+  npmDepsHash = "sha256-NBhII5HySIkv0bCeWjH6MknX5NMp11Gwno7RnfCKgjc=";
 
   nativeBuildInputs = [
     python3
+    dart-sass
   ];
 
   makeCacheWritable = true;
@@ -50,6 +41,10 @@ buildNpmPackage rec {
     ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
     npm_config_build_from_source = "true";
   };
+
+  preBuild = ''
+    echo "export const compilerCommand = ['dart-sass'];" > node_modules/sass-embedded/dist/lib/src/compiler-path.js
+  '';
 
   npmRebuildFlags = [
     # FIXME one of the esbuild versions fails to download @esbuild/linux-x64
@@ -73,16 +68,14 @@ buildNpmPackage rec {
   '';
 
   passthru = {
-    inherit bw_web_builds;
     tests = nixosTests.vaultwarden;
   };
 
-  meta = with lib; {
+  meta = {
     description = "Integrates the web vault into vaultwarden";
-    homepage = "https://github.com/dani-garcia/bw_web_builds";
-    changelog = "https://github.com/dani-garcia/bw_web_builds/releases/tag/v${version}";
-    platforms = platforms.all;
-    license = licenses.gpl3Plus;
+    homepage = "https://github.com/vaultwarden/vw_web_builds";
+    platforms = lib.platforms.all;
+    license = lib.licenses.gpl3Plus;
     inherit (vaultwarden.meta) maintainers;
   };
 }

@@ -1,35 +1,39 @@
 {
   lib,
   buildPythonPackage,
+  cryptography,
+  ecdsa,
   fetchFromGitHub,
   flask,
   pytestCheckHook,
   python-http-client,
-  pythonOlder,
   pyyaml,
+  setuptools,
   starkbank-ecdsa,
-  six,
   werkzeug,
 }:
 
 buildPythonPackage rec {
   pname = "sendgrid";
-  version = "6.12.0";
-  format = "setuptools";
-
-  disabled = pythonOlder "3.6";
+  version = "6.12.5";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = pname;
     repo = "sendgrid-python";
     tag = version;
-    hash = "sha256-+1Tkue09C2qqCqN8lbseo2MzVbx+qDE/M/3r3Q6EXYE=";
+    hash = "sha256-7r1FHcGmHRQK9mfpV3qcuZlIe7G6CIyarnpWLjduw4E=";
   };
 
-  propagatedBuildInputs = [
+  pythonRelaxDeps = [ "cryptography" ];
+
+  build-system = [ setuptools ];
+
+  dependencies = [
+    cryptography
+    ecdsa
     python-http-client
     starkbank-ecdsa
-    six
   ];
 
   nativeCheckInputs = [
@@ -47,11 +51,11 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "sendgrid" ];
 
-  meta = with lib; {
+  meta = {
     description = "Python client for SendGrid";
     homepage = "https://github.com/sendgrid/sendgrid-python";
     changelog = "https://github.com/sendgrid/sendgrid-python/blob/${src.tag}/CHANGELOG.md";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ fab ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fab ];
   };
 }

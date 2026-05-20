@@ -5,35 +5,34 @@
   pkg-config,
   openssl,
 }:
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "railway";
-  version = "4.3.0";
+  version = "4.36.1";
 
   src = fetchFromGitHub {
     owner = "railwayapp";
     repo = "cli";
-    rev = "v${version}";
-    hash = "sha256-3QdwwZMlhhO25GuhWFNI6HpvOXjXpVypP4oVqTt5zzo=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-PYTkYCggHvLPWy+YcnLJLdznxglBn4hSvMENAFs5GH0=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-ox9iqwBhdc1bPbIPlDIRK2lptoQ5kisGYr+0Ymsc3ps=";
+  cargoHash = "sha256-ZxU/vq/A6O4ziEfLUSeQlwQLZEMnE1wnpyfyrYvOs5M=";
 
   nativeBuildInputs = [ pkg-config ];
 
   buildInputs = [ openssl ];
 
-  OPENSSL_NO_VENDOR = 1;
+  env.OPENSSL_NO_VENDOR = 1;
 
-  meta = with lib; {
+  meta = {
     mainProgram = "railway";
     description = "Railway.app CLI";
     homepage = "https://github.com/railwayapp/cli";
-    changelog = "https://github.com/railwayapp/cli/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [
+    changelog = "https://github.com/railwayapp/cli/releases/tag/v${finalAttrs.version}";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [
       Crafter
       techknowlogick
     ];
   };
-}
+})

@@ -35,7 +35,8 @@ stdenv.mkDerivation {
       url = "https://github.com/niftools/nifskope/commit/30954e7f01f3d779a2a1fd37d363e8a6ad560bd3.patch";
       sha256 = "0d6xjj2mjjhdd7w1aig5f75jksjni16jyj0lxsz51pys6xqb6fpj";
     })
-  ] ++ (lib.optional stdenv.hostPlatform.isAarch64 ./no-sse-on-arm.patch);
+  ]
+  ++ (lib.optional stdenv.hostPlatform.isAarch64 ./no-sse-on-arm.patch);
 
   buildInputs = [
     qtbase
@@ -60,29 +61,28 @@ stdenv.mkDerivation {
     runHook preInstall
 
     d=$out/share/nifskope
-    mkdir -p $out/bin $out/share/applications $out/share/pixmaps $d/{shaders,lang}
+    mkdir -p $out/bin $out/share/applications $d/{shaders,lang}
     cp release/NifSkope $out/bin/
-    cp ./res/nifskope.png $out/share/pixmaps/
+    install -D ./res/nifskope.png -t $out/share/icons/hicolor/128x128/apps
     cp release/{nif.xml,kfm.xml,style.qss} $d/
     cp res/shaders/*.frag res/shaders/*.prog res/shaders/*.vert $d/shaders/
     cp ./res/lang/*.ts ./res/lang/*.tm $d/lang/
     cp ./install/linux-install/nifskope.desktop $out/share/applications
 
     substituteInPlace $out/share/applications/nifskope.desktop \
-      --replace 'Exec=nifskope' "Exec=$out/bin/NifSkope" \
-      --replace 'Icon=nifskope' "Icon=$out/share/pixmaps/nifskope.png"
+      --replace-fail 'Exec=nifskope' "Exec=NifSkope" \
 
     find $out/share -type f -exec chmod -x {} \;
 
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/niftools/nifskope";
     description = "Tool for analyzing and editing NetImmerse/Gamebryo '*.nif' files";
     maintainers = [ ];
-    platforms = platforms.linux;
-    license = licenses.bsd3;
+    platforms = lib.platforms.linux;
+    license = lib.licenses.bsd3;
     mainProgram = "NifSkope";
   };
 }

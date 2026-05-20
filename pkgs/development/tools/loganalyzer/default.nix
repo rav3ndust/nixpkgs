@@ -41,17 +41,25 @@ stdenv.mkDerivation rec {
 
   installFlags = [ "INSTALL_ROOT=$(out)" ];
 
-  postInstall = ''
-    ln -s $out/bin/LogAnalyzer $out/bin/loganalyzer
-  '';
+  postInstall =
+    let
+      outBin =
+        if stdenv.hostPlatform.isDarwin then
+          "LogAnalyzer.app/Contents/MacOS/LogAnalyzer"
+        else
+          "LogAnalyzer";
+    in
+    ''
+      ln -s $out/bin/${outBin} $out/bin/loganalyzer
+    '';
 
-  meta = with lib; {
+  meta = {
     description = "Tool that helps you to analyze your log files by reducing the content with patterns you define";
     homepage = "https://github.com/pbek/loganalyzer";
     changelog = "https://github.com/pbek/loganalyzer/blob/develop/CHANGELOG.md";
     downloadPage = "https://github.com/pbek/loganalyzer/releases/tag/v${version}";
-    license = licenses.gpl2Only;
-    maintainers = with maintainers; [ pbek ];
-    platforms = platforms.unix;
+    license = lib.licenses.gpl2Only;
+    maintainers = with lib.maintainers; [ pbek ];
+    platforms = lib.platforms.unix;
   };
 }

@@ -8,7 +8,6 @@
   cdrkit,
   dvdauthor,
   gtk3,
-  gettext,
   wrapGAppsHook3,
   gdk-pixbuf,
   gobject-introspection,
@@ -21,22 +20,25 @@ let
     pygobject3
     urllib3
     setuptools
+    setuptools-gettext
+    importlib-metadata
     ;
 in
-buildPythonApplication rec {
+buildPythonApplication (finalAttrs: {
   pname = "devede";
-  version = "4.19.0";
+  version = "4.21.3.1";
+  pyproject = true;
   namePrefix = "";
 
   src = fetchFromGitLab {
     owner = "rastersoft";
     repo = "devedeng";
-    rev = version;
-    hash = "sha256-hjt2bXQov4lC6O4VY/eu/PZ2taSKng9gRhFDFhQR9SY=";
+    rev = finalAttrs.version;
+    hash = "sha256-81H063PpBF/+JDsRgBLwfAevb11yNkDtH4KdtOAL/Fg=";
   };
 
   nativeBuildInputs = [
-    gettext
+    setuptools-gettext
     wrapGAppsHook3
     gobject-introspection
   ];
@@ -57,6 +59,7 @@ buildPythonApplication rec {
     cdrkit
     urllib3
     setuptools
+    importlib-metadata
   ];
 
   postPatch = ''
@@ -66,10 +69,15 @@ buildPythonApplication rec {
       --replace "/usr/local/share" "$out/share"
   '';
 
-  meta = with lib; {
+  passthru.updateScript = ./update.sh;
+
+  meta = {
     description = "DVD Creator for Linux";
     homepage = "https://www.rastersoft.com/programas/devede.html";
-    license = licenses.gpl3;
-    maintainers = [ maintainers.bdimcheff ];
+    license = lib.licenses.gpl3;
+    maintainers = [
+      lib.maintainers.bdimcheff
+      lib.maintainers.baksa
+    ];
   };
-}
+})

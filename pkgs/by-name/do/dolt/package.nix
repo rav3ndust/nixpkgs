@@ -1,31 +1,34 @@
 {
   fetchFromGitHub,
+  icu,
   lib,
   buildGoModule,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "dolt";
-  version = "1.52.3";
+  version = "1.86.6";
 
   src = fetchFromGitHub {
     owner = "dolthub";
     repo = "dolt";
-    rev = "v${version}";
-    sha256 = "sha256-c+7WWFaELEbWxgqHNDXOIt/PvielfMFbzwURlqXSZAY=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-OVoREOeVTuRMot6nfpxAfnxRFcTLpZWsIRcg/yk/rMg=";
   };
 
   modRoot = "./go";
   subPackages = [ "cmd/dolt" ];
-  vendorHash = "sha256-OYgxlEU84BDqVqfmvgBZ5blT6ySHLZcmKbVm4Bvj8Yk=";
+  vendorHash = "sha256-8Ls+ANNiE1yBgZuAnDp+FcU4rCiWwSKGo2jTjXVbWFo=";
   proxyVendor = true;
   doCheck = false;
 
-  meta = with lib; {
+  buildInputs = [ icu ];
+
+  meta = {
     description = "Relational database with version control and CLI a-la Git";
     mainProgram = "dolt";
     homepage = "https://github.com/dolthub/dolt";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ danbst ];
+    license = lib.licenses.asl20;
+    maintainers = [ ];
   };
-}
+})

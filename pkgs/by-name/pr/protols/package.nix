@@ -1,29 +1,31 @@
 {
   lib,
+  protobuf,
   rustPlatform,
   fetchFromGitHub,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "protols";
-  version = "0.12.0";
+  version = "0.13.4";
 
   src = fetchFromGitHub {
     owner = "coder3101";
     repo = "protols";
-    tag = version;
-    hash = "sha256-v4ROQVoJmrukHFrxykr6EuBFXRuaBnPZ7f36ly7rPhg=";
+    tag = finalAttrs.version;
+    hash = "sha256-OREJDG0RycYhULTbqx2dXaXlIYexebUFdCiJbBN3cXE=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-fmsPkXwu8qy+SRyP5w940gqNmXg0V/p/vDSI7EIFrh0=";
+  cargoHash = "sha256-uero/p1ATagY6k8t6QCdfPRLeZreVrvshe3dE/M9dkg=";
+
+  env.FALLBACK_INCLUDE_PATH = "${protobuf}/include";
 
   meta = {
     description = "Protocol Buffers language server written in Rust";
     homepage = "https://github.com/coder3101/protols";
-    changelog = "https://github.com/coder3101/protols/releases/tag/${version}";
+    changelog = "https://github.com/coder3101/protols/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ nartsiss ];
     mainProgram = "protols";
   };
-}
+})

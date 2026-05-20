@@ -15,19 +15,20 @@
   llhttp,
   openssl,
   fmt,
+  nix-update-script,
   enableProxyServerAndClient ? false,
   enablePushNotifications ? false,
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "opendht";
-  version = "3.2.0-unstable-2025-01-05";
+  version = "3.5.4";
 
   src = fetchFromGitHub {
     owner = "savoirfairelinux";
     repo = "opendht";
-    rev = "5237f0a3b3eb8965f294de706ad73596569ae1dd";
-    hash = "sha256-qErVKyZQR/asJ8qr0sRDaXZ8jUV7RaSLnJka5baWa7Q=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-mnnd6yATIk/TEuFG/M98d+pfeh42IKWBBYjkTP52xeM=";
   };
 
   nativeBuildInputs = [
@@ -35,22 +36,21 @@ stdenv.mkDerivation {
     pkg-config
   ];
 
-  buildInputs =
-    [
-      asio
-      fmt
-      nettle
-      gnutls
-      msgpack-cxx
-      readline
-      libargon2
-    ]
-    ++ lib.optionals enableProxyServerAndClient [
-      jsoncpp
-      restinio
-      llhttp
-      openssl
-    ];
+  buildInputs = [
+    asio
+    fmt
+    nettle
+    gnutls
+    msgpack-cxx
+    readline
+    libargon2
+  ]
+  ++ lib.optionals enableProxyServerAndClient [
+    jsoncpp
+    restinio
+    llhttp
+    openssl
+  ];
 
   cmakeFlags =
     lib.optionals enableProxyServerAndClient [
@@ -61,13 +61,6 @@ stdenv.mkDerivation {
       "-DOPENDHT_PUSH_NOTIFICATIONS=ON"
     ];
 
-  # https://github.com/savoirfairelinux/opendht/issues/612
-  postPatch = ''
-    substituteInPlace CMakeLists.txt \
-      --replace '\$'{exec_prefix}/'$'{CMAKE_INSTALL_LIBDIR} '$'{CMAKE_INSTALL_FULL_LIBDIR} \
-      --replace '\$'{prefix}/'$'{CMAKE_INSTALL_INCLUDEDIR} '$'{CMAKE_INSTALL_FULL_INCLUDEDIR}
-  '';
-
   outputs = [
     "out"
     "lib"
@@ -75,15 +68,19 @@ stdenv.mkDerivation {
     "man"
   ];
 
-  meta = with lib; {
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version-regex=v(.+)" ];
+  };
+
+  meta = {
     description = "C++11 Kademlia distributed hash table implementation";
     homepage = "https://github.com/savoirfairelinux/opendht";
-    license = licenses.gpl3Plus;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [
       taeer
       olynch
       thoughtpolice
     ];
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
   };
-}
+})

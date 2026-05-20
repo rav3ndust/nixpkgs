@@ -4,20 +4,28 @@
   rustPlatform,
   protobuf,
   versionCheckHook,
+  cmake,
+  pkg-config,
+  nix-update-script,
 }:
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "clash-rs";
-  version = "0.7.5";
+  version = "0.10.0";
 
   src = fetchFromGitHub {
     owner = "Watfaq";
     repo = "clash-rs";
-    tag = "v${version}";
-    hash = "sha256-c4XF0F2ifTvbXTMGiJc1EaGTlS/X5ilZTpXe01uHs4Y=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-r+9tFw4B/7g/4EEYnX0Zcv4jPeGbcVgdtpAcSyk/cxA=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-ZSwNlknpZ0zKj+sklmO14Ey5DPZ0Wk9xxMiXwIiuRd0=";
+  cargoHash = "sha256-D/TalJ0fBD4ZoHwU6uj5P0O6xFwinL9hE91bQhxC7s8=";
+
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+    rustPlatform.bindgenHook
+  ];
 
   nativeInstallCheckInputs = [
     protobuf
@@ -29,11 +37,7 @@ rustPlatform.buildRustPackage rec {
     RUSTC_BOOTSTRAP = 1;
   };
 
-  buildFeatures = [
-    "shadowsocks"
-    "tuic"
-    "onion"
-  ];
+  buildFeatures = [ "plus" ];
 
   doCheck = false; # test failed
 
@@ -43,7 +47,13 @@ rustPlatform.buildRustPackage rec {
   '';
 
   doInstallCheck = true;
-  versionCheckProgramArg = "--version";
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "^v([0-9.]+)$"
+    ];
+  };
 
   meta = {
     description = "Custom protocol, rule based network proxy software";
@@ -53,4 +63,4 @@ rustPlatform.buildRustPackage rec {
     maintainers = with lib.maintainers; [ aaronjheng ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
-}
+})

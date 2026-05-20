@@ -17,12 +17,11 @@ rustPlatform.buildRustPackage {
 
   src = fetchFromGitHub {
     owner = "tellerops";
-    repo = pname;
+    repo = "teller";
     rev = "v${version}";
     hash = "sha256-CI74nMMTIPwjJfy7ASR19V6EbYZ62NoAOxlP3Xt2BuI=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-PSa4EEDEFdFpfYPG5M5wMwfq3WSqMw5d8a+mKgBzCFw=";
 
   nativeBuildInputs = [
@@ -43,12 +42,12 @@ rustPlatform.buildRustPackage {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/tellerops/teller/";
     description = "Cloud native secrets management for developers";
     mainProgram = "teller";
-    license = licenses.asl20;
-    maintainers = with maintainers; [
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [
       cameronraysmith
       wahtique
     ];

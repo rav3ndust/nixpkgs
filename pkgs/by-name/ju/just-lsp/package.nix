@@ -2,21 +2,27 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
+  versionCheckHook,
   nix-update-script,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "just-lsp";
-  version = "0.2.1";
+  version = "0.4.4";
 
   src = fetchFromGitHub {
     owner = "terror";
     repo = "just-lsp";
     tag = finalAttrs.version;
-    hash = "sha256-MBkuLvMwAH0858X0TRAK1pL/JwsTIY/6Ra+Vd6X0odA=";
+    hash = "sha256-ew8/ugjSkCus5Fd/SpXfWKspvdOR6FC/Q2gBzWO3OOw=";
   };
 
-  cargoHash = "sha256-gVxWy8SGvAaavrdZHK/9aKfPAXUtfs98TyFKFkFa3+U=";
+  cargoHash = "sha256-YejdnLECFCmuYfmj6rYnKKsMD5HkHsYnS8gs4f3iCcw=";
+
+  nativeInstallCheckInputs = [
+    versionCheckHook
+  ];
+  doInstallCheck = true;
 
   passthru = {
     updateScript = nix-update-script { };

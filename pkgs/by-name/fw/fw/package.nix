@@ -6,21 +6,22 @@
   libgit2,
   openssl,
   zlib,
+  versionCheckHook,
+  nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "fw";
-  version = "2.20.0";
+  version = "2.21.0";
 
   src = fetchFromGitHub {
     owner = "brocode";
     repo = "fw";
-    rev = "v${version}";
-    hash = "sha256-bq8N49qArdF0EFIGiK4lCsC0CZxwmeo0R8OiehrifTg=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-tqtiAw4+bnCJMF37SluAE9NM55MAjBGkJTvGLcmYFnA=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-sU7PfD77Sqi1Vrq2DgkkBF1bzL8d+/csa60CtQ7itSQ=";
+  cargoHash = "sha256-B32GegI3rvame0Ds+8+oBVUbcNhr2kwm3oVVxng8BZY=";
 
   nativeBuildInputs = [
     pkg-config
@@ -36,11 +37,16 @@ rustPlatform.buildRustPackage rec {
     OPENSSL_NO_VENDOR = true;
   };
 
-  meta = with lib; {
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
+
+  passthru.updateScript = nix-update-script { };
+
+  meta = {
     description = "Workspace productivity booster";
     homepage = "https://github.com/brocode/fw";
-    license = licenses.wtfpl;
-    maintainers = with maintainers; [ figsoda ];
+    license = lib.licenses.wtfpl;
+    maintainers = [ lib.maintainers.progrm_jarvis ];
     mainProgram = "fw";
   };
-}
+})

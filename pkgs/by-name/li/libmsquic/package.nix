@@ -11,13 +11,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libmsquic";
-  version = "2.4.11";
+  version = "2.5.8";
 
   src = fetchFromGitHub {
     owner = "microsoft";
     repo = "msquic";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-ZI5tutVYs3myjRdsXGOq48F9fce2YUsMcI1Sqg7nyh0=";
+    hash = "sha256-IOPKIjJVZUBU13YkL7C7c9Y6cA9L62FYRKvFiXWTeLE=";
     fetchSubmodules = true;
   };
 
@@ -27,8 +27,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    lttng-tools
     libatomic_ops
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    lttng-tools
   ];
 
   postUnpack = ''

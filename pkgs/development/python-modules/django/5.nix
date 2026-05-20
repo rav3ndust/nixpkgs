@@ -3,8 +3,6 @@
   stdenv,
   buildPythonPackage,
   fetchFromGitHub,
-  fetchpatch,
-  pythonOlder,
   replaceVars,
 
   # build-system
@@ -33,7 +31,6 @@
   pylibmc,
   pymemcache,
   python,
-  pywatchman,
   pyyaml,
   pytz,
   redis,
@@ -44,42 +41,32 @@
 
 buildPythonPackage rec {
   pname = "django";
-  version = "5.1.9";
+  version = "5.2.13";
   pyproject = true;
-
-  disabled = pythonOlder "3.10";
 
   src = fetchFromGitHub {
     owner = "django";
     repo = "django";
-    rev = "refs/tags/${version}";
-    hash = "sha256-uBP6MoVjPUtNu6KxLjaYmKTN42JIUCTJSuSnQWSxyQU=";
+    tag = version;
+    hash = "sha256-8tRDExsCtyEonz+e18PYnfhb8qmgZNeBWUjg+LbB39U=";
   };
 
-  patches =
-    [
-      (replaceVars ./django_5_set_zoneinfo_dir.patch {
-        zoneinfo = tzdata + "/share/zoneinfo";
-      })
-      # prevent tests from messing with our pythonpath
-      ./django_5_tests_pythonpath.patch
-      # disable test that expects timezone issues
-      ./django_5_disable_failing_tests.patch
-
-      # fix filename length limit tests on bcachefs
-      # FIXME: remove in 5.2
-      (fetchpatch {
-        url = "https://github.com/django/django/commit/12f4f95405c7857cbf2f4bf4d0261154aac31676.patch";
-        hash = "sha256-+K20/V8sh036Ox9U7CSPgfxue7f28Sdhr3MsB7erVOk=";
-      })
-    ]
-    ++ lib.optionals withGdal [
-      (replaceVars ./django_5_set_geos_gdal_lib.patch {
-        geos = geos;
-        gdal = gdal;
-        extension = stdenv.hostPlatform.extensions.sharedLibrary;
-      })
-    ];
+  patches = [
+    (replaceVars ./5.2/zoneinfo.patch {
+      zoneinfo = tzdata + "/share/zoneinfo";
+    })
+    # prevent tests from messing with our pythonpath
+    ./5.2/pythonpath.patch
+    # disable test that expects timezone issues
+    ./5.2/disable-failing-test.patch
+  ]
+  ++ lib.optionals withGdal [
+    (replaceVars ./5.2/gdal.patch {
+      geos = geos;
+      gdal = gdal;
+      extension = stdenv.hostPlatform.extensions.sharedLibrary;
+    })
+  ];
 
   postPatch = ''
     substituteInPlace tests/utils_tests/test_autoreload.py \
@@ -108,19 +95,14 @@ buildPythonPackage rec {
     pillow
     pylibmc
     pymemcache
-    pywatchman
     pyyaml
     pytz
     redis
     selenium
     tblib
     tzdata
-  ] ++ lib.flatten (lib.attrValues optional-dependencies);
-
-  doCheck =
-    !stdenv.hostPlatform.isDarwin
-    # pywatchman depends on folly which does not support 32bits
-    && !stdenv.hostPlatform.is32bit;
+  ]
+  ++ lib.concatAttrValues optional-dependencies;
 
   preCheck = ''
     # make sure the installed library gets imported
@@ -139,7 +121,8 @@ buildPythonPackage rec {
     runHook preCheck
 
     pushd tests
-    ${python.interpreter} runtests.py --settings=test_sqlite
+    # without --parallel=1, tests fail with an "unexpected error due to a database lock" on Darwin
+    ${python.interpreter} runtests.py --settings=test_sqlite ${lib.optionalString stdenv.hostPlatform.isDarwin "--parallel=1"}
     popd
 
     runHook postCheck
@@ -147,11 +130,11 @@ buildPythonPackage rec {
 
   __darwinAllowLocalNetworking = true;
 
-  meta = with lib; {
+  meta = {
     changelog = "https://docs.djangoproject.com/en/${lib.versions.majorMinor version}/releases/${version}/";
     description = "High-level Python Web framework that encourages rapid development and clean, pragmatic design";
     homepage = "https://www.djangoproject.com";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ hexa ];
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ hexa ];
   };
 }

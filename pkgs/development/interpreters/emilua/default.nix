@@ -29,13 +29,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "emilua";
-  version = "0.11.6";
+  version = "0.12.1";
 
   src = fetchFromGitLab {
     owner = "emilua";
     repo = "emilua";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-r/WfRAr8AgnZGHxzcZVLg5MHDwcOTMWqOv/Qu/75Y1c=";
+    hash = "sha256-h/uC5yAj64A5cVQN6XPVlFg+mDFdugwWblp6qNoU824=";
   };
 
   propagatedBuildInputs = [
@@ -97,7 +97,6 @@ stdenv.mkDerivation (finalAttrs: {
   nativeInstallCheckInputs = [
     versionCheckHook
   ];
-  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   passthru = {

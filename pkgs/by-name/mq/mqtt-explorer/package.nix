@@ -13,7 +13,7 @@
   copyDesktopItems,
 }:
 # NOTE mqtt-explorer has 3 yarn subpackages and uses relative links
-# between them, which makes it hard to package them via 3 `mkYarnPackage`
+# between them, which makes it hard to package them via 3 `fetchYarnDeps`
 # since the resulting `node_modules` directories don't have the same structure
 # as if they were installed directly. Hence why we opted to use a
 # `stdenv.mkDerivation` instead.
@@ -51,7 +51,8 @@ stdenv.mkDerivation rec {
     typescript
     fixup-yarn-lock
     makeWrapper
-  ] ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [ copyDesktopItems ];
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [ copyDesktopItems ];
 
   env.ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
 
@@ -168,12 +169,12 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  meta = with lib; {
-    description = "An all-round MQTT client that provides a structured topic overview";
+  meta = {
+    description = "All-round MQTT client that provides a structured topic overview";
     homepage = "https://github.com/thomasnordquist/MQTT-Explorer";
     changelog = "https://github.com/thomasnordquist/MQTT-Explorer/releases/tag/v${version}";
-    license = licenses.cc-by-nd-40;
-    maintainers = with maintainers; [ tsandrini ];
+    license = lib.licenses.cc-by-nd-40;
+    maintainers = with lib.maintainers; [ tsandrini ];
     platforms = electron.meta.platforms;
     mainProgram = "mqtt-explorer";
   };

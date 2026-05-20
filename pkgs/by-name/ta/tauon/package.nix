@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchPypi,
   kissfft,
   miniaudio,
   pkg-config,
@@ -16,6 +17,7 @@
   librsvg,
   libsamplerate,
   libvorbis,
+  libxcursor,
   mpg123,
   opusfile,
   pango,
@@ -26,16 +28,34 @@
   withDiscordRPC ? true,
 }:
 
+let
+  # fork of pypresence, to be reverted if/when there's an upstream release
+  lynxpresence = python3Packages.buildPythonPackage rec {
+    pname = "lynxpresence";
+    version = "4.6.2";
+    pyproject = true;
+
+    src = fetchPypi {
+      inherit pname version;
+      hash = "sha256-w4WShLTTSf4JGQVL4lTkbOLL8C7cjnf8WwHyfwKK2zA=";
+    };
+
+    build-system = with python3Packages; [ setuptools ];
+
+    doCheck = false; # tests require internet connection
+    pythonImportsCheck = [ "lynxpresence" ];
+  };
+in
 python3Packages.buildPythonApplication rec {
   pname = "tauon";
-  version = "7.9.0";
+  version = "9.1.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "Taiko2k";
     repo = "Tauon";
     tag = "v${version}";
-    hash = "sha256-6aEUniLoE5Qtfht3OAe+zvC9yZwjH+KpskmjGowDuuU=";
+    hash = "sha256-Z/+8UCtwvY9000b1Y+HaTIehK8axzyR+eeeBPhllS4U=";
   };
 
   postUnpack = ''
@@ -47,17 +67,15 @@ python3Packages.buildPythonApplication rec {
   '';
 
   postPatch = ''
-    substituteInPlace src/tauon/__main__.py \
-      --replace-fail 'install_mode = False' 'install_mode = True'
-
     substituteInPlace src/tauon/t_modules/t_phazor.py \
       --replace-fail 'base_path = Path(pctl.install_directory).parent.parent / "build"' 'base_path = Path("${placeholder "out"}/${python3Packages.python.sitePackages}")'
   '';
 
   pythonRemoveDeps = [
-    "pysdl2-dll"
     "opencc"
     "tekore"
+    # Whether or not it is enabled (withDiscordRPC), it isn't present during build.
+    "pypresence"
   ];
 
   nativeBuildInputs = [
@@ -85,6 +103,7 @@ python3Packages.buildPythonApplication rec {
     opusfile
     pango
     pipewire
+    python3Packages.pyopengl
     wavpack
   ];
 
@@ -105,23 +124,27 @@ python3Packages.buildPythonApplication rec {
       pychromecast
       pylast
       pygobject3
-      pysdl2
+      pyopengl
+      pysdl3
       requests
       send2trash
       setproctitle
       tidalapi
     ]
-    ++ lib.optional withDiscordRPC pypresence
+    ++ lib.optional withDiscordRPC lynxpresence
     ++ lib.optional stdenv.hostPlatform.isLinux pulsectl;
 
   makeWrapperArgs = [
     "--prefix PATH : ${lib.makeBinPath [ ffmpeg ]}"
     "--prefix LD_LIBRARY_PATH : ${
-      lib.makeLibraryPath [
-        game-music-emu
-        libopenmpt
-        pulseaudio
-      ]
+      lib.makeLibraryPath (
+        [
+          game-music-emu
+          libopenmpt
+          pulseaudio
+        ]
+        ++ lib.optional stdenv.hostPlatform.isLinux libxcursor
+      )
     }"
     "--prefix PYTHONPATH : $out/share/tauon"
     "--set GI_TYPELIB_PATH $GI_TYPELIB_PATH"
@@ -135,13 +158,13 @@ python3Packages.buildPythonApplication rec {
     install -Dm644 extra/tauonmb{,-symbolic}.svg $out/share/icons/hicolor/scalable/apps
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Linux desktop music player from the future";
     mainProgram = "tauon";
     homepage = "https://tauonmusicbox.rocks/";
     changelog = "https://github.com/Taiko2k/Tauon/releases/tag/v${version}";
-    license = licenses.gpl3;
-    maintainers = with maintainers; [ jansol ];
-    platforms = platforms.linux ++ platforms.darwin;
+    license = lib.licenses.gpl3;
+    maintainers = with lib.maintainers; [ jansol ];
+    platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 }

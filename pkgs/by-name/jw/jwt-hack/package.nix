@@ -1,33 +1,46 @@
 {
   lib,
-  buildGoModule,
+  rustPlatform,
   fetchFromGitHub,
+  pkg-config,
+  openssl,
 }:
 
-buildGoModule rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "jwt-hack";
-  version = "1.2.0";
+  version = "2.5.0";
 
   src = fetchFromGitHub {
     owner = "hahwul";
     repo = "jwt-hack";
-    tag = "v${version}";
-    hash = "sha256-IHR+ItI4ToINLpkVc7yrgpNTS17nD02G6x3pNMEfIW4=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-kutt5VhMY/YIXBpVZTg/xAwa9d+J5ypfLi5aLakjfaY=";
   };
 
-  vendorHash = "sha256-YEH+epSvyy1j0s8AIJ5+BdF47H7KqgBRC4t81noOkjo=";
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+  };
 
-  ldflags = [
-    "-w"
-    "-s"
+  postPatch = ''
+    ln -s ${./Cargo.lock} Cargo.lock
+  '';
+
+  nativeBuildInputs = [
+    pkg-config
   ];
 
-  meta = with lib; {
-    description = "Tool for attacking JWT";
+  buildInputs = [
+    openssl
+  ];
+
+  env.OPENSSL_NO_VENDOR = 1;
+
+  meta = {
+    description = "JSON Web Token Hack Toolkit";
     homepage = "https://github.com/hahwul/jwt-hack";
-    changelog = "https://github.com/hahwul/jwt-hack/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    changelog = "https://github.com/hahwul/jwt-hack/releases/tag/${finalAttrs.src.tag}";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fab ];
     mainProgram = "jwt-hack";
   };
-}
+})

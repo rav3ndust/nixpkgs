@@ -2,8 +2,9 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchPypi,
   node-gyp,
-  nodejs_20,
+  nodejs,
   nixosTests,
   gettext,
   python3,
@@ -15,24 +16,28 @@
   pngquant,
   qpdf,
   tesseract5,
-  unpaper,
-  pnpm,
+  fetchPnpmDeps,
+  pnpmConfigHook,
+  pnpm_10,
   poppler-utils,
   liberation_ttf,
   xcbuild,
   pango,
   pkg-config,
+  symlinkJoin,
   nltk-data,
-  xorg,
+  lndir,
 }:
 let
-  version = "2.15.3";
+  pnpm = pnpm_10;
+
+  version = "2.20.15";
 
   src = fetchFromGitHub {
     owner = "paperless-ngx";
     repo = "paperless-ngx";
     tag = "v${version}";
-    hash = "sha256-zkOOUMyAvYYJnYn4s7D4tsYhodVX5kvPdXBBknBsusY=";
+    hash = "sha256-Czh4Knel0IIHsTc3kEnp1153Kv+3721GRCbTYTkeCDg=";
   };
 
   python = python3.override {
@@ -40,8 +45,20 @@ let
     packageOverrides = final: prev: {
       django = prev.django_5;
 
+      fido2 = prev.fido2.overridePythonAttrs {
+        version = "1.2.0";
+
+        src = fetchPypi {
+          pname = "fido2";
+          version = "1.2.0";
+          hash = "sha256-45+VkgEi1kKD/aXlWB2VogbnBPpChGv6RmL4aqDTMzs=";
+        };
+
+        pytestFlags = [ ];
+      };
+
       # tesseract5 may be overwritten in the paperless module and we need to propagate that to make the closure reduction effective
-      ocrmypdf = prev.ocrmypdf.override { tesseract = tesseract5; };
+      ocrmypdf = prev.ocrmypdf_16.override { tesseract = tesseract5; };
     };
   };
 
@@ -53,78 +70,84 @@ let
     pngquant
     qpdf
     tesseract5
-    unpaper
     poppler-utils
   ];
 
-  frontend =
-    let
-      frontendSrc = src + "/src-ui";
-    in
-    stdenv.mkDerivation rec {
-      pname = "paperless-ngx-frontend";
-      inherit version;
+  frontend = stdenv.mkDerivation (finalAttrs: {
+    pname = "paperless-ngx-frontend";
+    inherit version;
 
-      src = frontendSrc;
+    src = src + "/src-ui";
 
-      pnpmDeps = pnpm.fetchDeps {
-        inherit pname version src;
-        hash = "sha256-yoTXlxXLcWD2DMxqjb02ZORJ+E0xE1DbZm1VL7vXM4g=";
-      };
-
-      nativeBuildInputs =
-        [
-          node-gyp
-          nodejs_20
-          pkg-config
-          pnpm.configHook
-          python3
-        ]
-        ++ lib.optionals stdenv.hostPlatform.isDarwin [
-          xcbuild
-        ];
-
-      buildInputs =
-        [
-          pango
-        ]
-        ++ lib.optionals stdenv.hostPlatform.isDarwin [
-          giflib
-        ];
-
-      CYPRESS_INSTALL_BINARY = "0";
-      NG_CLI_ANALYTICS = "false";
-
-      buildPhase = ''
-        runHook preBuild
-
-        pushd node_modules/canvas
-        node-gyp rebuild
-        popd
-
-        pnpm run build --configuration production
-
-        runHook postBuild
-      '';
-
-      doCheck = true;
-      checkPhase = ''
-        runHook preCheck
-
-        pnpm run test
-
-        runHook postCheck
-      '';
-
-      installPhase = ''
-        runHook preInstall
-
-        mkdir -p $out/lib/paperless-ui
-        mv ../src/documents/static/frontend $out/lib/paperless-ui/
-
-        runHook postInstall
-      '';
+    pnpmDeps = fetchPnpmDeps {
+      inherit pnpm;
+      inherit (finalAttrs) pname version src;
+      fetcherVersion = 3;
+      hash = "sha256-HO+IDNB3NXWgvV0cvZ5zx46JuXv6Tgroz+YfVump5MA=";
     };
+
+    nativeBuildInputs = [
+      node-gyp
+      nodejs
+      pkg-config
+      pnpmConfigHook
+      pnpm
+      python3
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      xcbuild
+    ];
+
+    buildInputs = [
+      pango
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      giflib
+    ];
+
+    CYPRESS_INSTALL_BINARY = "0";
+    NG_CLI_ANALYTICS = "false";
+
+    buildPhase = ''
+      runHook preBuild
+
+      pushd node_modules/canvas
+      node-gyp rebuild
+      popd
+
+      # cat forcefully disables angular cli's spinner which doesn't work with nix' tty which is 0x0
+      pnpm run build --configuration production | cat
+
+      runHook postBuild
+    '';
+
+    doCheck = true;
+    checkPhase = ''
+      runHook preCheck
+
+      pnpm run test | cat
+
+      runHook postCheck
+    '';
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p $out/lib/paperless-ui
+      mv ../src/documents/static/frontend $out/lib/paperless-ui/
+
+      runHook postInstall
+    '';
+  });
+
+  nltkDataDir = symlinkJoin {
+    name = "paperless_ngx_nltk_data";
+    paths = with nltk-data; [
+      punkt-tab
+      snowball-data
+      stopwords
+    ];
+  };
 in
 python.pkgs.buildPythonApplication rec {
   pname = "paperless-ngx";
@@ -134,43 +157,50 @@ python.pkgs.buildPythonApplication rec {
 
   postPatch = ''
     # pytest-xdist with to many threads makes the tests flaky
-    if (( $NIX_BUILD_CORES > 4)); then
-      NIX_BUILD_CORES=4
+    if (( $NIX_BUILD_CORES > 3)); then
+      NIX_BUILD_CORES=3
     fi
     substituteInPlace pyproject.toml \
       --replace-fail '"--numprocesses=auto",' "" \
-      --replace-fail '--maxprocesses=16' "--numprocesses=$NIX_BUILD_CORES" \
-      --replace-fail "djangorestframework-guardian~=0.3.0" "djangorestframework-guardian2"
+      --replace-fail '--maxprocesses=16' "--numprocesses=$NIX_BUILD_CORES"
   '';
+
+  build-system = [ python.pkgs.setuptools ];
 
   nativeBuildInputs = [
     gettext
-    xorg.lndir
+    lndir
   ];
 
   pythonRelaxDeps = [
     "celery"
     "django-allauth"
-    "django-extensions"
+    "django-auditlog"
+    "django-cachalot"
     "drf-spectacular-sidecar"
-    "filelock"
     "python-dotenv"
-    "rapidfuzz"
-    # TODO: https://github.com/NixOS/nixpkgs/pull/373099
-    "zxing-cpp"
+    "gotenberg-client"
+    "redis"
+    "scikit-learn"
+    "tika-client"
+    # requested by maintainer
+    "imap-tools"
+    "ocrmypdf"
   ];
 
   dependencies =
     with python.pkgs;
     [
+      babel
       bleach
       channels
       channels-redis
       concurrent-log-handler
       dateparser
-      django_5
+      django
       django-allauth
       django-auditlog
+      django-cachalot
       django-celery-results
       django-compression-middleware
       django-cors-headers
@@ -179,8 +209,9 @@ python.pkgs.buildPythonApplication rec {
       django-guardian
       django-multiselectfield
       django-soft-delete
+      django-treenode
       djangorestframework
-      djangorestframework-guardian2
+      djangorestframework-guardian
       drf-spectacular
       drf-spectacular-sidecar
       drf-writable-nested
@@ -199,6 +230,7 @@ python.pkgs.buildPythonApplication rec {
       pathvalidate
       pdf2image
       psycopg
+      psycopg-pool
       python-dateutil
       python-dotenv
       python-gnupg
@@ -275,59 +307,68 @@ python.pkgs.buildPythonApplication rec {
   # manually managed in postPatch
   dontUsePytestXdist = false;
 
-  pytestFlagsArray = [
+  enabledTestPaths = [
     "src"
   ];
 
-  # The tests require:
-  # - PATH with runtime binaries
-  # - A temporary HOME directory for gnupg
-  # - XDG_DATA_DIRS with test-specific fonts
   preCheck = ''
+    # The tests require:
+    # - PATH with runtime binaries
+    # - A temporary HOME directory for gnupg
+    # - XDG_DATA_DIRS with test-specific fonts
     export PATH="${path}:$PATH"
     export HOME=$(mktemp -d)
     export XDG_DATA_DIRS="${liberation_ttf}/share:$XDG_DATA_DIRS"
+    export PAPERLESS_NLTK_DIR=${passthru.nltkDataDir}
+    # Limit threads per worker based on NIX_BUILD_CORES, capped at 256
+    # ocrmypdf has an internal limit of 256 jobs and will fail with more:
+    # https://github.com/ocrmypdf/OCRmyPDF/blob/66308c281306302fac3470f587814c3b212d0c40/src/ocrmypdf/cli.py#L234
+    export PAPERLESS_THREADS_PER_WORKER=$(( NIX_BUILD_CORES > 256 ? 256 : NIX_BUILD_CORES ))
+
+    # the generated pyc files conflict when running the tests
+    rm -r build/lib
   '';
 
   disabledTests = [
     # FileNotFoundError(2, 'No such file or directory'): /build/tmp...
     "test_script_with_output"
     "test_script_exit_non_zero"
-    "testDocumentPageCountMigrated"
-    # AssertionError: 10 != 4 (timezone/time issue)
-    # Due to getting local time from modification date in test_consumer.py
-    "testNormalOperation"
     # Something broken with new Tesseract and inline RTL/LTR overrides?
     "test_rtl_language_detection"
-    # django.core.exceptions.FieldDoesNotExist: Document has no field named 'transaction_id'
-    "test_convert"
+    # Favicon tests fail due to static file handling in the test environment
+    # https://github.com/NixOS/nixpkgs/issues/421393
+    "test_favicon_view"
+    "test_favicon_view_missing_file"
+    # Requires DNS
+    "test_send_webhook_data_or_json"
+    # execnet.gateway_base.DumpError: can't serialize <class 'pathlib._local.PosixPath'>
+    # https://github.com/pytest-dev/pytest-xdist/issues/384
+    "test_subdirectory_upload"
+    # AssertionError: 4 != 3
+    "testNormalOperation"
   ];
 
   doCheck = !stdenv.hostPlatform.isDarwin;
 
   passthru = {
     inherit
-      python
-      path
       frontend
+      nltkDataDir
+      path
+      python
       tesseract5
       ;
-    nltkData = with nltk-data; [
-      punkt_tab
-      snowball_data
-      stopwords
-    ];
     tests = { inherit (nixosTests) paperless; };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Tool to scan, index, and archive all of your physical documents";
     homepage = "https://docs.paperless-ngx.com/";
-    changelog = "https://github.com/paperless-ngx/paperless-ngx/releases/tag/v${version}";
-    license = licenses.gpl3Only;
-    platforms = platforms.unix;
+    changelog = "https://github.com/paperless-ngx/paperless-ngx/releases/tag/${src.tag}";
+    license = lib.licenses.gpl3Only;
+    platforms = lib.platforms.unix;
     mainProgram = "paperless-ngx";
-    maintainers = with maintainers; [
+    maintainers = with lib.maintainers; [
       leona
       SuperSandro2000
       erikarvstedt

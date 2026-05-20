@@ -1,29 +1,47 @@
 {
   lib,
+  stdenv,
   rustPlatform,
   fetchFromGitHub,
+  just,
   libcosmicAppHook,
   sqlite,
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "oboete";
-  version = "0.1.8";
+  version = "0.2.4";
+
+  strictDeps = true;
 
   src = fetchFromGitHub {
     owner = "mariinkys";
     repo = "oboete";
-    tag = version;
-    hash = "sha256-tQn3ihGHkR91zNtBIiyyIEEo21Q0ZSKLEaV/3UI9pwU=";
+    tag = finalAttrs.version;
+    hash = "sha256-QP0ZK6E3rz9WCvglJek8S25O8X5b8iyPAk7eph4lqMg=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-91JMgdpMXL0a7oZXAG5xgiulOIyVXQ5x09wN3XDeSy0=";
+  cargoHash = "sha256-ZEve4uKhbcps8FFRGizA6tedz2aH0j4gKTi3HauxpFE=";
 
-  nativeBuildInputs = [ libcosmicAppHook ];
+  nativeBuildInputs = [
+    libcosmicAppHook
+    just
+  ];
 
   buildInputs = [ sqlite ];
+
+  dontUseJustBuild = true;
+  dontUseJustCheck = true;
+
+  justFlags = [
+    "--set"
+    "prefix"
+    (placeholder "out")
+    "--set"
+    "cargo-target-dir"
+    "target/${stdenv.hostPlatform.rust.cargoShortTarget}"
+  ];
 
   passthru = {
     updateScript = nix-update-script { };
@@ -32,7 +50,7 @@ rustPlatform.buildRustPackage rec {
   meta = {
     description = "Simple flashcards application for the COSMIC™ desktop written in Rust";
     homepage = "https://github.com/mariinkys/oboete";
-    changelog = "https://github.com/mariinkys/oboete/releases/tag/${version}";
+    changelog = "https://github.com/mariinkys/oboete/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.gpl3Only;
     maintainers = with lib.maintainers; [
       GaetanLepage
@@ -41,4 +59,4 @@ rustPlatform.buildRustPackage rec {
     platforms = lib.platforms.linux;
     mainProgram = "oboete";
   };
-}
+})

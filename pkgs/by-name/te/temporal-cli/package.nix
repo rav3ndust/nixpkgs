@@ -3,50 +3,42 @@
   fetchFromGitHub,
   buildGoModule,
   installShellFiles,
+  writableTmpDirAsHomeHook,
   stdenv,
+  nix-update-script,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "temporal-cli";
-  version = "1.3.0";
+  version = "1.7.0";
 
   src = fetchFromGitHub {
     owner = "temporalio";
     repo = "cli";
-    rev = "v${version}";
-    hash = "sha256-9O+INXJhNwgwwvC0751ifdHmxbD0qI5A3LdDb4Krk/o=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-P/wfvKRAvqRgUJabVE9RvT4o3fNZ52JX48hXm3C3orI=";
   };
 
-  vendorHash = "sha256-Xe/qrlqg6DpCNmsO/liTKjWIaY3KznkOQdXSSoJVZq4=";
-
-  overrideModAttrs = old: {
-    # https://gitlab.com/cznic/libc/-/merge_requests/10
-    postBuild = ''
-      patch -p0 < ${./darwin-sandbox-fix.patch}
-    '';
-  };
+  vendorHash = "sha256-dD21m6tlwkZkclYOcYUNlsPXxYmLggjrFTv9XctCIt0=";
 
   nativeBuildInputs = [ installShellFiles ];
 
-  excludedPackages = [
-    "./cmd/docgen"
-    "./tests"
+  subPackages = [
+    "cmd/temporal"
   ];
 
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/temporalio/cli/temporalcli.Version=${version}"
+    "-X github.com/temporalio/cli/temporalcli.Version=${finalAttrs.version}"
   ];
 
   # Tests fail with x86 on macOS Rosetta 2
   doCheck = !(stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64);
 
-  preCheck = ''
-    export HOME="$(mktemp -d)"
-  '';
+  nativeCheckInputs = [ writableTmpDirAsHomeHook ];
 
-  postInstall = ''
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     installShellCompletion --cmd temporal \
       --bash <($out/bin/temporal completion bash) \
       --fish <($out/bin/temporal completion fish) \
@@ -55,6 +47,13 @@ buildGoModule rec {
 
   __darwinAllowLocalNetworking = true;
 
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "^v(\\d+\\.\\d+\\.\\d+)$"
+    ];
+  };
+
   meta = {
     description = "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal";
     homepage = "https://docs.temporal.io/cli";
@@ -62,4 +61,4 @@ buildGoModule rec {
     maintainers = with lib.maintainers; [ aaronjheng ];
     mainProgram = "temporal";
   };
-}
+})

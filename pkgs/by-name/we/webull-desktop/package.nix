@@ -22,11 +22,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "webull-desktop";
-  version = "8.2.0";
+  version = "8.9.0";
 
   src = fetchurl {
-    url = "https://u1sweb.webullfintech.com/us/Webull%20Desktop_8.2.0_800200_global_x64signed.deb";
-    hash = "sha256-/KVY6I9gYWWZSJhsTW5GECCeOsx+6XAVIRpghlJUK4k=";
+    url = "https://u1sweb.webullfintech.com/us/Webull%20Desktop_8.9.0_80009000_global_x64signed.deb";
+    hash = "sha256-brt5EXUE9g72vN2Kx9/jf4P/lkVfWLsbzJIf13phgdI=";
   };
 
   nativeBuildInputs = [
@@ -60,7 +60,13 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir $out/bin
     ln -s $out/usr/local/WebullDesktop/WebullDesktop $out/bin/webull-desktop
     substituteInPlace $out/usr/share/applications/WebullDesktop.desktop \
-      --replace-fail Categories=Utiltity Categories=Finance
+      --replace-fail Categories=Utiltity Categories=Finance \
+      --replace-fail "Exec=/usr/local/WebullDesktop/WebullDesktop" "Exec=webull-desktop" \
+      --replace-fail "Icon=WebullDesktop.png" "Icon=WebullDesktop" \
+      --replace-fail "Version=8.2.0" "Version=${finalAttrs.version}"
+
+    ln -s $out/usr/share $out/share
+
 
     addAutoPatchelfSearchPath $out/usr/local/WebullDesktop
     addAutoPatchelfSearchPath $out/usr/local/WebullDesktop/platforms
@@ -79,12 +85,12 @@ stdenv.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Webull desktop trading application";
     homepage = "https://www.webull.com/trading-platforms/desktop-app";
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    license = licenses.unfree;
-    maintainers = with maintainers; [ fauxmight ];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    license = lib.licenses.unfree;
+    maintainers = with lib.maintainers; [ fauxmight ];
     platforms = [ "x86_64-linux" ];
     mainProgram = "webull-desktop";
   };

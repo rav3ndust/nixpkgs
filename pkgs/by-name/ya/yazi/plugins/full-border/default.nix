@@ -5,13 +5,13 @@
 }:
 mkYaziPlugin {
   pname = "full-border.yazi";
-  version = "25.2.26-unstable-2025-03-11";
+  version = "0-unstable-2026-04-22";
 
   src = fetchFromGitHub {
     owner = "yazi-rs";
     repo = "plugins";
-    rev = "92f78dc6d0a42569fd0e9df8f70670648b8afb78";
-    hash = "sha256-mqo71VLZsHmgTybxgqKNo9F2QeMuCSvZ89uen1VbWb4=";
+    rev = "034efd687f689f1981ab0e5a7dd46c1e1b4a08c9";
+    hash = "sha256-JIb26wE0WBf9Ul0wYW1/XpQICVTsNLgWgkXvtC457zo=";
   };
 
   meta = {

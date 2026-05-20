@@ -7,17 +7,25 @@
   gtk3-x11,
   pcre,
   pkg-config,
-  webkitgtk_4_0,
-  xorg,
+  webkitgtk_4_1,
+  libxrandr,
+  libx11,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "rnnoise-plugin";
   version = "1.10";
+  outputs = [
+    "out"
+    "ladspa"
+    "lv2"
+    "lxvst"
+    "vst3"
+  ];
 
   src = fetchFromGitHub {
     owner = "werman";
     repo = "noise-suppression-for-voice";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-sfwHd5Fl2DIoGuPDjELrPp5KpApZJKzQikCJmCzhtY8=";
   };
 
@@ -31,27 +39,35 @@ stdenv.mkDerivation rec {
     ./disable-ubsan.patch
   ];
 
-  buildInputs =
-    [
-      freetype
-      gtk3-x11
-      pcre
-      xorg.libX11
-      xorg.libXrandr
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [
-      webkitgtk_4_0
-    ];
+  buildInputs = [
+    freetype
+    gtk3-x11
+    pcre
+    libx11
+    libxrandr
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    webkitgtk_4_1
+  ];
 
-  meta = with lib; {
+  # Move each plugin into a dedicated output, leaving a symlink in $out for backwards compatibility
+  postInstall = ''
+    for plugin in ladspa lv2 lxvst vst3; do
+      mkdir -p ''${!plugin}/lib
+      mv $out/lib/$plugin ''${!plugin}/lib/$plugin
+      ln -s ''${!plugin}/lib/$plugin $out/lib/$plugin
+    done
+  '';
+
+  meta = {
     description = "Real-time noise suppression plugin for voice based on Xiph's RNNoise";
     homepage = "https://github.com/werman/noise-suppression-for-voice";
-    license = licenses.gpl3;
-    platforms = platforms.all;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3;
+    platforms = lib.platforms.all;
+    maintainers = with lib.maintainers; [
       panaeon
       henrikolsson
       sciencentistguy
     ];
   };
-}
+})

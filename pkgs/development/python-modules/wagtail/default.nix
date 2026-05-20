@@ -3,6 +3,11 @@
   buildPythonPackage,
   fetchFromGitHub,
 
+  # frontend
+  fetchNpmDeps,
+  nodejs,
+  npmHooks,
+
   # build-system
   setuptools,
 
@@ -18,6 +23,7 @@
   djangorestframework,
   draftjs-exporter,
   laces,
+  modelsearch,
   openpyxl,
   permissionedforms,
   pillow,
@@ -29,20 +35,41 @@
   callPackage,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "wagtail";
-  version = "6.4.1";
+  version = "7.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "wagtail";
     repo = "wagtail";
-    tag = "v${version}";
-    hash = "sha256-2qixbJK3f+3SBnsfVEcObFJmuBvE2J9o3LIkILZQRLQ=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-o/4jn32ffR3BPVNwtFKJ6PowXYi7SpjBqghdeZIl5tM=";
   };
+
+  nativeBuildInputs = [
+    npmHooks.npmConfigHook
+    nodejs
+  ];
+
+  npmDeps = fetchNpmDeps {
+    inherit (finalAttrs) src;
+    hash = "sha256-Uc16K1RZUCnr4qRe2u4yB44F+zYFBxMpEQCz5992RMA=";
+  };
+
+  preBuild = ''
+    # upstream only provides a hook for sdists, not wheels
+    # https://github.com/wagtail/wagtail/blob/v7.3/setup.py#L22
+    npm run build
+  '';
 
   build-system = [
     setuptools
+  ];
+
+  pythonRelaxDeps = [
+    "django-tasks"
+    "modelsearch"
   ];
 
   dependencies = [
@@ -57,13 +84,15 @@ buildPythonPackage rec {
     djangorestframework
     draftjs-exporter
     laces
+    modelsearch
     openpyxl
     permissionedforms
     pillow
     requests
     telepath
     willow
-  ] ++ willow.optional-dependencies.heif;
+  ]
+  ++ willow.optional-dependencies.heif;
 
   # Tests are in separate derivation because they require a package that depends
   # on wagtail (wagtail-factories)
@@ -77,8 +106,8 @@ buildPythonPackage rec {
     description = "Django content management system focused on flexibility and user experience";
     mainProgram = "wagtail";
     homepage = "https://github.com/wagtail/wagtail";
-    changelog = "https://github.com/wagtail/wagtail/blob/v${version}/CHANGELOG.txt";
+    changelog = "https://github.com/wagtail/wagtail/blob/${finalAttrs.src.tag}/CHANGELOG.txt";
     license = lib.licenses.bsd3;
     maintainers = with lib.maintainers; [ sephi ];
   };
-}
+})

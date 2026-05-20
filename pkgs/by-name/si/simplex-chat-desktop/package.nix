@@ -3,16 +3,28 @@
   appimageTools,
   fetchurl,
   gitUpdater,
+  stdenv,
 }:
 
 let
   pname = "simplex-chat-desktop";
-  version = "6.3.3";
+  version = "6.5.2";
 
-  src = fetchurl {
-    url = "https://github.com/simplex-chat/simplex-chat/releases/download/v${version}/simplex-desktop-x86_64.AppImage";
-    hash = "sha256-qm0JPwHnfICCUN5mgSrKH8V6orJ4+p/9UmrQ/GPWIBo=";
+  sources = {
+    "aarch64-linux" = fetchurl {
+      url = "https://github.com/simplex-chat/simplex-chat/releases/download/v${version}/simplex-desktop-aarch64.AppImage";
+      hash = "sha256-CvHwYKbieRYbBKUCoKAa11rTy5Opdfb7FKS4poantKs=";
+    };
+    "x86_64-linux" = fetchurl {
+      url = "https://github.com/simplex-chat/simplex-chat/releases/download/v${version}/simplex-desktop-x86_64.AppImage";
+      hash = "sha256-caRL09PKJ33XHRReZ5qSpfgKH0wpJxGSHXfA83sz5UE=";
+    };
   };
+
+  inherit (stdenv.hostPlatform) system;
+  throwSystem = throw "simplex-chat-desktop: Unsupported system: ${system}";
+
+  src = sources.${system} or throwSystem;
 
   appimageContents = appimageTools.extract {
     inherit pname version src;
@@ -20,6 +32,8 @@ let
 in
 appimageTools.wrapType2 {
   inherit pname version src;
+
+  extraPkgs = pkgs: [ pkgs.libnotify ];
 
   extraBwrapArgs = [
     "--setenv _JAVA_AWT_WM_NONREPARENTING 1"
@@ -39,13 +53,16 @@ appimageTools.wrapType2 {
     ignoredVersions = "-";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Desktop application for SimpleX Chat";
     mainProgram = "simplex-chat-desktop";
     homepage = "https://simplex.chat";
     changelog = "https://github.com/simplex-chat/simplex-chat/releases/tag/v${version}";
-    license = licenses.agpl3Only;
-    maintainers = with maintainers; [ terryg ];
-    platforms = [ "x86_64-linux" ];
+    license = lib.licenses.agpl3Only;
+    maintainers = with lib.maintainers; [ terryg ];
+    platforms = [
+      "aarch64-linux"
+      "x86_64-linux"
+    ];
   };
 }

@@ -2,11 +2,11 @@
   callPackages,
   callPackage,
   varnish60,
-  varnish76,
-  varnish77,
+  varnish80,
+  lib,
 }:
 {
-  varnish60Packages = rec {
+  varnish60Packages = lib.recurseIntoAttrs rec {
     varnish = varnish60;
     modules = (callPackages ./modules.nix { inherit varnish; }).modules15;
     digest = callPackage ./digest.nix {
@@ -20,12 +20,8 @@
       sha256 = "1n94slrm6vn3hpymfkla03gw9603jajclg84bjhwb8kxsk3rxpmk";
     };
   };
-  varnish76Packages = rec {
-    varnish = varnish76;
-    modules = (callPackages ./modules.nix { inherit varnish; }).modules25;
-  };
-  varnish77Packages = rec {
-    varnish = varnish77;
-    modules = (callPackages ./modules.nix { inherit varnish; }).modules26;
+  varnish80Packages = lib.recurseIntoAttrs rec {
+    varnish = varnish80;
+    modules = (callPackages ./modules.nix { inherit varnish; }).modules27;
   };
 }

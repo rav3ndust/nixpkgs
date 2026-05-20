@@ -18,21 +18,22 @@
 
 stdenv.mkDerivation rec {
   pname = "emblem";
-  version = "1.4.0";
+  version = "1.6.0";
 
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     group = "World";
     owner = "design";
     repo = "emblem";
-    rev = version;
-    sha256 = "sha256-pW+2kQANZ9M1f0jMoBqCxMjLCu0xAnuEE2EdzDq4ZCE=";
+    tag = version;
+    hash = "sha256-OqP6KLaDix4hR/AA+lfaMu4nZPqpAKfYzZu7tr+RUJI=";
+    # Temporary workaround for https://github.com/NixOS/nixpkgs/issues/485701
+    forceFetchGit = true;
   };
 
   cargoDeps = rustPlatform.fetchCargoVendor {
-    inherit src;
-    name = "${pname}-${version}";
-    hash = "sha256-j9PrnXt0GyyfCKmcq1zYmDNlrvogtK5n316MIC+z+w0=";
+    inherit pname version src;
+    hash = "sha256-J00zw8jOeMLjGyn2Gj4TA5vHjIWOw+x/XEIXMyBFMdw=";
   };
 
   nativeBuildInputs = [
@@ -68,10 +69,7 @@ stdenv.mkDerivation rec {
     homepage = "https://gitlab.gnome.org/World/design/emblem";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.unix;
-    maintainers = with lib.maintainers; [
-      figsoda
-      foo-dogsquared
-    ];
+    maintainers = [ ];
     teams = [ lib.teams.gnome-circle ];
   };
 }

@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  godot_4_3,
+  godot_4_5,
   nix-update-script,
 }:
 
@@ -16,17 +16,17 @@ let
     presets.${stdenv.hostPlatform.system}
       or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 
-  godot = godot_4_3;
+  godot = godot_4_5;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "pixelorama";
-  version = "1.1";
+  version = "1.1.8";
 
   src = fetchFromGitHub {
     owner = "Orama-Interactive";
     repo = "Pixelorama";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-UJ9sQ9igB2YAtkeHRUPvA60lbR2OXd4tqBDFxf9YTnI=";
+    hash = "sha256-21DNwr5D8Bl2fkMnOtyB3tZrYS/1yZAxo9OkCqV+SYs=";
   };
 
   strictDeps = true;
@@ -34,6 +34,17 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     godot
   ];
+
+  # Pixelorama is tightly coupled to the version of Godot that it is meant to be built with,
+  # and Godot does not follow semver, they break things in minor releases.
+  preConfigure = ''
+    godot_ver="${lib.versions.majorMinor godot.version}"
+    godot_expected=$(sed -n -E 's@config/features=PackedStringArray\("([0-9]+\.[0-9]+)"\)@\1@p' project.godot)
+    [ "$godot_ver" == "$godot_expected" ] || {
+      echo "Expected Godot version: $godot_expected; found: $godot_ver" >&2
+      exit 1
+    }
+  '';
 
   buildPhase = ''
     runHook preBuild
@@ -62,17 +73,17 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://orama-interactive.itch.io/pixelorama";
-    description = "Free & open-source 2D sprite editor, made with the Godot Engine!";
+    description = "Free & open-source 2D sprite editor, made with the Godot Engine";
     changelog = "https://github.com/Orama-Interactive/Pixelorama/blob/${finalAttrs.src.rev}/CHANGELOG.md";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     platforms = [
       "i686-linux"
       "x86_64-linux"
       "aarch64-linux"
     ];
-    maintainers = with maintainers; [ felschr ];
+    maintainers = with lib.maintainers; [ felschr ];
     mainProgram = "pixelorama";
   };
 })

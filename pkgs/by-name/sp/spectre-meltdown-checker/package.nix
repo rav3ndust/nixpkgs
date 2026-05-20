@@ -1,26 +1,29 @@
 {
-  lib,
-  stdenv,
-  fetchFromGitHub,
-  makeBinaryWrapper,
-  coreutils,
   binutils-unwrapped,
+  coreutils,
+  fetchFromGitHub,
+  lib,
+  makeBinaryWrapper,
+  stdenv,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "spectre-meltdown-checker";
-  version = "0.46";
+  version = "26.33.0420460";
 
   src = fetchFromGitHub {
     owner = "speed47";
     repo = "spectre-meltdown-checker";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-M4ngdtp2esZ+CSqZAiAeOnKtaK8Ra+TmQfMsr5q5gkg=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-lydZqvX20QmulwTrsGnInTF1j6CmJw8DUFfAaq0R5l4=";
   };
+
+  passthru.updateScript = gitUpdater { };
 
   prePatch = ''
     substituteInPlace spectre-meltdown-checker.sh \
-      --replace /bin/echo ${coreutils}/bin/echo
+      --replace-fail /bin/echo ${coreutils}/bin/echo
   '';
 
   nativeBuildInputs = [ makeBinaryWrapper ];
@@ -36,10 +39,11 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   meta = {
+    changelog = "https://github.com/speed47/spectre-meltdown-checker/releases/tag/${finalAttrs.src.tag}";
     description = "Spectre & Meltdown vulnerability/mitigation checker for Linux";
     mainProgram = "spectre-meltdown-checker";
     homepage = "https://github.com/speed47/spectre-meltdown-checker";
-    license = lib.licenses.gpl3;
+    license = lib.licenses.gpl3Only;
     maintainers = [ lib.maintainers.dotlambda ];
     platforms = lib.platforms.linux;
   };

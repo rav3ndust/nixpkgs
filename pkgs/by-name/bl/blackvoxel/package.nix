@@ -4,7 +4,7 @@
   fetchFromGitHub,
   makeDesktopItem,
   imagemagick,
-  glew110,
+  glew_1_10,
   SDL_compat,
   nix-update-script,
 }:
@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ imagemagick ];
 
   buildInputs = [
-    glew110
+    glew_1_10
     SDL_compat
   ];
 
@@ -50,7 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   postInstall = ''
-    install -Dm644 blackvoxel.png $out/share/icons/hicolor/1024x1024/apps/blackvoxel.png
+    install -Dm644 blackvoxel.png $out/share/icons/blackvoxel.png
   '';
 
   desktopItems = [
@@ -66,7 +66,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru.updateScript = nix-update-script { };
 
   meta = {
-    description = "A Sci-Fi game with industry and automation";
+    description = "Sci-Fi game with industry and automation";
     homepage = "https://www.blackvoxel.com";
     changelog = "https://github.com/Blackvoxel/Blackvoxel/releases/tag/${finalAttrs.version}";
     license = with lib.licenses; [

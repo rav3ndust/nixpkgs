@@ -12,6 +12,7 @@
   gtk4,
   lcms,
   libadwaita,
+  libglycin-gtk4,
   libseccomp,
   libwebp,
   meson,
@@ -26,20 +27,26 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "identity";
-  version = "0.7.0";
+  version = "26.03";
 
   src = fetchFromGitLab {
     domain = "gitlab.gnome.org";
     owner = "YaLTeR";
     repo = "identity";
-    rev = "refs/tags/v${finalAttrs.version}";
-    hash = "sha256-h8/mWGuosBiQRpoW8rINJht/7UBVEnUnTKY5HBCAyw4=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-CVSUk0xhfsMM47L0BVQj69Jw2MhsElBI3mxETCWBqcU=";
   };
 
   cargoDeps = rustPlatform.fetchCargoVendor {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-YkbhZQUpe8ffBpHcYl7wjFgs3krAXlvHgcBdP/6uvek=";
+    hash = "sha256-AuIAfk6BipUHkIfRiLJf0tjadVxsEIKKvpZgKA11oJE=";
   };
+
+  # The crate can't find our provided gstreamer-gl-egl-1.0.pc in the PKG_CONFIG_PATH otherwise.
+  postPatch = ''
+    substituteInPlace $cargoDepsCopy/*/gstreamer-gl-egl-sys-*/Cargo.toml \
+      --replace-fail 'gstreamer-gl-egl-1.0' 'gstreamer-gl-1.0'
+  '';
 
   strictDeps = true;
 
@@ -69,6 +76,7 @@ stdenv.mkDerivation (finalAttrs: {
     gtk4
     lcms
     libadwaita
+    libglycin-gtk4
     libseccomp
     libwebp
   ];

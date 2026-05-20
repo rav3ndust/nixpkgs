@@ -35,12 +35,16 @@ with haskellLib;
   patch = haskellLib.disableParallelBuilding super.patch;
   reflex-dom-core = haskellLib.disableParallelBuilding super.reflex-dom-core;
 
-  reflex-dom =
-    lib.warn "reflex-dom builds with JS backend but it is missing fixes for working at runtime"
-      super.reflex-dom.override
-      (drv: {
-        jsaddle-webkit2gtk = null;
-      });
+  # Marked as dontDistribute in -common because of jsaddle-webkit2gtk
+  # which requires an unmaintained version of libsoup. Since this dep
+  # is unnecessary for the JS backend, we can re-enable these jobs here.
+  reflex-dom = doDistribute (
+    super.reflex-dom.override (drv: {
+      jsaddle-webkit2gtk = null;
+    })
+  );
+  reflex-localize-dom = doDistribute super.reflex-localize-dom;
+  trasa-reflex = doDistribute super.trasa-reflex;
 
   miso-examples = pkgs.lib.pipe super.miso-examples [
     (addBuildDepends (

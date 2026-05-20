@@ -34,6 +34,13 @@ stdenv.mkDerivation rec {
       includes = [ "tests/catch2/catch.hpp" ];
       hash = "sha256-SbSA813QI8RRVy1lvAOGMGAC2KUQKjwYR2imqX40pvU=";
     })
+
+    (fetchpatch {
+      name = "memorymap-macos.patch";
+      url = "https://github.com/DegateCommunity/Degate/commit/04685b088f485b3b73c55b7bfb989d2f0c88e4ca.patch";
+      includes = [ "src/Core/Utils/MemoryMap.h" ];
+      hash = "sha256-5UfVLc4OoMBaDa0qwOCRpd+dOtdDh4kxHNVfTA50lPg=";
+    })
   ];
 
   postPatch = ''
@@ -67,12 +74,12 @@ stdenv.mkDerivation rec {
     runHook postCheck
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Modern and open-source cross-platform software for chips reverse engineering";
     mainProgram = "Degate";
     homepage = "https://degate.readthedocs.io/";
-    license = licenses.gpl3;
-    platforms = platforms.unix;
-    maintainers = with maintainers; [ ris ];
+    license = lib.licenses.gpl3;
+    platforms = lib.platforms.unix;
+    maintainers = with lib.maintainers; [ ris ];
   };
 }

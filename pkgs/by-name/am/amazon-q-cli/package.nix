@@ -2,41 +2,42 @@
   lib,
   fetchFromGitHub,
   rustPlatform,
-  protobuf_26,
   versionCheckHook,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "amazon-q-cli";
-  version = "1.9.1";
+  version = "1.19.7";
+
+  passthru.updateScript = nix-update-script { };
 
   src = fetchFromGitHub {
     owner = "aws";
     repo = "amazon-q-developer-cli";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-BiVCiMBL5LLm8RYw58u6P7yqQq9XnN8b6fTbxNE2QsA=";
+    hash = "sha256-KeYSZB3/eVKOVGYA92QwVweLPvamcizcSBtj08HtcCU=";
   };
 
-  useFetchCargoVendor = true;
+  nativeBuildInputs = [
+    rustPlatform.bindgenHook
+  ];
 
-  cargoHash = "sha256-7zUgWLGTZx3Ex7RYxb3eZimWdy6AxkNwpCDUwiAr2JE=";
+  cargoHash = "sha256-BlHdEMt3Z/dBnU8PevH9/g/64G1Vz5lwAps0gv60cmw=";
 
   cargoBuildFlags = [
     "-p"
-    "q_cli"
-  ];
-
-  nativeBuildInputs = [
-    protobuf_26
+    "chat_cli"
   ];
 
   postInstall = ''
-    install -m 0755 $out/bin/q_cli $out/bin/amazon-q
+    install -m 0755 $out/bin/chat_cli $out/bin/amazon-q
+    rm -f $out/bin/chat_cli $out/bin/test_mcp_server
   '';
 
   cargoTestFlags = [
     "-p"
-    "q_cli"
+    "chat_cli"
   ];
 
   # skip integration tests that have external dependencies
@@ -60,12 +61,17 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=init_lint_zsh_post_zshrc"
     "--skip=init_lint_zsh_pre_zprofile"
     "--skip=init_lint_zsh_pre_zshrc"
+    "--skip=telemetry::cognito::test::pools"
+    "--skip=auth::pkce::tests::test_pkce_flow_with_state_mismatch_throws_err"
+    "--skip=auth::pkce::tests::test_pkce_flow_completes_successfully"
+    "--skip=auth::pkce::tests::test_pkce_flow_with_authorization_redirect_error"
+    "--skip=auth::pkce::tests::test_pkce_flow_with_timeout"
+    "--skip=request::tests::request_test"
   ];
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
   versionCheckProgram = "${placeholder "out"}/bin/amazon-q";
-  versionCheckProgramArg = "--version";
 
   meta = {
     description = "Amazon Q Developer AI coding agent CLI";
@@ -76,6 +82,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ];
     mainProgram = "amazon-q";
     maintainers = [ lib.maintainers.jamesward ];
-    platforms = lib.platforms.linux;
+    platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 })

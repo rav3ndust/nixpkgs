@@ -3,6 +3,7 @@
   stdenv,
   buildNpmPackage,
   fetchFromGitHub,
+  nodejs_22,
   python3,
   xcbuild,
   nix-update-script,
@@ -10,28 +11,29 @@
 
 buildNpmPackage rec {
   pname = "firebase-tools";
-  version = "14.3.0";
+  version = "15.18.0";
+  nodejs = nodejs_22;
 
   src = fetchFromGitHub {
     owner = "firebase";
     repo = "firebase-tools";
     tag = "v${version}";
-    hash = "sha256-Y3+Nw6+ZCnHOJeoMRhWafBVi0yrb41NX/4FcpqHk4eA=";
+    hash = "sha256-bsCBDiHOkov3OgjGy29wmZVXDBX6AmH34wNYOPve6uI=";
   };
 
-  npmDepsHash = "sha256-+rAwYopIP/NEb602TVuZEZUY+dQPzkuTXpWCBeLCjmg=";
+  npmDepsHash = "sha256-qJezxPI1ao6/G4Ku7qjOFbdEaJohAH+7DWeP9QY/jOs=";
 
+  # No more package-lock.json in upstream src
   postPatch = ''
-    ln -s npm-shrinkwrap.json package-lock.json
+    cp ./npm-shrinkwrap.json ./package-lock.json
   '';
 
-  nativeBuildInputs =
-    [
-      python3
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      xcbuild
-    ];
+  nativeBuildInputs = [
+    python3
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    xcbuild
+  ];
 
   env.PUPPETEER_SKIP_DOWNLOAD = true;
 

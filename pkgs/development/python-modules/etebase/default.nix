@@ -1,6 +1,5 @@
 {
   lib,
-  stdenv,
   fetchFromGitHub,
   buildPythonPackage,
   rustPlatform,
@@ -41,13 +40,12 @@ buildPythonPackage rec {
   ];
 
   cargoDeps = rustPlatform.fetchCargoVendor {
-    inherit src;
-    name = "${pname}-${version}";
+    inherit pname version src;
     hash = "sha256-tFOZJFrNge3N+ux2Hp4Mlm9K/AXYxuuBzEQdQYGGDjg=";
     inherit patches;
   };
 
-  format = "pyproject";
+  pyproject = true;
 
   nativeBuildInputs = [
     pkg-config
@@ -74,11 +72,10 @@ buildPythonPackage rec {
     inherit (nixosTests) etebase-server;
   };
 
-  meta = with lib; {
-    broken = stdenv.hostPlatform.isDarwin;
+  meta = {
     homepage = "https://www.etebase.com/";
     description = "Python client library for Etebase";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ _3699n ];
+    license = lib.licenses.bsd3;
+    maintainers = [ ];
   };
 }

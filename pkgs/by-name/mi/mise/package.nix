@@ -11,6 +11,7 @@
   git,
   pkg-config,
   openssl,
+  cmake,
   cacert,
   usage,
   mise,
@@ -19,19 +20,18 @@
   jq,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "mise";
-  version = "2025.4.11";
+  version = "2026.5.6";
 
   src = fetchFromGitHub {
     owner = "jdx";
     repo = "mise";
-    rev = "v${version}";
-    hash = "sha256-qnVLVT+evB/gUxU8HQaOhT3imdtVN2Iwh+7ldx6NR6s=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-ac7pK9LYwm//y4TVa1XtlIxJGkloItJxUcGOVCAxzPk=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-TBkU10eqNT5825QlDyeBUAw3CZXUGSu4ufoC5XrmJ04=";
+  cargoHash = "sha256-ZvICWDUpemtsbz9rDqxlNWpRRzEfZEdefJsbXwL4A0E=";
 
   nativeBuildInputs = [
     installShellFiles
@@ -61,18 +61,26 @@ rustPlatform.buildRustPackage rec {
       --replace-fail 'cmd!("direnv"' 'cmd!("${lib.getExe direnv}"'
   '';
 
-  nativeCheckInputs = [ cacert ];
+  nativeCheckInputs = [
+    cacert
+    cmake
+    # gix spawns git-upload-pack by name in file:// clone tests.
+    git
+    rustPlatform.bindgenHook
+  ];
 
-  checkFlags =
-    [
-      # last_modified will always be different in nix
-      "--skip=tera::tests::test_last_modified"
-    ]
-    ++ lib.optionals (stdenv.hostPlatform.system == "x86_64-darwin") [
-      # started failing mid-April 2025
-      "--skip=task::task_file_providers::remote_task_http::tests::test_http_remote_task_get_local_path_with_cache"
-      "--skip=task::task_file_providers::remote_task_http::tests::test_http_remote_task_get_local_path_without_cache"
-    ];
+  # disable warnings as errors for aws-lc-sys in checkPhase
+  env.NIX_CFLAGS_COMPILE = "-Wno-error";
+
+  checkFlags = [
+    # last_modified will always be different in nix
+    "--skip=tera::tests::test_last_modified"
+  ]
+  ++ lib.optionals (stdenv.hostPlatform.isDarwin) [
+    # x86_64-darwin started failing mid-April 2025; aarch64 in Feb 2026
+    "--skip=task::task_file_providers::remote_task_http::tests::test_http_remote_task_get_local_path_with_cache"
+    "--skip=task::task_file_providers::remote_task_http::tests::test_http_remote_task_get_local_path_without_cache"
+  ];
 
   cargoTestFlags = [ "--all-features" ];
   # some tests access the same folders, don't test in parallel to avoid race conditions
@@ -82,17 +90,25 @@ rustPlatform.buildRustPackage rec {
     installManPage ./man/man1/mise.1
 
     substituteInPlace ./completions/{mise.bash,mise.fish,_mise}  \
-      --replace-fail '-v usage' '-v ${lib.getExe usage}' \
+      --replace-fail '-p usage' '-p ${lib.getExe usage}' \
       --replace-fail 'usage complete-word' '${lib.getExe usage} complete-word'
 
     installShellCompletion \
       --bash ./completions/mise.bash \
       --fish ./completions/mise.fish \
       --zsh ./completions/_mise
+
+    mkdir -p $out/lib/mise
+    touch $out/lib/mise/.disable-self-update
   '';
 
   passthru = {
-    updateScript = nix-update-script { };
+    updateScript = nix-update-script {
+      extraArgs = [
+        # Ignore subcrate releases (fox, aqua-registry)
+        "--version-regex=^v([0-9]+\\.[0-9]+\\.[0-9]+)$"
+      ];
+    };
     tests = {
       version = (testers.testVersion { package = mise; }).overrideAttrs (old: {
         nativeBuildInputs = old.nativeBuildInputs ++ [ cacert ];
@@ -110,10 +126,9 @@ rustPlatform.buildRustPackage rec {
           ''
             export HOME=$(mktemp -d)
 
-            spec="$(mise usage)"
             for shl in bash fish zsh; do
               echo "testing $shl"
-              usage complete-word --shell $shl --spec "$spec"
+              usage complete-word --shell $shl --file <(mise usage)
             done
 
             touch $out
@@ -124,9 +139,9 @@ rustPlatform.buildRustPackage rec {
   meta = {
     homepage = "https://mise.jdx.dev";
     description = "Front-end to your dev env";
-    changelog = "https://github.com/jdx/mise/releases/tag/v${version}";
+    changelog = "https://github.com/jdx/mise/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ konradmalik ];
     mainProgram = "mise";
   };
-}
+})

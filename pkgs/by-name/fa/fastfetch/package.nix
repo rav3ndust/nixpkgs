@@ -8,10 +8,11 @@
   dbus,
   dconf,
   ddcutil,
+  enlightenment,
   glib,
   hwdata,
   imagemagick,
-  libXrandr,
+  libxrandr,
   libdrm,
   libelf,
   libglvnd,
@@ -34,8 +35,10 @@
   versionCheckHook,
   vulkan-loader,
   wayland,
-  xfce,
-  xorg,
+  xfconf,
+  libxext,
+  libxdmcp,
+  libxau,
   yyjson,
   zlib,
   zfs,
@@ -45,6 +48,7 @@
   dbusSupport ? true,
   flashfetchSupport ? false,
   terminalSupport ? true,
+  enlightenmentSupport ? true,
   gnomeSupport ? true,
   imageSupport ? true,
   openclSupport ? true,
@@ -59,13 +63,16 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "fastfetch";
-  version = "2.42.0";
+  version = "2.63.1";
+
+  strictDeps = true;
+  __structuredAttrs = true;
 
   src = fetchFromGitHub {
     owner = "fastfetch-cli";
     repo = "fastfetch";
     tag = finalAttrs.version;
-    hash = "sha256-nlhW3ftBOjb2BHz1qjOI4VGiSn1+VAUcaA9n0nPikCU=";
+    hash = "sha256-6c3vA8AFSfew1TdSeUmJ4mIbFyDaJPVWUc93iZyqRY0=";
   };
 
   outputs = [
@@ -121,6 +128,10 @@ stdenv.mkDerivation (finalAttrs: {
           # Bluetooth, wifi, player & media detection
           dbus
         ]
+        ++ lib.optionals enlightenmentSupport [
+          # Eet support for reading Enlightenment window manager configuration.
+          enlightenment.efl
+        ]
         ++ lib.optionals gnomeSupport [
           # Needed for values that are only stored in DConf + Fallback for GSettings.
           dconf
@@ -166,16 +177,16 @@ stdenv.mkDerivation (finalAttrs: {
         ++ lib.optionals x11Support [
           # At least one of them sould be present in X11 sessions for better display detection and faster WM detection.
           # The *randr ones provide multi monitor support The libxcb* ones usually have better performance.
-          libXrandr
+          libxrandr
           libxcb
           # Required by libxcb messages
-          xorg.libXau
-          xorg.libXdmcp
-          xorg.libXext
+          libxau
+          libxdmcp
+          libxext
         ]
         ++ lib.optionals xfceSupport [
           #  Needed for XFWM theme and XFCE Terminal font.
-          xfce.xfconf
+          xfconf
         ]
         ++ lib.optionals zfsSupport [
           # Needed for zpool module
@@ -190,88 +201,88 @@ stdenv.mkDerivation (finalAttrs: {
     in
     commonDeps ++ imageDeps ++ sqliteDeps ++ linuxCoreDeps ++ linuxFeatureDeps ++ macosDeps;
 
-  cmakeFlags =
-    [
-      (lib.cmakeOptionType "filepath" "CMAKE_INSTALL_SYSCONFDIR" "${placeholder "out"}/etc")
-      (lib.cmakeBool "ENABLE_DIRECTX_HEADERS" false)
-      (lib.cmakeBool "ENABLE_SYSTEM_YYJSON" true)
+  cmakeFlags = [
+    (lib.cmakeOptionType "filepath" "CMAKE_INSTALL_SYSCONFDIR" "${placeholder "out"}/etc")
+    (lib.cmakeBool "ENABLE_DIRECTX_HEADERS" false)
+    (lib.cmakeBool "ENABLE_SYSTEM_YYJSON" true)
 
-      # Feature flags
-      (lib.cmakeBool "BUILD_FLASHFETCH" flashfetchSupport)
+    # Feature flags
+    (lib.cmakeBool "BUILD_FLASHFETCH" flashfetchSupport)
 
-      (lib.cmakeBool "ENABLE_IMAGEMAGICK6" false)
-      (lib.cmakeBool "ENABLE_IMAGEMAGICK7" imageSupport)
-      (lib.cmakeBool "ENABLE_CHAFA" imageSupport)
+    (lib.cmakeBool "ENABLE_IMAGEMAGICK6" false)
+    (lib.cmakeBool "ENABLE_IMAGEMAGICK7" imageSupport)
+    (lib.cmakeBool "ENABLE_CHAFA" imageSupport)
 
-      (lib.cmakeBool "ENABLE_SQLITE3" sqliteSupport)
+    (lib.cmakeBool "ENABLE_SQLITE3" sqliteSupport)
 
-      (lib.cmakeBool "ENABLE_LIBZFS" zfsSupport)
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [
-      (lib.cmakeBool "ENABLE_PULSE" audioSupport)
+    (lib.cmakeBool "ENABLE_LIBZFS" zfsSupport)
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    (lib.cmakeBool "ENABLE_PULSE" audioSupport)
 
-      (lib.cmakeBool "ENABLE_DDCUTIL" brightnessSupport)
+    (lib.cmakeBool "ENABLE_DDCUTIL" brightnessSupport)
 
-      (lib.cmakeBool "ENABLE_DBUS" dbusSupport)
+    (lib.cmakeBool "ENABLE_DBUS" dbusSupport)
 
-      (lib.cmakeBool "ENABLE_ELF" terminalSupport)
+    (lib.cmakeBool "ENABLE_EET" enlightenmentSupport)
 
-      (lib.cmakeBool "ENABLE_GIO" gnomeSupport)
-      (lib.cmakeBool "ENABLE_DCONF" gnomeSupport)
+    (lib.cmakeBool "ENABLE_ELF" terminalSupport)
 
-      (lib.cmakeBool "ENABLE_ZLIB" imageSupport)
+    (lib.cmakeBool "ENABLE_GIO" gnomeSupport)
+    (lib.cmakeBool "ENABLE_DCONF" gnomeSupport)
 
-      (lib.cmakeBool "ENABLE_OPENCL" openclSupport)
+    (lib.cmakeBool "ENABLE_ZLIB" imageSupport)
 
-      (lib.cmakeBool "ENABLE_EGL" openglSupport)
-      (lib.cmakeBool "ENABLE_GLX" openglSupport)
+    (lib.cmakeBool "ENABLE_OPENCL" openclSupport)
 
-      (lib.cmakeBool "ENABLE_RPM" rpmSupport)
+    (lib.cmakeBool "ENABLE_EGL" openglSupport)
+    (lib.cmakeBool "ENABLE_GLX" openglSupport)
 
-      (lib.cmakeBool "ENABLE_DRM" (!x11Support && !waylandSupport))
-      (lib.cmakeBool "ENABLE_DRM_AMDGPU" (!x11Support && !waylandSupport))
+    (lib.cmakeBool "ENABLE_RPM" rpmSupport)
 
-      (lib.cmakeBool "ENABLE_VULKAN" vulkanSupport)
+    (lib.cmakeBool "ENABLE_DRM" (!x11Support && !waylandSupport))
+    (lib.cmakeBool "ENABLE_DRM_AMDGPU" (!x11Support && !waylandSupport))
 
-      (lib.cmakeBool "ENABLE_WAYLAND" waylandSupport)
+    (lib.cmakeBool "ENABLE_VULKAN" vulkanSupport)
 
-      (lib.cmakeBool "ENABLE_XCB_RANDR" x11Support)
-      (lib.cmakeBool "ENABLE_XRANDR" x11Support)
+    (lib.cmakeBool "ENABLE_WAYLAND" waylandSupport)
 
-      (lib.cmakeBool "ENABLE_XFCONF" xfceSupport)
+    (lib.cmakeBool "ENABLE_XCB_RANDR" x11Support)
+    (lib.cmakeBool "ENABLE_XRANDR" x11Support)
 
-      (lib.cmakeOptionType "filepath" "CUSTOM_PCI_IDS_PATH" "${hwdata}/share/hwdata/pci.ids")
-      (lib.cmakeOptionType "filepath" "CUSTOM_AMDGPU_IDS_PATH" "${libdrm}/share/libdrm/amdgpu.ids")
-    ];
+    (lib.cmakeBool "ENABLE_XFCONF" xfceSupport)
+
+    (lib.cmakeOptionType "filepath" "CUSTOM_PCI_IDS_PATH" "${hwdata}/share/hwdata/pci.ids")
+    (lib.cmakeOptionType "filepath" "CUSTOM_AMDGPU_IDS_PATH" "${libdrm}/share/libdrm/amdgpu.ids")
+  ];
 
   postPatch = ''
-    substituteInPlace completions/fastfetch.fish --replace-fail python3 '${python3.interpreter}'
+    substituteInPlace completions/fastfetch.{bash,fish,zsh} --replace-fail python3 '${python3.interpreter}'
   '';
 
-  postInstall =
-    ''
-      wrapProgram $out/bin/fastfetch \
-        --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath finalAttrs.buildInputs}"
-    ''
-    + lib.optionalString flashfetchSupport ''
-      wrapProgram $out/bin/flashfetch \
-        --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath finalAttrs.buildInputs}"
-    '';
+  postInstall = ''
+    wrapProgram $out/bin/fastfetch \
+      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath finalAttrs.buildInputs}"
+  ''
+  + lib.optionalString flashfetchSupport ''
+    wrapProgram $out/bin/flashfetch \
+      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath finalAttrs.buildInputs}"
+  '';
 
   nativeInstallCheckInputs = [ versionCheckHook ];
-  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   passthru.updateScript = nix-update-script { };
 
   meta = {
-    description = "An actively maintained, feature-rich and performance oriented, neofetch like system information tool";
+    description = "Actively maintained, feature-rich and performance oriented, neofetch like system information tool";
     homepage = "https://github.com/fastfetch-cli/fastfetch";
     changelog = "https://github.com/fastfetch-cli/fastfetch/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [
       luftmensch-luftmensch
       khaneliman
+      defelo
     ];
     platforms = lib.platforms.all;
     mainProgram = "fastfetch";
@@ -282,6 +293,7 @@ stdenv.mkDerivation (finalAttrs: {
       * audioSupport: PulseAudio functionality
       * brightnessSupport: External display brightness detection via DDCUtil
       * dbusSupport: DBus functionality for Bluetooth, WiFi, player & media detection
+      * enlightenmentSupport: Enlightenment configuration detection via EFL's Eet
       * flashfetchSupport: Build the flashfetch utility (default: false)
       * gnomeSupport: GNOME integration (dconf, dbus, gio)
       * imageSupport: Image rendering (chafa and imagemagick)

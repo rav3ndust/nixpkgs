@@ -9,20 +9,17 @@
   hepunits,
   pandas,
   pytestCheckHook,
-  pythonOlder,
   tabulate,
 }:
 
 buildPythonPackage rec {
   pname = "particle";
-  version = "0.25.3";
+  version = "0.26.2";
   pyproject = true;
-
-  disabled = pythonOlder "3.9";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-eM9+VuniEYOF+/uJCNg5XnomerXwWWqq/rrbCMsERSs=";
+    hash = "sha256-I8xDFfkNB9n69Z+BPbptEgCGigFZXjfXyVbr0ICdZy0=";
   };
 
   postPatch = ''

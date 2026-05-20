@@ -5,7 +5,7 @@
   cmake,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "randomX";
   version = "1.2.1";
 
@@ -13,17 +13,17 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "tevador";
-    repo = pname;
-    rev = "v${version}";
+    repo = "randomX";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-dfImzwbEfJQcaPZCoWypHiI6dishVRdqS/r+n3tfjvM=";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Proof of work algorithm based on random code execution";
     homepage = "https://github.com/tevador/RandomX";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ rnhmjoj ];
-    platforms = platforms.unix;
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ rnhmjoj ];
+    platforms = lib.platforms.unix;
   };
 
-}
+})

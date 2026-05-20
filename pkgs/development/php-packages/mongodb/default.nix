@@ -15,29 +15,28 @@
 
 buildPecl rec {
   pname = "mongodb";
-  version = "2.0.0";
+  version = "2.3.1";
 
   src = fetchFromGitHub {
     owner = "mongodb";
     repo = "mongo-php-driver";
     rev = version;
-    hash = "sha256-o4fy46oh3iWLAcszcFo1m5GdalQs6OswT+OQTYo2cZc=";
+    hash = "sha256-R6mFykE9QrM2i5NA+xuRFYzAf/PCCwfdnAWRcsEovfc=";
     fetchSubmodules = true;
   };
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs =
-    [
-      cyrus_sasl
-      icu64
-      openssl
-      snappy
-      zlib
-      pcre2
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      libiconv
-    ];
+  buildInputs = [
+    cyrus_sasl
+    icu64
+    openssl
+    snappy
+    zlib
+    pcre2
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    libiconv
+  ];
 
   meta = {
     description = "Official MongoDB PHP driver";

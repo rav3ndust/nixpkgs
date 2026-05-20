@@ -4,15 +4,15 @@
   fetchFromGitHub,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "trickest-cli";
-  version = "2.0.2";
+  version = "2.1.8";
 
   src = fetchFromGitHub {
     owner = "trickest";
     repo = "trickest-cli";
-    tag = "v${version}";
-    hash = "sha256-b0UiZEuuNqjY43xhwm01PtHTe2YMx6AHLJk336NB0no=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-AAaVwdvhQZPIXLs2ec8UtVWbcjb3CPI6V+zzkYe6KK4=";
   };
 
   vendorHash = "sha256-Ae0fNzYOAeCMrNFVhw4VvG/BkOMcguIMiBvLGt7wxEo=";
@@ -22,12 +22,12 @@ buildGoModule rec {
     "-w"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "CLI tool to execute Trickest workflows";
     homepage = "https://github.com/trickest/trickest-cli";
-    changelog = "https://github.com/trickest/trickest-cli/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    changelog = "https://github.com/trickest/trickest-cli/releases/tag/v${finalAttrs.version}";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fab ];
     mainProgram = "trickest";
   };
-}
+})

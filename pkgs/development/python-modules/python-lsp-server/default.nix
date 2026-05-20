@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   buildPythonPackage,
   fetchFromGitHub,
 
@@ -7,6 +8,7 @@
   setuptools-scm,
 
   # dependencies
+  black,
   docstring-to-markdown,
   jedi,
   pluggy,
@@ -41,14 +43,14 @@
 
 buildPythonPackage rec {
   pname = "python-lsp-server";
-  version = "1.12.2";
+  version = "1.14.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "python-lsp";
     repo = "python-lsp-server";
     tag = "v${version}";
-    hash = "sha256-tdhYLAXs1Yf3DqCzf/pLOlJvr/zYRkSlAF6hsavSu+A=";
+    hash = "sha256-Yq5dYaX+/hLvmPpHI8rhCcSlabQBPAyUrIQRgnoi17c=";
   };
 
   pythonRelaxDeps = [
@@ -63,6 +65,7 @@ buildPythonPackage rec {
   build-system = [ setuptools-scm ];
 
   dependencies = [
+    black
     docstring-to-markdown
     jedi
     pluggy
@@ -82,6 +85,7 @@ buildPythonPackage rec {
       pylint
       rope
       toml
+      websockets
       whatthepatch
       yapf
     ];
@@ -109,13 +113,22 @@ buildPythonPackage rec {
     pytestCheckHook
     versionCheckHook
     writableTmpDirAsHomeHook
-  ] ++ optional-dependencies.all;
-  versionCheckProgram = "${placeholder "out"}/bin/pylsp";
-  versionCheckProgramArg = "--version";
+  ]
+  ++ optional-dependencies.all;
 
   disabledTests = [
     # avoid dependencies on many Qt things just to run one singular test
     "test_pyqt_completion"
+
+    # Flaky: ValueError: I/O operation on closed file
+    "test_concurrent_ws_requests"
+
+    # AttributeError: 'NoneType' object has no attribute 'plugin_manager'
+    "test_missing_message"
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # TimeoutError: rope/autoimport is slow under Nix's fs isolation on darwin
+    "test_autoimport_code_actions_and_completions_for_notebook_document"
   ];
 
   pythonImportsCheck = [

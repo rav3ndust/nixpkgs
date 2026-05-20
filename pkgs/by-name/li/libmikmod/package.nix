@@ -11,13 +11,13 @@ let
   inherit (lib) optional optionalString;
 
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libmikmod";
-  version = "3.3.12";
+  version = "3.3.13";
 
   src = fetchurl {
-    url = "mirror://sourceforge/mikmod/libmikmod-${version}.tar.gz";
-    sha256 = "sha256-re9iFIY1FqSltE6/LHHvhOzf6zRElz2suscJEcm8Z+k=";
+    url = "mirror://sourceforge/mikmod/libmikmod-${finalAttrs.version}.tar.gz";
+    sha256 = "sha256-n8F5n36mqVx8WILemL6F/H0gugpKb8rK4RyMazgrsgc=";
   };
 
   buildInputs = [ texinfo ] ++ optional stdenv.hostPlatform.isLinux alsa-lib;
@@ -29,26 +29,28 @@ stdenv.mkDerivation rec {
     "man"
   ];
 
-  NIX_LDFLAGS = optionalString stdenv.hostPlatform.isLinux "-lasound";
+  env = lib.optionalAttrs stdenv.hostPlatform.isLinux {
+    NIX_LDFLAGS = "-lasound";
+  };
+
+  enableParallelBuilding = true;
 
   postInstall = ''
     moveToOutput bin/libmikmod-config "$dev"
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Library for playing tracker music module files";
     mainProgram = "libmikmod-config";
     homepage = "https://mikmod.shlomifish.org/";
-    license = licenses.lgpl2Plus;
-    maintainers = with maintainers; [
-      astsmtl
-      lovek323
+    license = lib.licenses.lgpl2Plus;
+    maintainers = [
     ];
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
 
     longDescription = ''
       A library for playing tracker music module files supporting many formats,
       including MOD, S3M, IT and XM.
     '';
   };
-}
+})

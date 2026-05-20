@@ -4,25 +4,30 @@
   rustPlatform,
   fetchFromGitHub,
   installShellFiles,
+  nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "watchexec";
-  version = "2.3.0";
+  version = "2.5.1";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-yZGMibh6Qo4gIwj5v0LRt7kdrHGsJ1OG3ACvVKZY7hQ=";
+    owner = "watchexec";
+    repo = "watchexec";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-Dobb+l24nL01od+KET3PGgDzFaYr1LPhkPrbpA3G6y4=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-O2Y0LT16p8tV02OFFgKwPIPn7+qeACJPtT0VWLSyCVE=";
+  cargoHash = "sha256-ZwF5nNI2ESwgaH129MhcJPlhtmxqwhhQ9W49u9bilRk=";
 
   nativeBuildInputs = [ installShellFiles ];
 
-  NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isDarwin "-framework AppKit";
+  env = lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    NIX_LDFLAGS = toString [
+      "-framework"
+      "AppKit"
+    ];
+  };
 
   checkFlags = [
     "--skip=help"
@@ -35,14 +40,27 @@ rustPlatform.buildRustPackage rec {
 
   postInstall = ''
     installManPage doc/watchexec.1
-    installShellCompletion --zsh --name _watchexec completions/zsh
+    installShellCompletion --cmd watchexec \
+      --bash completions/bash \
+      --fish completions/fish \
+      --zsh completions/zsh
   '';
 
-  meta = with lib; {
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "^v(.+)"
+    ];
+  };
+
+  meta = {
     description = "Executes commands in response to file modifications";
     homepage = "https://watchexec.github.io/";
-    license = with licenses; [ asl20 ];
-    maintainers = [ maintainers.michalrus ];
+    license = with lib.licenses; [ asl20 ];
+    maintainers = with lib.maintainers; [
+      michalrus
+      prince213
+    ];
     mainProgram = "watchexec";
   };
-}
+})

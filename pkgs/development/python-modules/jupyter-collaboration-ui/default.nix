@@ -7,15 +7,15 @@
   jupyter-collaboration,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "jupyter-collaboration-ui";
-  version = "2.0.1";
+  version = "2.3.0";
   pyproject = true;
 
   src = fetchPypi {
     pname = "jupyter_collaboration_ui";
-    inherit version;
-    hash = "sha256-9UONyyhvhpywCVNbGtZz9eL8EGUS4XBM1zEY1RWsomY=";
+    inherit (finalAttrs) version;
+    hash = "sha256-g16BhhTrOWRfL1g6V7IkbY0ez/T/0tSBq0pvayxFuZc=";
   };
 
   postPatch = ''
@@ -33,7 +33,7 @@ buildPythonPackage rec {
   # no tests
   doCheck = false;
 
-  passthru.tests = jupyter-collaboration.tests;
+  passthru.tests = jupyter-collaboration;
 
   meta = {
     description = "JupyterLab/Jupyter Notebook 7+ extension providing user interface integration for real time collaboration";
@@ -41,4 +41,4 @@ buildPythonPackage rec {
     license = lib.licenses.bsd3;
     teams = [ lib.teams.jupyter ];
   };
-}
+})

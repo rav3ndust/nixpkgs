@@ -10,17 +10,24 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "ferron";
-  version = "1.3.0";
+  version = "2.7.0";
 
   src = fetchFromGitHub {
     owner = "ferronweb";
     repo = "ferron";
     tag = finalAttrs.version;
-    hash = "sha256-Ckz4+B4CxS2S+YbImdqkNGBONTMetxXxZb/J84dB4c0=";
+    hash = "sha256-nh3dq8s+lH+WbFviFZ9L+4MF4YhGPaJWTYtH12HfXoI=";
   };
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-ZK78ftnVb6k19Pv84HMeM5rGit/KxHJRG8JP8mrjCnY=";
+  # ../../ is cargoDepsCopy, and obviously does not contain monoio's README.md
+  postPatch = ''
+    substituteInPlace $cargoDepsCopy/*/monoio-0.2.4/src/lib.rs \
+      --replace-fail '#![doc = include_str!("../../README.md")]' ""
+  '';
+
+  strictDeps = true;
+
+  cargoHash = "sha256-ft7Ewv56u31iPCH3LJKE4Mt68KTfHtIiYMRjeGcwSQQ=";
 
   nativeBuildInputs = [
     pkg-config
@@ -37,7 +44,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
   nativeInstallCheckInputs = [
     versionCheckHook
   ];
-  versionCheckProgramArg = "--version";
   doInstallCheck = true;
 
   passthru = {
@@ -49,7 +55,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/ferronweb/ferron";
     changelog = "https://github.com/ferronweb/ferron/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ GaetanLepage ];
+    maintainers = with lib.maintainers; [
+      _0x4A6F
+      GaetanLepage
+    ];
     mainProgram = "ferron";
   };
 })

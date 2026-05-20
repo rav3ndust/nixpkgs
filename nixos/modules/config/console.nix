@@ -9,7 +9,7 @@ let
 
   makeColor = i: lib.concatMapStringsSep "," (x: "0x" + lib.substring (2 * i) 2 x);
 
-  isUnicode = lib.hasSuffix "UTF-8" (lib.toUpper config.i18n.defaultLocale);
+  isUnicode = config.i18n.defaultCharset == "UTF-8" || cfg.useXkbConfig;
 
   optimizedKeymap =
     pkgs.runCommand "keymap"
@@ -23,10 +23,12 @@ let
       '';
 
   # Sadly, systemd-vconsole-setup doesn't support binary keymaps.
-  vconsoleConf = pkgs.writeText "vconsole.conf" ''
-    KEYMAP=${cfg.keyMap}
-    ${lib.optionalString (cfg.font != null) "FONT=${cfg.font}"}
-  '';
+  vconsoleConf =
+    withFont:
+    pkgs.writeText "vconsole.conf" ''
+      KEYMAP=${cfg.keyMap}
+      ${lib.optionalString (withFont && cfg.font != null) "FONT=${cfg.font}"}
+    '';
 
   consoleEnv =
     kbd:
@@ -139,7 +141,9 @@ in
   config = lib.mkMerge [
     {
       console.keyMap =
-        with config.services.xserver;
+        let
+          inherit (config.services.xserver) xkb;
+        in
         lib.mkIf cfg.useXkbConfig (
           pkgs.runCommand "xkb-console-keymap" { preferLocalBuild = true; } ''
             '${pkgs.buildPackages.ckbcomp}/bin/ckbcomp' \
@@ -161,7 +165,7 @@ in
 
           # Let systemd-vconsole-setup.service do the work of setting up the
           # virtual consoles.
-          environment.etc."vconsole.conf".source = vconsoleConf;
+          environment.etc."vconsole.conf".source = vconsoleConf true;
           # Provide kbd with additional packages.
           environment.etc.kbd.source = "${consoleEnv pkgs.kbd}/share";
 
@@ -178,7 +182,7 @@ in
           );
 
           boot.initrd.systemd.contents = {
-            "/etc/vconsole.conf".source = vconsoleConf;
+            "/etc/vconsole.conf".source = vconsoleConf cfg.earlySetup;
             # Add everything if we want full console setup...
             "/etc/kbd" = lib.mkIf cfg.earlySetup {
               source = "${consoleEnv config.boot.initrd.systemd.package.kbd}/share";
@@ -191,19 +195,17 @@ in
           boot.initrd.systemd.additionalUpstreamUnits = [
             "systemd-vconsole-setup.service"
           ];
-          boot.initrd.systemd.storePaths =
-            [
-              "${config.boot.initrd.systemd.package}/lib/systemd/systemd-vconsole-setup"
-              "${config.boot.initrd.systemd.package.kbd}/bin/setfont"
-              "${config.boot.initrd.systemd.package.kbd}/bin/loadkeys"
-              "${config.boot.initrd.systemd.package.kbd.gzip}/bin/gzip" # Fonts and keyboard layouts are compressed
-            ]
-            ++ lib.optionals (cfg.font != null && lib.hasPrefix builtins.storeDir cfg.font) [
-              "${cfg.font}"
-            ]
-            ++ lib.optionals (lib.hasPrefix builtins.storeDir cfg.keyMap) [
-              "${cfg.keyMap}"
-            ];
+          boot.initrd.systemd.storePaths = [
+            "${config.boot.initrd.systemd.package}/lib/systemd/systemd-vconsole-setup"
+            "${config.boot.initrd.systemd.package.kbd}/bin/setfont"
+            "${config.boot.initrd.systemd.package.kbd}/bin/loadkeys"
+          ]
+          ++ lib.optionals (cfg.font != null && cfg.earlySetup && lib.hasPrefix builtins.storeDir cfg.font) [
+            "${cfg.font}"
+          ]
+          ++ lib.optionals (lib.hasPrefix builtins.storeDir cfg.keyMap) [
+            "${cfg.keyMap}"
+          ];
 
           systemd.additionalUpstreamSystemUnits = [
             "systemd-vconsole-setup.service"
@@ -213,7 +215,7 @@ in
             description = "Reset console on configuration changes";
             wantedBy = [ "multi-user.target" ];
             restartTriggers = [
-              vconsoleConf
+              (config.environment.etc."vconsole.conf".source)
               (consoleEnv pkgs.kbd)
             ];
             reloadIfChanged = true;

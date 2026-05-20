@@ -13,37 +13,42 @@
   google-cloud-testutils,
   grpc-google-iam-v1,
   grpc-interceptor,
+  opentelemetry-resourcedetector-gcp,
   proto-plus,
   protobuf,
   sqlparse,
 
   # optional dependencies
   libcst,
-
-  # testing
-  google-cloud-monitoring,
-  mmh3,
-  mock,
   opentelemetry-api,
   opentelemetry-sdk,
   opentelemetry-semantic-conventions,
+  google-cloud-monitoring,
+  mmh3,
+
+  # testing
+  mock,
   pytest-asyncio,
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "google-cloud-spanner";
-  version = "3.54.0";
+  version = "3.63.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "googleapis";
     repo = "python-spanner";
-    tag = "v${version}";
-    hash = "sha256-uJKUgY7fV+AK/2HQyjQRFypcL+mPZ/M5ZtAU+f73ezM=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-QWBl7X/cKGds617IrHKaIteOnqgwB83jgfi8j/ESUws=";
   };
 
   build-system = [ setuptools ];
+
+  pythonRelaxDeps = [
+    "protobuf"
+  ];
 
   dependencies = [
     deprecated
@@ -51,13 +56,22 @@ buildPythonPackage rec {
     google-cloud-core
     grpc-google-iam-v1
     grpc-interceptor
+    opentelemetry-resourcedetector-gcp
     proto-plus
     protobuf
     sqlparse
-  ] ++ google-api-core.optional-dependencies.grpc;
+  ];
 
   optional-dependencies = {
     libcst = [ libcst ];
+    tracing = [
+      opentelemetry-api
+      opentelemetry-sdk
+      opentelemetry-semantic-conventions
+      # opentelemetry-resourcedetector-gcp # Not available in nixpkgs
+      google-cloud-monitoring
+      mmh3
+    ];
   };
 
   nativeCheckInputs = [
@@ -70,7 +84,8 @@ buildPythonPackage rec {
     opentelemetry-semantic-conventions
     pytest-asyncio
     pytestCheckHook
-  ];
+  ]
+  ++ lib.concatAttrValues finalAttrs.passthru.optional-dependencies;
 
   preCheck = ''
     # prevent google directory from shadowing google imports
@@ -84,6 +99,13 @@ buildPythonPackage rec {
     "test_list_instance"
     # can't import mmh3
     "test_generate_client_hash"
+    # Flaky, compares to execution time
+    "test_snapshot_read_concurrent"
+    # Flaky, can retry too quickly and fail
+    "test_retry_helper"
+    # Flaky, system speed sensitive
+    "test_transaction_for_concurrent_statement_should_begin_one_transaction_with_query"
+    "test_transaction_for_concurrent_statement_should_begin_one_transaction_with_read"
   ];
 
   disabledTestPaths = [
@@ -117,8 +139,8 @@ buildPythonPackage rec {
   meta = {
     description = "Cloud Spanner API client library";
     homepage = "https://github.com/googleapis/python-spanner";
-    changelog = "https://github.com/googleapis/python-spanner/blob/v${version}/CHANGELOG.md";
+    changelog = "https://github.com/googleapis/python-spanner/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.asl20;
     maintainers = [ lib.maintainers.sarahec ];
   };
-}
+})
